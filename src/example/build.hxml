@@ -1,21 +1,15 @@
--main Example
--cp src
--cp ../../../src
--js build/example.js
+-main InjectionExample
+-lib minject
+-js example-js/index.js
 
 --next
 
--main Example
--cp src
--cp ../../../src
--swf build/example.swf
+-main InjectionExample
+-lib minject
+-swf example-swf/index.swf
 
 --next
 
--main Example
--cp src
--cp ../../../src
--neko build/example.n
-
--cmd cd build
--cmd neko example.n
+-main InjectionExample
+-lib minject
+-neko example-neko.n

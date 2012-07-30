@@ -48,68 +48,49 @@ class Build extends mtask.core.BuildBase
 		target.afterCompile = function()
 		{
 			cp("src/lib/*", target.path);
-			// cmd("haxe", ["-cp", "src/lib", "-js", target.path + "/haxedoc.js", 
-			// 	"-xml", target.path + "/haxedoc.xml", "msignal.Signal"]);
-			// rm(target.path + "/haxedoc.js");
+			cmd("haxe", ["-cp", "src/lib", "-js", target.path + "/haxedoc.js", 
+				"-xml", target.path + "/haxedoc.xml", "minject.Injector"]);
+			rm(target.path + "/haxedoc.js");
 		}
 	}
 
-	// function exampleHaxe(target:Haxe, path:String, main:String)
-	// {
-	// 	target.addPath("src/lib");
-	// 	target.addPath(path);
-	// 	target.main = main;
-	// }
+	function exampleHaxe(target:Haxe)
+	{
+		target.addPath("src/lib");
+		target.addPath("src/example");
+		target.main = "InjectionExample";
+	}
 
-	// function exampleDirectory(target:Directory, path:String, main:String)
-	// {
-	// 	var exampleJS = new WebJS();
-	// 	exampleHaxe(exampleJS.app, path, main);
-	// 	target.addTarget("example-js", exampleJS);
+	@target function example(target:Directory)
+	{
+		var exampleJS = new WebJS();
+		exampleHaxe(exampleJS.app);
+		target.addTarget("example-js", exampleJS);
 
-	// 	var exampleSWF = new WebSWF();
-	// 	exampleHaxe(exampleSWF.app, path, main);
-	// 	target.addTarget("example-swf", exampleSWF);
+		var exampleSWF = new WebSWF();
+		exampleHaxe(exampleSWF.app);
+		target.addTarget("example-swf", exampleSWF);
 
-	// 	var exampleNeko = new Neko();
-	// 	exampleHaxe(exampleNeko, path, main);
-	// 	target.addTarget("example-neko", exampleNeko);
+		var exampleNeko = new Neko();
+		exampleHaxe(exampleNeko);
+		target.addTarget("example-neko", exampleNeko);
 
-	// 	target.afterBuild = function()
-	// 	{
-	// 		cp(path + "/*", target.path);
-	// 	}
-	// }
+		target.afterBuild = function()
+		{
+			cp("src/example/*", target.path);
+			zip(target.path);
+		}
+	}
 
-	// @target function examples(target:Directory)
-	// {
-	// 	var example = new Directory();
-	// 	exampleDirectory(example, "src/example/basic", "BasicExample");
-	// 	target.addTarget("basic", example);
+	@task function release()
+	{
+		require("clean");
+		require("test");
+		require("build haxelib", "build example");
+	}
 
-	// 	var example = new Directory();
-	// 	exampleDirectory(example, "src/example/extend", "ExtendExample");
-	// 	target.addTarget("extend", example);
-
-	// 	var example = new Directory();
-	// 	exampleDirectory(example, "src/example/responder", "ResponderExample");
-	// 	target.addTarget("responder", example);
-
-	// 	target.afterBuild = function()
-	// 	{
-	// 		zip(target.path);
-	// 	}
-	// }
-
-	// @task function release()
-	// {
-	// 	require("clean");
-	// 	require("test");
-	// 	require("build haxelib", "build examples");
-	// }
-
-	// @task function test()
-	// {
-	// 	cmd("haxelib", ["run", "munit", "test", "-js", "-as3", "-neko"]);
-	// }
+	@task function test()
+	{
+		cmd("haxelib", ["run", "munit", "test", "-js", "-as3", "-neko"]);
+	}
 }

@@ -1,12 +1,10 @@
-package ;
-
 import minject.Injector;
 
-class Example
+class InjectionExample
 {
 	public static function main()
 	{
-		new Example();
+		new InjectionExample();
 	}
 
 	public var injector:Injector;
