@@ -7,4 +7,20 @@ For more information see [the original documentation](https://github.com/tschnei
 
 You can download an example of minject usage [here](http://github.com/downloads/massiveinteractive/minject/example.zip).
 
-Haxe specific documentation coming soon!
+
+### Basic Usage
+
+Requests:
+
+	@Inject
+	public var foo:Foo;
+
+	@Inject("myBar")
+	public var myBar:Bar;
+
+
+Mapping:
+
+	injector = new Injector();
+	injector.mapSingleton(Foo);
+	injector.mapClass(Bar, Bar, "myBar");
