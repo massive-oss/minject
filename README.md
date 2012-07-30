@@ -1,8 +1,10 @@
 minject
 =======
 
-A macro enhanced Haxe port of Till Schneidereit's AS3 Swift Suspenders IOC library.
+A macro enhanced Haxe port of Till Schneidereit's AS3 Swift Suspenders IOC library. Please note that this is a port of SwiftSuspenders v1, as the API has changed significantly in v2.
 
-For more information see [the original documentation](http://github.com/tschneidereit/SwiftSuspenders)
+For more information see [the original documentation](https://github.com/tschneidereit/SwiftSuspenders/blob/the-past/README.textile).
 
-You can download an example of minject usage [here](http://github.com/downloads/massiveinteractive/minject/example.zip)
+You can download an example of minject usage [here](http://github.com/downloads/massiveinteractive/minject/example.zip).
+
+Haxe specific documentation coming soon!
