@@ -22,6 +22,8 @@ SOFTWARE.
 
 package minject;
 
+import haxe.rtti.Meta;
+
 import mcore.data.Dictionary;
 import minject.point.ConstructorInjectionPoint;
 import minject.point.InjectionPoint;
@@ -29,30 +31,52 @@ import minject.point.MethodInjectionPoint;
 import minject.point.NoParamsConstructorInjectionPoint;
 import minject.point.PostConstructInjectionPoint;
 import minject.point.PropertyInjectionPoint;
+
 import minject.result.InjectClassResult;
 import minject.result.InjectOtherRuleResult;
 import minject.result.InjectSingletonResult;
 import minject.result.InjectValueResult;
-import haxe.rtti.Meta;
 
-@:build(minject.RTTI.build())
-class Injector implements IInjector
+/**
+The dependency injector.
+*/
+@:build(minject.RTTI.build()) class Injector
 {
-	//static var INJECTION_POINTS_CACHE = new Hash<Dynamic>();
+	/**
+	A dictionary of instances that have already had their dependencies satified 
+	by the injector.
+	*/
 	public var attendedToInjectees(default, null):Dictionary<Dynamic, Bool>;
+
+	/**
+	The parent of this injector.
+	*/
 	public var parentInjector(default, set_parentInjector):Injector;
 
-	var m_parentInjector:Injector;
-	var m_mappings:Hash<Dynamic>;
-	var m_injecteeDescriptions:ClassHash<InjecteeDescription>;
+	var injectionConfigs:Hash<InjectionConfig>;
+	var injecteeDescriptions:ClassHash<InjecteeDescription>;
 	
 	public function new()
 	{
-		m_mappings = new Hash<Dynamic>();
-		m_injecteeDescriptions = new ClassHash<InjecteeDescription>();
+		injectionConfigs = new Hash<InjectionConfig>();
+		injecteeDescriptions = new ClassHash<InjecteeDescription>();
 		attendedToInjectees = new Dictionary<Dynamic, Bool>();
 	}
 	
+	/**
+	When asked for an instance of the class <code>whenAskedFor</code> 
+	inject the instance <code>useValue</code>.
+	
+	<p>This is used to register an existing instance with the injector 
+	and treat it like a Singleton.</p>
+	
+	@param whenAskedFor A class or interface
+	@param useValue An instance
+	@param named An optional name (id)
+	
+	@returns A reference to the rule for this injection. To be used with 
+	<code>mapRule</code>
+	*/
 	public function mapValue(whenAskedFor:Class<Dynamic>, useValue:Dynamic, ?named:String = ""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -60,6 +84,19 @@ class Injector implements IInjector
 		return config;
 	}
 	
+	/**
+	When asked for an instance of the class <code>whenAskedFor</code> 
+	inject a new instance of <code>instantiateClass</code>.
+	
+	<p>This will create a new instance for each injection.</p>
+	
+	@param whenAskedFor A class or interface
+	@param instantiateClass A class to instantiate
+	@param named An optional name (id)
+
+	@returns A reference to the rule for this injection. To be used with 
+	<code>mapRule</code>
+	*/
 	public function mapClass(whenAskedFor:Class<Dynamic>, instantiateClass:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -67,11 +104,38 @@ class Injector implements IInjector
 		return config;
 	}
 	
+	/**
+	When asked for an instance of the class <code>whenAskedFor</code> 
+	inject an instance of <code>whenAskedFor</code>.
+	
+	<p>This will create an instance on the first injection, but will 
+	re-use that instance for subsequent injections.</p>
+	
+	@param whenAskedFor A class or interface
+	@param named An optional name (id)
+	
+	@returns A reference to the rule for this injection. To be used with 
+	<code>mapRule</code>
+	*/
 	public function mapSingleton(whenAskedFor:Class<Dynamic>, ?named:String="") :Dynamic
 	{
 		return mapSingletonOf(whenAskedFor, whenAskedFor, named);
 	}
 	
+	/**
+	When asked for an instance of the class <code>whenAskedFor</code>
+	inject an instance of <code>useSingletonOf</code>.
+	
+	<p>This will create an instance on the first injection, but will 
+	re-use that instance for subsequent injections.</p>
+	
+	@param whenAskedFor A class or interface
+	@param useSingletonOf A class to instantiate
+	@param named An optional name (id)
+	
+	@returns A reference to the rule for this injection. To be used with 
+	<code>mapRule</code>
+	*/
 	public function mapSingletonOf(whenAskedFor:Class<Dynamic>, useSingletonOf:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -79,6 +143,20 @@ class Injector implements IInjector
 		return config;
 	}
 	
+	/**
+	When asked for an instance of the class <code>whenAskedFor</code>
+	use rule <code>useRule</code> to determine the correct injection.
+	
+	<p>This will use whatever injection is set by the given injection 
+	rule as created using one of the other mapping methods.</p>
+	
+	@param whenAskedFor A class or interface
+	@param useRule The rule to use for the injection
+	@param named An optional name (id)
+	
+	@returns A reference to the rule for this injection. To be used with 
+	<code>mapRule</code>
+	*/
 	public function mapRule(whenAskedFor:Class<Dynamic>, useRule:Dynamic, ?named:String = ""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -86,26 +164,30 @@ class Injector implements IInjector
 		return useRule;
 	}
 	
-	function getClassName(forClass:Class<Dynamic>):String
-	{
-		if (forClass == null) return "Dynamic";
-		else return Type.getClassName(forClass);
-	}
-
+	/**
+	*/
 	public function getMapping(forClass:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var requestName = getClassName(forClass) + "#" + named;
 		
-		if (m_mappings.exists(requestName))
+		if (injectionConfigs.exists(requestName))
 		{
-			return m_mappings.get(requestName);
+			return injectionConfigs.get(requestName);
 		}
 		
 		var config = new InjectionConfig(forClass, named);
-		m_mappings.set(requestName, config);
+		injectionConfigs.set(requestName, config);
 		return config;
 	}
 	
+	/**
+	Perform an injection into an object, satisfying all it's dependencies
+	
+	<p>The <code>Injector</code> should throw an <code>Error</code> if 
+	it can't satisfy all dependencies of the injectee.</p>
+	
+	@param target The object to inject into - the Injectee
+	*/
 	public function injectInto(target:Dynamic):Void
 	{
 		if (attendedToInjectees.exists(target))
@@ -120,9 +202,9 @@ class Injector implements IInjector
 
 		var injecteeDescription:InjecteeDescription = null;
 
-		if (m_injecteeDescriptions.exists(targetClass))
+		if (injecteeDescriptions.exists(targetClass))
 		{
-			injecteeDescription = m_injecteeDescriptions.get(targetClass);
+			injecteeDescription = injecteeDescriptions.get(targetClass);
 		}
 		else
 		{
@@ -141,26 +223,50 @@ class Injector implements IInjector
 		}
 	}
 	
-	public function instantiate<T>(forClass:Class<T>):T
+	/**
+	Create an object of the given class, supplying its dependencies as 
+	constructor parameters if the used DI solution has support for 
+	constructor injection
+	
+	<p>Adapters for DI solutions that don't support constructor 
+	injection should just create a new instance and perform setter 
+	and/or method injection on that.</p>
+	
+	<p>NOTE: This method will always create a new instance. If you need 
+	to retrieve an instance consider using <code>getInstance</code></p>
+	
+	<p>The <code>Injector</code> should throw an <code>Error</code> if 
+	it can't satisfy all dependencies of the injectee.</p>
+	
+	@param theClass The class to instantiate
+	@returns The created instance
+	*/
+	public function instantiate<T>(theClass:Class<T>):T
 	{
 		var injecteeDescription:InjecteeDescription;
 
-		if (m_injecteeDescriptions.exists(forClass))
+		if (injecteeDescriptions.exists(theClass))
 		{
-			injecteeDescription = m_injecteeDescriptions.get(forClass);
+			injecteeDescription = injecteeDescriptions.get(theClass);
 		}
 		else
 		{
-			injecteeDescription = getInjectionPoints(forClass);
+			injecteeDescription = getInjectionPoints(theClass);
 		}
 
 		var injectionPoint:InjectionPoint = injecteeDescription.ctor;
-		var instance:Dynamic = injectionPoint.applyInjection(forClass, this);
+		var instance:Dynamic = injectionPoint.applyInjection(theClass, this);
 		injectInto(instance);
 
 		return instance;
 	}
 	
+	/**
+	Remove a rule from the injector
+
+	@param theClass A class or interface
+	@param named An optional name (id)
+	*/
 	public function unmap(theClass:Class<Dynamic>, ?named:String=""):Void
 	{
 		var mapping = getConfigurationForRequest(theClass, named);
@@ -173,6 +279,13 @@ class Injector implements IInjector
 		mapping.setResult(null);
 	}
 
+	/**
+	Does a rule exist to satsify such a request?
+
+	@param clazz A class or interface
+	@param named An optional name (id)
+	@returns Whether such a mapping exists
+	*/
 	public function hasMapping(forClass:Class<Dynamic>, ?named :String = '') :Bool
 	{
 		var mapping = getConfigurationForRequest(forClass, named);
@@ -185,6 +298,13 @@ class Injector implements IInjector
 		return mapping.hasResponse(this);
 	}
 
+	/**
+	Create or retrieve an instance of the given class
+	
+	@param ofClass The class to retrieve.
+	@param named An optional name (id)
+	@return An instance
+	*/	
 	public function getInstance<T>(ofClass:Class<T>, ?named:String=""):T
 	{
 		var mapping = getConfigurationForRequest(ofClass, named);
@@ -197,6 +317,43 @@ class Injector implements IInjector
 		return mapping.getResponse(this);
 	}
 	
+	/**
+	Create an injector that inherits rules from its parent
+	
+	@returns The injector 
+	*/	
+	public function createChildInjector():Injector
+	{
+		var injector = new Injector();
+		injector.parentInjector = this;
+		return injector;
+	}
+
+	/**
+	Searches for an injection mapping in the ancestry of the injector. This 
+	method is called when a dependency cannot be satisfied by this injector.
+	*/
+	public function getAncestorMapping(forClass:Class<Dynamic>, named:String=null):InjectionConfig
+	{
+		var parent = parentInjector;
+
+		while (parent != null)
+		{
+			var parentConfig = parent.getConfigurationForRequest(forClass, named, false);
+
+			if (parentConfig != null && parentConfig.hasOwnResponse())
+			{
+				return parentConfig;
+			}
+
+			parent = parent.parentInjector;
+		}
+		
+		return null;
+	}
+
+	//-------------------------------------------------------------------------- private
+
 	function getInjectionPoints(forClass:Class<Dynamic>):InjecteeDescription
 	{
 		var typeMeta = Meta.getType(forClass);
@@ -264,7 +421,7 @@ class Injector implements IInjector
 		}
 
 		var injecteeDescription = new InjecteeDescription(ctorInjectionPoint, injectionPoints);
-		m_injecteeDescriptions.set(forClass, injecteeDescription);
+		injecteeDescriptions.set(forClass, injecteeDescription);
 		return injecteeDescription;
 	}
 
@@ -272,7 +429,7 @@ class Injector implements IInjector
 	{
 		var requestName = getClassName(forClass) + '#' + named;
 		
-		if(!m_mappings.exists(requestName))
+		if(!injectionConfigs.exists(requestName))
 		{
 			if (traverseAncestors && parentInjector != null && parentInjector.hasMapping(forClass, named))
 			{
@@ -282,34 +439,9 @@ class Injector implements IInjector
 			return null;
 		}
 
-		return m_mappings.get(requestName);
+		return injectionConfigs.get(requestName);
 	}
-	/* pretty sure this is only used by xml config, which we don't use.
-	function addParentInjectionPoints(description:Classdef, injectionPoints:Array<Dynamic>):Void
-	{
-		var parentClassName = description.superClass.path;
 
-		if (parentClassName == null)
-		{
-			return;
-		}
-
-		var parentClass = Type.resolveClass(parentClassName);
-		var parentDescription:InjecteeDescription = null;
-
-		if (m_injecteeDescriptions.exists(parentClass))
-		{
-			parentDescription = m_injecteeDescriptions.get(parentClass);
-		}
-		else
-		{
-			parentDescription = getInjectionPoints(parentClass);
-		}
-
-		injectionPoints.push(injectionPoints);
-		injectionPoints.push(parentDescription.injectionPoints);
-	}
-	*/
 	function set_parentInjector(value:Injector):Injector
 	{
 		//restore own map of worked injectees if parent injector is removed
@@ -329,30 +461,10 @@ class Injector implements IInjector
 		return parentInjector;
 	}
 
-	public function createChildInjector():IInjector
+	function getClassName(forClass:Class<Dynamic>):String
 	{
-		var injector = new Injector();
-		injector.parentInjector = this;
-		return injector;
-	}
-
-	public function getAncestorMapping(forClass:Class<Dynamic>, named:String=null):InjectionConfig
-	{
-		var parent = parentInjector;
-
-		while (parent != null)
-		{
-			var parentConfig = parent.getConfigurationForRequest(forClass, named, false);
-
-			if (parentConfig != null && parentConfig.hasOwnResponse())
-			{
-				return parentConfig;
-			}
-
-			parent = parent.parentInjector;
-		}
-		
-		return null;
+		if (forClass == null) return "Dynamic";
+		else return Type.getClassName(forClass);
 	}
 
 	function getFields(type:Class<Dynamic>)

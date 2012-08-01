@@ -22,10 +22,20 @@ SOFTWARE.
 
 package minject;
 
-class Reflector implements IReflector
+/**
+A utility class for reflection.
+*/
+class Reflector
 {
 	public function new(){}
 
+	/**
+	Does the class specified by classOrClassName implement this superclass or interface?
+	
+	@param classOrClassName
+	@param superclass
+	@returns Boolean
+	*/
 	public function classExtendsOrImplements(classOrClassName:Dynamic, superClass:Class<Dynamic>):Bool
 	{
 		var actualClass:Class<Dynamic> = null;
@@ -55,16 +65,24 @@ class Reflector implements IReflector
 		return Std.is(classInstance, superClass);
 	}
 
+	/**
+	Get the class of this instance
+	
+	@param value The instance
+	@returns Class
+	*/
 	public function getClass(value:Dynamic):Class<Dynamic>
 	{
-		if (Std.is(value, Class))
-		{
-			return value;
-		}
-
+		if (Std.is(value, Class)) return value;
 		return Type.getClass(value);
 	}
 	
+	/**
+	Get the fully qualified class name of this instance, class name, or class
+	
+	@param value The instance, class name, or class
+	@returns The Fully Qualified Class Name
+	*/
 	public function getFQCN(value:Dynamic):String
 	{
 		var fqcn:String;
