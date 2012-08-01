@@ -13,18 +13,18 @@ MassiveInject supports the following features as described in more details later
 
 * metadata based annotation of injection points
 * injecting into:
-** properties (i.e. setters)
-** variables
-** methods (with support for optional arguments)
-** constructors (with support for optional arguments)
+    * properties (i.e. setters)
+    * variables
+    * methods (with support for optional arguments)
+    * constructors (with support for optional arguments)
 
 * named injections, allowing for more specific binding of injections than just by their type. (See "Defining injection points")
 * @post annotations for invoking methods after all injections have been applied
 * mapping:
-** values
-** classes (of which new instances are created for each injection)
-** singletons (which are created lazily on first injection and then reused for each additional injection of the same rule)
-** rules (which allows sharing singletons between multiple mapping rules)
+    * values
+    * classes (of which new instances are created for each injection)
+    * singletons (which are created lazily on first injection and then reused for each additional injection of the same rule)
+    * rules (which allows sharing singletons between multiple mapping rules)
 
 * creating child injectors which share their parents' injection mappings but can define additional mappings complementing or replacing the parents' ones
 * querying for the existence of injection rules using Injector#hasMapping
