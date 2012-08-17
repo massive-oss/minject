@@ -24,7 +24,7 @@ package minject;
 
 import haxe.rtti.Meta;
 
-import mdata.Dictionary;
+import mcore.data.Dictionary;
 import minject.point.ConstructorInjectionPoint;
 import minject.point.InjectionPoint;
 import minject.point.MethodInjectionPoint;

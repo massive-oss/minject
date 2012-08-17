@@ -2,8 +2,6 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--lib mcore
--lib mdata
 -cp src
 
 -cp test
@@ -14,8 +12,6 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--lib mcore
--lib mdata
 -cp src
 
 -cp test
@@ -26,8 +22,6 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--lib mcore
--lib mdata
 -cp src
 
 -cp test
@@ -39,8 +33,6 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--lib mcore
--lib mdata
 -cp src
 
 -cp test
