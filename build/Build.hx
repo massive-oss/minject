@@ -42,13 +42,19 @@ class Build extends mtask.core.BuildBase
 		target.license.organization = "Massive Interactive";
 		target.username = "massive";
 		target.description = "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.";
+		
 		target.addTag("cross");
 		target.addTag("utility");
 		target.addTag("massive");
+
+		target.addDependency("mcore");
+		target.addDependency("mdata");
+
 		target.afterCompile = function()
 		{
 			cp("src/*", target.path);
 			cmd("haxe", ["-cp", "src", "-js", target.path + "/haxedoc.js", "--no-output",
+				"-lib", "mcore", "-lib", "mdata",
 				"-xml", target.path + "/haxedoc.xml", "minject.Injector"]);
 			Haxe.filterXml(target.path + "/haxedoc.xml", ["minject"]);
 		}
@@ -56,6 +62,8 @@ class Build extends mtask.core.BuildBase
 
 	function exampleHaxe(target:Haxe)
 	{
+		target.addLib("mcore");
+		target.addLib("mdata");
 		target.addPath("src");
 		target.addPath("example");
 		target.main = "InjectionExample";
