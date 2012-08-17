@@ -37,7 +37,7 @@ class Build extends mtask.core.BuildBase
 	{
 		target.name = build.project.id;
 		target.version = build.project.version;
-		target.versionDescription = "Initial release.";
+		target.versionDescription = "Removed inline mcore/mdata classes, added dependencies.";
 		target.url = "http://github.com/massiveinteractive/minject";
 		target.license.organization = "Massive Interactive";
 		target.username = "massive";
