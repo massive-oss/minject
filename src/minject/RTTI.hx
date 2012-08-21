@@ -62,7 +62,13 @@ class RTTI
 
 		if (ref.isInterface)
 		{
-			if (!Context.defined("cpp"))
+			if(Context.defined("cpp")
+				&&  (Context.defined("haxe_208") || Context.defined("haxe_209"))
+				&&  !Context.defined("haxe_210"))
+			{
+				Context.warning("Unable to add interface metadata for '" + ref.name + "'. Fixed in Haxe 2.10", Context.currentPos());
+			}
+			else
 			{
 				ref.meta.add("interface", [], ref.pos);
 			}

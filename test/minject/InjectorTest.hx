@@ -651,13 +651,18 @@ class InjectorTest
 		Assert.isTrue(passed);
 	}
 	
+	#if cpp
+		#if (!haxe_210 && (haxe_208||haxe_209))
+		@Ignore("Not supported in Haxe 2.08 or Haxe 2.09")
+		#end
+	#end
 	@Test
 	public function instantiateThrowsMeaningfulErrorOnInterfaceInstantiation() : Void
 	{
 		var passed = false;
 
 		try
-		{
+		{	
 			injector.instantiate(Interface1);
 		}
 		catch (e:Dynamic)

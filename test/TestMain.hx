@@ -32,6 +32,14 @@ import js.Lib;
 import js.Dom;
 #end
 
+#if !sys
+    #if neko
+    typedef Sys = neko.Sys;
+    #elseif cpp
+    typedef Sys = cpp.Sys;
+    #end
+#end
+
 /**
  * Auto generated Test Application.
  * Refer to munit command line tool for more information (haxelib run munit)
@@ -46,8 +54,8 @@ class TestMain
         suites.push(TestSuite);
 
         #if MCOVER
-            var client = new m.cover.coverage.munit.client.MCoverPrintClient();
-            var httpClient = new HTTPClient(new m.cover.coverage.munit.client.MCoverSummaryReportClient());
+            var client = new mcover.coverage.munit.client.MCoverPrintClient();
+            var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
         #else
             var client = new RichPrintClient();
             var httpClient = new HTTPClient(new SummaryReportClient());
@@ -73,8 +81,8 @@ class TestMain
                 flash.external.ExternalInterface.call("testResult", successful);
             #elseif js
                 js.Lib.eval("testResult(" + successful + ");");
-            #elseif neko
-                neko.Sys.exit(0);
+            #elseif (sys||neko||cpp)
+                Sys.exit(0);
             #end
         }
         // if run from outside browser can get error which we can ignore
