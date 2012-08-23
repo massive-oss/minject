@@ -1,15 +1,14 @@
-MassiveInject
-=======
+## Overview
 
-MassiveInject is a macro enhanced Haxe port of Till Schneidereit's AS3 Swift Suspenders IOC library. Please note that this is a port of SwiftSuspenders v1, the API has changed significantly in v2.
+minject is a macro enhanced Haxe port of Till Schneidereit's AS3 Swift Suspenders IOC library. Please note that this is a port of SwiftSuspenders v1, the API has changed significantly in v2.
 
-MassiveInject is a basic metadata driven IOC (Inversion Of Control) solution for Haxe. It has been thoroughly tested on JS, AVM1/2 and Neko platforms, but should also work on other platforms (waiting for cpp/php support in munit!)
+minject is a basic metadata driven IOC (Inversion Of Control) solution for Haxe. It has been thoroughly tested on JS, AVM1/2 and Neko platforms, but should also work on other platforms (waiting for cpp/php support in munit!)
 
 This documentation is a modified version of the original, which can be found [here](https://github.com/tschneidereit/SwiftSuspenders/blob/the-past/README.textile).
 
 ## Features
 
-MassiveInject supports the following features as described in more details later in the documentation:
+minject supports the following features as described in more details later in the documentation:
 
 * metadata based annotation of injection points
 * injecting into:
@@ -40,7 +39,7 @@ You can download an example of minject usage [here](https://github.com/downloads
 
 ### Defining dependencies
 
-MassiveInject supports three types of dependency definitions:
+minject supports three types of dependency definitions:
 * *value bindings*, which simply map an injection request to be satisfied by injecting the given object
 * *class bindings*, which map an injection request to be satisfied by injecting a new instance of the given class
 * *singleton bindings*, which map all injection requests for the given class by injecting the same shared instance, which itself gets created on first request
@@ -79,12 +78,12 @@ Instances of classes that depend on automatic DI are only ready to be used after
 
 ### Querying for injection mapping existence
 
-MassiveInject supports querying for the existence of mapping rules for any request using `Injector#hasMapping`.
+minject supports querying for the existence of mapping rules for any request using `Injector#hasMapping`.
 `hasMapping` expects a class or an interface and optionally a name for the mapping and returns `true` if a request for this class/name combination can be satisfied. Otherwise, it returns `false`.
 
 ### Directly applying injection mappings
 
-MassiveInject supports directly applying injection mappings using `Injector#getInstance`.
+minject supports directly applying injection mappings using `Injector#getInstance`.
 `getInstance` expects a class or an interface and optionally a name for the mapping and returns the mapping's result if one is defined. Otherwise, an exception is thrown.
 
 The returned value depends on the mapping defined for the relevant request. E.g., if a singleton mapping has been defined for the request, the shared singleton instance will be returned instead of creating a new instance of the class.
@@ -95,7 +94,7 @@ If a mapping for a requested injection is not found, an exception string contain
 
 ### Child Injectors
 
-MassiveInject supports creating child injectors. These are dependent on their parent injector and automatically inherit all rule mappings the parent has. Additionally, they can have their own rule mappings, complementing or overriding the parent mappings.
+minject supports creating child injectors. These are dependent on their parent injector and automatically inherit all rule mappings the parent has. Additionally, they can have their own rule mappings, complementing or overriding the parent mappings.
 
 The main use-case for this feature is as a solution to the so-called "robot legs problem". When using Dependency Injection, one often wants to create very similar object trees that have only slight differences. A good illustration is a simplified robot, that can be built using identical parts for its legs but needs different parts for the left and the right foot. Using normal Dependency Injection, one would have to subclass the RobotLeg class for each leg only to enable specifying different injections for each foot. The subclasses would then have to implement boilerplate code to apply the injection to the variable the parent expects the foot in:
 
