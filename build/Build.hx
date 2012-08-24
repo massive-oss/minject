@@ -35,16 +35,14 @@ class Build extends mtask.core.BuildBase
 
 	@target function haxelib(target:HaxeLib)
 	{
-		target.name = build.project.id;
-		target.version = build.project.version;
-		target.versionDescription = "Removed inline mcore/mdata classes, added dependencies.";
 		target.url = "http://github.com/massiveinteractive/minject";
-		target.license.organization = "Massive Interactive";
-		target.username = "massive";
 		target.description = "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.";
+		target.versionDescription = "Removed inline mcore/mdata classes, added dependencies.";
+
 		target.addTag("cross");
 		target.addTag("utility");
 		target.addTag("massive");
+		
 		target.afterCompile = function()
 		{
 			cp("src/*", target.path);
