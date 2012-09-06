@@ -1,15 +1,15 @@
 -main InjectionExample
 -lib minject
--js example-js/index.js
+-js web/index.js
 
 --next
 
 -main InjectionExample
 -lib minject
--swf example-swf/index.swf
+-swf flash/index.swf
 
 --next
 
 -main InjectionExample
 -lib minject
--neko example-neko.n
+-neko neko.n

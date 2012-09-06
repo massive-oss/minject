@@ -21,10 +21,9 @@ SOFTWARE.
 */
 
 import mtask.target.HaxeLib;
-import mtask.target.Neko;
-import mtask.target.Directory;
 import mtask.target.Web;
-import mtask.target.Haxe;
+import mtask.target.Flash;
+import mtask.target.Directory;
 
 class Build extends mtask.core.BuildBase
 {
@@ -43,48 +42,29 @@ class Build extends mtask.core.BuildBase
 		target.addTag("utility");
 		target.addTag("massive");
 		
-		target.afterCompile = function()
+		target.afterCompile = function(path)
 		{
-			cp("src/*", target.path);
-			cmd("haxe", ["-cp", "src", "-js", target.path + "/haxedoc.js", "--no-output",
-				"-xml", target.path + "/haxedoc.xml", "minject.Injector"]);
-			Haxe.filterXml(target.path + "/haxedoc.xml", ["minject"]);
+			cp("src/*", path);
 		}
 	}
 
-	function exampleHaxe(target:Haxe)
+	@target function example(t:Directory)
 	{
-		target.addPath("src");
-		target.addPath("example");
-		target.main = "InjectionExample";
-	}
-
-	@target function example(target:Directory)
-	{
-		var exampleJS = new WebJS();
-		exampleHaxe(exampleJS.app);
-		target.addTarget("example-js", exampleJS);
-
-		var exampleSWF = new WebSWF();
-		exampleHaxe(exampleSWF.app);
-		target.addTarget("example-swf", exampleSWF);
-
-		var exampleNeko = new Neko();
-		exampleHaxe(exampleNeko);
-		target.addTarget("example-neko", exampleNeko);
-
-		target.afterBuild = function()
+		t.beforeCompile = function(path)
 		{
-			cp("example/*", target.path);
-			zip(target.path);
+			cp("example/*", path);
 		}
 	}
+	
+	@target("example/web") function exampleWeb(t:Web) {}
+	@target("example/flash") function exampleFlash(t:Flash) {}
 
 	@task function release()
 	{
 		invoke("clean");
 		invoke("test");
-		invoke("build haxelib", "build example");
+		invoke("build haxelib");
+		invoke("build example");
 	}
 
 	@task function test()
