@@ -30,7 +30,7 @@ class InjectionResult
 	{
 	}
 	
-	@IgnoreCover
+	@:IgnoreCover
 	public function getResponse(injector:Injector):Dynamic
 	{
 		return null;

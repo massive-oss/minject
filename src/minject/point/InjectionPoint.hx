@@ -32,12 +32,12 @@ class InjectionPoint
 		initializeInjection(meta);
 	}
 	
-	@IgnoreCover
+	@:IgnoreCover
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
 		return target;
 	}
 
-	@IgnoreCover
+	@:IgnoreCover
 	function initializeInjection(meta:Dynamic):Void {}
 }
