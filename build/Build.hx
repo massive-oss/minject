@@ -74,7 +74,8 @@ class Build extends mtask.core.BuildBase
 
 	@task("ci:quick") function quick()
 	{
-		cmd("haxelib", ["run", "munit", "test", "-coverage", "-js", "-kill-browser"]);
+		trace(exists("bin"));
+		cmd("haxelib", ["run", "munit", "test", "-coverage", "-kill-browser"]);
 		cmd("haxelib", ["run", "munit", "report", "teamcity"]);
 	}
 
