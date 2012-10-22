@@ -74,9 +74,11 @@ class Build extends mtask.core.BuildBase
 
 	@task("ci:quick") function quick()
 	{
-		trace(exists("bin"));
 		cmd("haxelib", ["run", "munit", "test", "-coverage", "-kill-browser"]);
 		cmd("haxelib", ["run", "munit", "report", "teamcity"]);
+
+		invoke("build haxelib");
+		invoke("build example");
 	}
 
 	@task("ci:nightly") function nightly()
