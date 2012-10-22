@@ -59,30 +59,17 @@ class Build extends mtask.core.BuildBase
 	@target("example/web") function exampleWeb(t:Web) {}
 	@target("example/flash") function exampleFlash(t:Flash) {}
 
-	@task function release()
-	{
-		invoke("clean");
-		invoke("test");
-		invoke("build haxelib");
-		invoke("build example");
-	}
-
 	@task function test()
 	{
 		cmd("haxelib", ["run", "munit", "test", "-coverage"]);
 	}
 
-	@task("ci:quick") function quick()
+	@task function teamcity()
 	{
 		cmd("haxelib", ["run", "munit", "test", "-coverage", "-kill-browser"]);
 		cmd("haxelib", ["run", "munit", "report", "teamcity"]);
 
 		invoke("build haxelib");
 		invoke("build example");
-	}
-
-	@task("ci:nightly") function nightly()
-	{
-		cmd("haxelib", ["run", "munit", "test", "-coverage", "-kill-browser"]);
 	}
 }
