@@ -7,3 +7,4 @@ TestSuite.hx
 /bin
 /.temp
 .DS_Store
+teamcity-info.xml

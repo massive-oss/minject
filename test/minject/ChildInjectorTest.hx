@@ -56,7 +56,6 @@ class ChildInjectorTest
 	@Test
 	public function injectorCreatesChildInjector():Void
 	{
-		Assert.isTrue(false);
 		var childInjector = injector.createChildInjector();
 		Assert.isType(childInjector, Injector);
 	}
