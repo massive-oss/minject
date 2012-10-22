@@ -42,7 +42,7 @@ class Build extends mtask.core.BuildBase
 		target.addTag("utility");
 		target.addTag("massive");
 		
-		target.afterCompile = function(path)
+		target.beforeCompile = function(path)
 		{
 			cp("src/*", path);
 		}
