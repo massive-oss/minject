@@ -66,10 +66,11 @@ class Build extends mtask.core.BuildBase
 
 	@task function teamcity()
 	{
-		cmd("haxelib", ["run", "munit", "test", "-coverage", "-kill-browser"]);
-		cmd("haxelib", ["run", "munit", "report", "teamcity"]);
-
+		invoke("test");
 		invoke("build haxelib");
 		invoke("build example");
+
+		cmd("haxelib", ["run", "munit", "report", "teamcity"]);
+		cmd("killall", ['"Google Chrome"']);
 	}
 }
