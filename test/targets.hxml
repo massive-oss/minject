@@ -41,10 +41,10 @@
 --next
 
 ## CPP
-# -main TestMain
-# -lib munit
-# -lib hamcrest
-# -cp src
-# -cp test
-# -debug
-# -cpp bin/test/cpp_test
+-main TestMain
+-lib munit
+-lib hamcrest
+-cp src
+-cp test
+-debug
+-cpp bin/test/cpp_test
