@@ -30,19 +30,22 @@ import haxe.macro.Type;
 class RTTI
 {
 	static var called = false;
+	static var metaTags:Array<String>;
 
-	public static function build()
+	public static function build(?tags:Array<String>=null)
 	{
-		generate();
+		generate(tags);
 		return haxe.macro.Context.getBuildFields();
 	}
 
-	public static function generate()
+	public static function generate(?tags:Array<String>=null)
 	{
 		if (called) return;
 		called = true;
+		metaTags = tags == null ? ["inject", "post"] : tags;
 
 		Context.onGenerate(function(types){
+
 			for (type in types)
 			{
 				switch (type)
@@ -97,7 +100,7 @@ class RTTI
 		for (m in meta)
 		{
 			var name = m.name;
-			if (name == "inject" || name == "post")
+			if(Lambda.indexOf(metaTags,name) > -1)
 			{
 				abort = false;
 				break;
@@ -137,8 +140,9 @@ class RTTI
 			{
 				case TFun(args, ret):
 				var types = [];
-				for (arg in args)
+				for (i in 0...args.length)
 				{
+					var arg =  args[i];
 					switch (arg.t)
 					{
 						case TInst(t, params):
@@ -147,7 +151,7 @@ class RTTI
 						var opt = arg.opt ? "true" : "false";
 						pack.push(type.name);
 						var typeName = pack.join(".");
-						types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + '}', ref.pos));
+						types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + ',pos:'+ i +'}', ref.pos));
 						default:
 					}
 				}
