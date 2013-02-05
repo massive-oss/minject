@@ -487,6 +487,13 @@ The dependency injector.
 	}
 }
 
+/**
+Contains the set of objects which have been injected into.
+ 
+Under dynamic languages that don't support weak references this set a hidden property 
+on an injectee when added, to mark it as injected. This is to avoid storing a direct 
+reference of it here, causing it never to be available for GC.
+*/
 private class InjectedSet
 {
 	#if (flash9 || cpp || java)
@@ -524,6 +531,19 @@ private class InjectedSet
 		store.delete(value);
 		#else
 		Reflect.deleteField(value, "__injected__");
+		#end
+	}
+
+	/**
+	Under dynamic targets that don't support weak refs (js, avm1, neko) this will always return
+	an empty iterator due to values not being stored in this set. This is to avoid memory leaks.
+	*/
+	public function iterator()
+	{
+		#if (flash9 || cpp || java)
+		return store.iterator();
+		#else
+		return [].iterator();
 		#end
 	}
 }
