@@ -43,10 +43,10 @@ The dependency injector.
 @:build(minject.RTTI.build()) class Injector
 {
 	/**
-	A set of instances that have already had their dependencies satified 
+	A set of instances that have already had their dependencies satisfied 
 	by the injector.
 	*/
-	public var attendedToInjectees(default, null):InjectedSet;
+	public var attendedToInjectees(default, null):InjecteeSet;
 
 	/**
 	The parent of this injector.
@@ -60,7 +60,7 @@ The dependency injector.
 	{
 		injectionConfigs = new Hash<InjectionConfig>();
 		injecteeDescriptions = new ClassHash<InjecteeDescription>();
-		attendedToInjectees = new InjectedSet();
+		attendedToInjectees = new InjecteeSet();
 	}
 	
 	/**
@@ -447,7 +447,7 @@ The dependency injector.
 		//restore own map of worked injectees if parent injector is removed
 		if (parentInjector != null && value == null)
 		{
-			attendedToInjectees = new InjectedSet();
+			attendedToInjectees = new InjecteeSet();
 		}
 
 		parentInjector = value;
@@ -494,7 +494,7 @@ Under dynamic languages that don't support weak references this set a hidden pro
 on an injectee when added, to mark it as injected. This is to avoid storing a direct 
 reference of it here, causing it never to be available for GC.
 */
-private class InjectedSet
+private class InjecteeSet
 {
 	#if (flash9 || cpp || java)
 	var store:Dictionary<Dynamic, Bool>;
