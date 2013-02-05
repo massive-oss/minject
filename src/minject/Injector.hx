@@ -43,10 +43,10 @@ The dependency injector.
 @:build(minject.RTTI.build()) class Injector
 {
 	/**
-	A dictionary of instances that have already had their dependencies satified 
+	A set of instances that have already had their dependencies satisfied 
 	by the injector.
 	*/
-	public var attendedToInjectees(default, null):Dictionary<Dynamic, Bool>;
+	public var attendedToInjectees(default, null):InjecteeSet;
 
 	/**
 	The parent of this injector.
@@ -60,7 +60,7 @@ The dependency injector.
 	{
 		injectionConfigs = new Hash<InjectionConfig>();
 		injecteeDescriptions = new ClassHash<InjecteeDescription>();
-		attendedToInjectees = new Dictionary<Dynamic, Bool>();
+		attendedToInjectees = new InjecteeSet();
 	}
 	
 	/**
@@ -190,13 +190,13 @@ The dependency injector.
 	*/
 	public function injectInto(target:Dynamic):Void
 	{
-		if (attendedToInjectees.exists(target))
+		if (attendedToInjectees.contains(target))
 		{
 			return;
 		}
 
-		attendedToInjectees.set(target, true);
-		
+		attendedToInjectees.add(target);
+
 		//get injection points or cache them if this target's class wasn't encountered before
 		var targetClass = Type.getClass(target);
 
@@ -215,7 +215,7 @@ The dependency injector.
 
 		var injectionPoints:Array<Dynamic> = injecteeDescription.injectionPoints;
 		var length:Int = injectionPoints.length;
-		
+
 		for (i in 0...length)
 		{
 			var injectionPoint:InjectionPoint = injectionPoints[i];
@@ -447,7 +447,7 @@ The dependency injector.
 		//restore own map of worked injectees if parent injector is removed
 		if (parentInjector != null && value == null)
 		{
-			attendedToInjectees = new Dictionary<Dynamic, Bool>();
+			attendedToInjectees = new InjecteeSet();
 		}
 
 		parentInjector = value;
@@ -484,6 +484,67 @@ The dependency injector.
 		}
 
 		return meta;
+	}
+}
+
+/**
+Contains the set of objects which have been injected into.
+ 
+Under dynamic languages that don't support weak references this set a hidden property 
+on an injectee when added, to mark it as injected. This is to avoid storing a direct 
+reference of it here, causing it never to be available for GC.
+*/
+private class InjecteeSet
+{
+	#if (flash9 || cpp || java)
+	var store:Dictionary<Dynamic, Bool>;
+	#end
+	
+	public function new()
+	{
+		#if (flash9 || cpp || java)
+		store = new Dictionary(true);
+		#end
+	}
+
+	public function add(value:Dynamic)
+	{
+		#if (flash9 || cpp || java)
+		store.set(value, true);
+		#else
+		value.__injected__ = true;
+		#end
+	}
+
+	public function contains(value:Dynamic)
+	{
+		#if (flash9 || cpp || java)
+		return store.exists(value);
+		#else
+		return value.__injected__ == true;
+		#end
+	}
+
+	public function delete(value:Dynamic)
+	{
+		#if (flash9 || cpp || java)
+		store.delete(value);
+		#else
+		Reflect.deleteField(value, "__injected__");
+		#end
+	}
+
+	/**
+	Under dynamic targets that don't support weak refs (js, avm1, neko) this will always return
+	an empty iterator due to values not being stored in this set. This is to avoid memory leaks.
+	*/
+	public function iterator()
+	{
+		#if (flash9 || cpp || java)
+		return store.iterator();
+		#else
+		return [].iterator();
+		#end
 	}
 }
 
