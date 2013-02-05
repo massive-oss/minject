@@ -517,6 +517,15 @@ private class InjectedSet
 		return value.__injected__ == true;
 		#end
 	}
+
+	public function delete(value:Dynamic)
+	{
+		#if (flash9 || cpp || java)
+		store.delete(value);
+		#else
+		Reflect.deleteField(value, "__injected__");
+		#end
+	}
 }
 
 class ClassHash<T>
