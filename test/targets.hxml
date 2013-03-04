@@ -2,6 +2,7 @@
 -main TestMain
 -lib munit
 -lib hamcrest
+-lib mdata
 -cp src
 -cp test
 -swf-version 9
@@ -10,13 +11,14 @@
 --next
 
 #Flash 8
--main TestMain
--lib munit
--lib hamcrest
--cp src
--cp test
--swf-version 8
--swf bin/test/as2_test.swf
+# -main TestMain
+# -lib munit
+# -lib hamcrest
+# -lib mdata
+# -cp src
+# -cp test
+# -swf-version 8
+# -swf bin/test/as2_test.swf
 
 --next
 
@@ -24,6 +26,7 @@
 -main TestMain
 -lib munit
 -lib hamcrest
+-lib mdata
 -cp src
 -cp test
 -js bin/test/js_test.js
@@ -34,6 +37,7 @@
 -main TestMain
 -lib munit
 -lib hamcrest
+-lib mdata
 -cp src
 -cp test
 -neko bin/test/neko_test.n
@@ -44,6 +48,7 @@
 -main TestMain
 -lib munit
 -lib hamcrest
+-lib mdata
 -cp src
 -cp test
 -debug

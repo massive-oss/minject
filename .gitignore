@@ -6,5 +6,6 @@ TestSuite.hx
 /.mcover
 /bin
 /.temp
+/lib
 .DS_Store
 teamcity-info.xml

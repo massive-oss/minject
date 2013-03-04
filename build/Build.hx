@@ -32,17 +32,20 @@ class Build extends mtask.core.BuildBase
 		super();
 	}
 
-	@target function haxelib(target:HaxeLib)
+	@target function haxelib(t:HaxeLib)
 	{
-		target.url = "http://github.com/massiveinteractive/minject";
-		target.description = "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.";
-		target.versionDescription = "Removed inline mcore/mdata classes, added dependencies.";
+		t.url = "http://github.com/massiveinteractive/minject";
+		t.description = "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.";
+		t.versionDescription = "Removed inline mcore/mdata classes, added dependencies.";
 
-		target.addTag("cross");
-		target.addTag("utility");
-		target.addTag("massive");
+		t.addTag("cross");
+		t.addTag("utility");
+		t.addTag("massive");
 		
-		target.beforeCompile = function(path)
+		t.addDependency("mcore");
+		t.addDependency("mdata");
+
+		t.beforeCompile = function(path)
 		{
 			cp("src/*", path);
 		}
