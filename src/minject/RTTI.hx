@@ -120,9 +120,15 @@ class RTTI
 					processProperty(ref, field, t.get(), params);
 					default:
 				}
-
+				
 				case TInst(t, params):
 				processProperty(ref, field, t.get(), params);
+				
+				#if haxe3
+				case TAbstract(t, params):
+				processProperty(ref, field, t.get(), params);
+				#end
+				
 				default:
 			}
 
@@ -161,7 +167,7 @@ class RTTI
 		}
 	}
 
-	static function processProperty(ref:ClassType, field:ClassField, type:ClassType, params)
+	static function processProperty(ref:ClassType, field:ClassField, type:BaseType, params)
 	{
 		var pack = type.pack;
 		pack.push(type.name);
