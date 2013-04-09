@@ -37,6 +37,12 @@ import minject.result.InjectOtherRuleResult;
 import minject.result.InjectSingletonResult;
 import minject.result.InjectValueResult;
 
+#if haxe3
+private typedef StringMap<T> = haxe.ds.StringMap<T>;
+#else
+private typedef StringMap<T> = Hash<T>;
+#end
+
 /**
 The dependency injector.
 */
@@ -53,12 +59,12 @@ The dependency injector.
 	*/
 	public var parentInjector(default, set_parentInjector):Injector;
 
-	var injectionConfigs:Hash<InjectionConfig>;
+	var injectionConfigs:StringMap<InjectionConfig>;
 	var injecteeDescriptions:ClassHash<InjecteeDescription>;
 	
 	public function new()
 	{
-		injectionConfigs = new Hash<InjectionConfig>();
+		injectionConfigs = new StringMap<InjectionConfig>();
 		injecteeDescriptions = new ClassHash<InjecteeDescription>();
 		attendedToInjectees = new InjecteeSet();
 	}
@@ -550,11 +556,11 @@ private class InjecteeSet
 
 class ClassHash<T>
 {
-	var hash:Hash<T>;
+	var hash:StringMap<T>;
 
 	public function new()
 	{
-		hash = new Hash<T>();
+		hash = new StringMap<T>();
 	}
 
 	public function set(key:Class<Dynamic>, value:T):Void

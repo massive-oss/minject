@@ -22,7 +22,11 @@ SOFTWARE.
 
 package minject.support.types;
 
+#if haxe3
+class Class2 implements Interface1 implements Interface2
+#else
 class Class2 implements Interface1, implements Interface2
+#end
 {
 	public function new() {}
 }
