@@ -51,13 +51,17 @@ For all definition types, it's possible to specify names, which allows using mul
 ### Defining injection points
 
 Dependency bindings can be injected into an object using constructor, setter, property or method injection (or a combination of these).
-Setter, property and method injection require metadata for all injections to be added to the injectee class, whereas you only need to add metadata for named dependencies when using constructor injection:
+Constructor, Setter, property and method injection require metadata for all injections to be added to the injectee class.
 
 	@inject
 
 and for injecting named dependencies
 
 	@inject('NamedDependency')
+	
+When using basic constructor injections
+
+	@inject public function new(foo:Bar, beautiful:Flower) { ... }
 
 When using named dependencies for constructor injection, the metadata has to be placed before the constructor method.
 
