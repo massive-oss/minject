@@ -3,3 +3,5 @@
 1.1.1 Fixes possible memory leak, removes inline dependencies
 
 * Fixes possible memory leak in attendedToInjectees under JS.
+
+1.2.0 Adds support for Haxe 3

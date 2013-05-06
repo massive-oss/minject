@@ -45,11 +45,11 @@
 --next
 
 ## CPP
--main TestMain
--lib munit
--lib hamcrest
--lib mdata
--cp src
--cp test
--debug
--cpp bin/test/cpp_test
+# -main TestMain
+# -lib munit
+# -lib hamcrest
+# -lib mdata
+# -cp src
+# -cp test
+# -debug
+# -cpp bin/test/cpp_test
