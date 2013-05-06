@@ -2,12 +2,18 @@
 	"project": 
 	{
 		"name": "MassiveInject",
-		"version": "1.1.1",
+		"version": "1.2.0",
 		"id": "minject",
 		"dependencies": 
 		{
-			"mcore": "1.x",
-			"mdata": "1.x"
+			"mcore": ">=1.2 <2",
+			"mdata": ">=2 <3"
+		},
+		"devDependencies":
+		{
+			"munit": "2.x",
+			"mcover": "2.x",
+			"mtask": "haxe3"
 		}
 	}
 }

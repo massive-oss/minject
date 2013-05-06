@@ -105,13 +105,14 @@ class RTTI
 		}
 		
 		if (abort) return;
+		
 		switch (field.kind)
 		{
-			case FVar(read, write):
+			case FVar(_, write):
 			switch (field.type)
 			{
 				// might need to recurse into typedefs here, incase people are silly - dp
-				case TType(t, params):
+				case TType(t, _):
 				var def = t.get();
 				switch (def.type)
 				{
@@ -119,9 +120,15 @@ class RTTI
 					processProperty(ref, field, t.get(), params);
 					default:
 				}
-
+				
 				case TInst(t, params):
 				processProperty(ref, field, t.get(), params);
+				
+				#if haxe3
+				case TAbstract(t, params):
+				processProperty(ref, field, t.get(), params);
+				#end
+				
 				default:
 			}
 
@@ -132,16 +139,16 @@ class RTTI
 				default:
 			}
 
-			case FMethod(k):
+			case FMethod(_):
 			switch (field.type)
 			{
-				case TFun(args, ret):
+				case TFun(args, _):
 				var types = [];
 				for (arg in args)
 				{
 					switch (arg.t)
 					{
-						case TInst(t, params):
+						case TInst(t, _):
 						var type = t.get();
 						var pack = type.pack;
 						var opt = arg.opt ? "true" : "false";
@@ -157,12 +164,10 @@ class RTTI
 				
 				default:
 			}
-			
-			default:
 		}
 	}
 
-	static function processProperty(ref:ClassType, field:ClassField, type:ClassType, params)
+	static function processProperty(ref:ClassType, field:ClassField, type:BaseType, params)
 	{
 		var pack = type.pack;
 		pack.push(type.name);
