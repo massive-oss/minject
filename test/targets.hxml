@@ -2,7 +2,6 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--lib mdata
 -cp src
 -cp test
 -swf-version 9
@@ -26,7 +25,6 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--lib mdata
 -cp src
 -cp test
 -js bin/test/js_test.js
@@ -37,7 +35,6 @@
 -main TestMain
 -lib munit
 -lib hamcrest
--lib mdata
 -cp src
 -cp test
 -neko bin/test/neko_test.n
