@@ -131,14 +131,7 @@ class RTTI
 				
 				default:
 			}
-
-			switch (write)
-			{
-				case AccCall(m):
-				field.meta.add("setter", [Context.parse('"' + m + '"', ref.pos)], ref.pos);
-				default:
-			}
-
+			
 			case FMethod(_):
 			switch (field.type)
 			{

@@ -32,7 +32,6 @@ class PropertyInjectionPoint extends InjectionPoint
 	var propertyName:String;
 	var propertyType:String;
 	var injectionName:String;
-	var hasSetter:Bool;
 
 	public function new(meta:Dynamic, ?injector:Injector=null)
 	{
@@ -49,15 +48,7 @@ class PropertyInjectionPoint extends InjectionPoint
 			throw 'Injector is missing a rule to handle injection into property "' + propertyName + '" of object "' + target + '". Target dependency: "' + propertyType + '", named "' + injectionName + '"';
 		}
 
-		if (hasSetter)
-		{
-			var setter = Reflect.field(target, propertyName);
-			Reflection.callMethod(target, setter, [injection]);
-		}
-		else
-		{
-			Reflect.setField(target, propertyName, injection);
-		}
+		Reflect.setProperty(target, propertyName, injection);
 		
 		return target;
 	}
@@ -65,16 +56,7 @@ class PropertyInjectionPoint extends InjectionPoint
 	override function initializeInjection(meta:Dynamic):Void
 	{
 		propertyType = meta.type[0];
-		hasSetter = (meta.setter != null);
-
-		if (hasSetter)
-		{
-			propertyName = meta.setter[0];
-		}
-		else
-		{
-			propertyName = meta.name[0];
-		}
+		propertyName = meta.name[0];
 
 		if (meta.inject == null)
 		{
