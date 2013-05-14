@@ -22,11 +22,11 @@ class InjectionExample
 	}
 
 	/**
-	Registers three class types using three approaches
-		- singleton
-		- class (with name)
-		- value (with name);
-	*/
+		Registers three class types using three approaches
+			- singleton
+			- class (with name)
+			- value (with name);
+	**/
 	function initializeContext()
 	{
 		injector.mapSingleton(TypeA);
@@ -93,7 +93,6 @@ class TypeB
 
 class TypeC extends TypeB
 {
-
 	public function new()
 	{
 		super();
