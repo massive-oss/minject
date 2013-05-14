@@ -5,3 +5,4 @@
 * Fixes possible memory leak in attendedToInjectees under JS.
 
 1.2.0 Adds support for Haxe 3
+1.2.1 Fixes compile time macro error under Haxe 3 rc2
