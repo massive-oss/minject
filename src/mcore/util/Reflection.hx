@@ -49,7 +49,6 @@ class Reflection
 	*/
 	public static function setProperty(object:Dynamic, property:String, value:Dynamic):Dynamic
 	{
-		Console.warn("Use Reflect.setProperty");
 		Reflect.setProperty(object, property, value);
 		return value;
 
