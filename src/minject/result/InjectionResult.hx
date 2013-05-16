@@ -35,4 +35,9 @@ class InjectionResult
 	{
 		return null;
 	}
+
+	public function toString():String
+	{
+		return "";
+	}
 }

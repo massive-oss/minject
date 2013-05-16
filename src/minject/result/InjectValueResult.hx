@@ -38,4 +38,9 @@ class InjectValueResult extends InjectionResult
 	{
 		return value;
 	}
+
+	override public function toString():String
+	{
+		return Type.getClassName(Type.getClass(value));
+	}
 }

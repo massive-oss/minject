@@ -27,10 +27,10 @@ import minject.result.InjectionResult;
 class InjectionConfig
 {
 	public var request:Class<Dynamic>;
+	public var result(default, null):InjectionResult;
 	public var injectionName:String;
 
 	var injector:Injector;
-	var result:InjectionResult;
 	
 	public function new(request:Class<Dynamic>, injectionName:String)
 	{
@@ -71,9 +71,13 @@ class InjectionConfig
 	{
 		if (this.result != null && result != null)
 		{
-			trace('Warning: Injector already has a rule for type "' + 
-			Type.getClassName(request) + '", named "' + injectionName + 
-			'".\nIf you have overwritten this mapping intentionally ' +
+			var named = (injectionName != null && injectionName != "") ? 
+							' named "' + injectionName  + '" and' : "";
+
+			trace('Warning: Injecter has a an existing rule for type "' +
+			Type.getClassName(request) + '"' + named + " mapped to '" + this.result + "'." +
+			"\nAttempting to overwrite this with mapping for '" + result + "'." +
+			'\nIf you have overwritten this mapping intentionally ' +
 			'you can use "injector.unmap()" prior to your replacement ' +
 			'mapping in order to avoid seeing this message.');
 		}

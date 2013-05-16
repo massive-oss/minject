@@ -39,4 +39,11 @@ class InjectOtherRuleResult extends InjectionResult
 	{
 		return rule.getResponse(injector);
 	}
+
+	override public function toString()
+	{
+		if (rule.result != null)
+			return rule.result.toString();
+		return super.toString();
+	}
 }

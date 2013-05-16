@@ -38,4 +38,9 @@ class InjectClassResult extends InjectionResult
 	{
 		return injector.instantiate(responseType);
 	}
+
+	override public function toString():String
+	{
+		return Type.getClassName(responseType);
+	}
 }
