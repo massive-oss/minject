@@ -29,8 +29,8 @@ class InjectionConfig
 	public var request:Class<Dynamic>;
 	public var injectionName:String;
 
-	var result:InjectionResult;
 	var injector:Injector;
+	var result:InjectionResult;
 	
 	public function new(request:Class<Dynamic>, injectionName:String)
 	{
@@ -56,7 +56,7 @@ class InjectionConfig
 
 		return null;
 	}
-	
+
 	public function hasResponse(injector:Injector):Bool
 	{
 		return (result != null);
