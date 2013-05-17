@@ -27,9 +27,9 @@ import minject.result.InjectionResult;
 class InjectionConfig
 {
 	public var request:Class<Dynamic>;
-	public var result(default, null):InjectionResult;
 	public var injectionName:String;
 
+	var result:InjectionResult;
 	var injector:Injector;
 	
 	public function new(request:Class<Dynamic>, injectionName:String)
