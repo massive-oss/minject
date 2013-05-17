@@ -42,8 +42,6 @@ class InjectOtherRuleResult extends InjectionResult
 
 	override public function toString()
 	{
-		if (rule.result != null)
-			return rule.result.toString();
-		return super.toString();
+		return rule.toString();
 	}
 }

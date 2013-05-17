@@ -56,7 +56,7 @@ class InjectionConfig
 
 		return null;
 	}
-
+	
 	public function hasResponse(injector:Injector):Bool
 	{
 		return (result != null);
@@ -71,12 +71,8 @@ class InjectionConfig
 	{
 		if (this.result != null && result != null)
 		{
-			var named = (injectionName != null && injectionName != "") ? 
-							' named "' + injectionName  + '" and' : "";
-
-			trace('Warning: Injecter has a an existing rule for type "' +
-			Type.getClassName(request) + '"' + named + " mapped to '" + this.result + "'." +
-			"\nAttempting to overwrite this with mapping for '" + result + "'." +
+			trace("Warning: Injector contains " + this +  "." +
+			"\nAttempting to overwrite this with mapping for [" + result + "]." +
 			'\nIf you have overwritten this mapping intentionally ' +
 			'you can use "injector.unmap()" prior to your replacement ' +
 			'mapping in order to avoid seeing this message.');
@@ -88,5 +84,12 @@ class InjectionConfig
 	public function setInjector(injector:Injector):Void
 	{
 		this.injector = injector;
+	}
+
+	public function toString():String
+	{
+		var named = (injectionName != null && injectionName != "") ?
+					' named "' + injectionName  + '" and' : "";
+		return "rule: [" + Type.getClassName(request) + "]" + named + " mapped to [" + result + "]";
 	}
 }
