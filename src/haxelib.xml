@@ -1,9 +1,7 @@
 <project name="minject" url="http://github.com/massiveinteractive/minject" license="MIT">
 	<user name="massive"/>
 	<description><![CDATA[A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.]]></description>
-	<version name="1.2.1"><![CDATA[Fixes compile time macro error under Haxe 3 rc2.]]></version>
-	<depends name="mcore"/>
-	<depends name="mdata"/>
+	<version name="1.2.2"><![CDATA[Added haxelib.json.]]></version>
 	<tag v="cross"/>
 	<tag v="utility"/>
 	<tag v="massive"/>
