@@ -46,7 +46,7 @@ private typedef StringMap<T> = Hash<T>;
 /**
 	The dependency injector.
 **/
-@:build(minject.RTTI.build()) class Injector
+#if !macro @:build(minject.RTTI.build()) #end class Injector
 {
 	/**
 		A set of instances that have already had their dependencies satisfied 
