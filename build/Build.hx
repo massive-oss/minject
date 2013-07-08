@@ -36,7 +36,7 @@ class Build extends mtask.core.BuildBase
 	{
 		t.url = "http://github.com/massiveinteractive/minject";
 		t.description = "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.";
-		t.versionDescription = "Added haxelib.json.";
+		t.versionDescription = "Fix issue where macros couldn't be used with the Injector.";
 		t.username = "massive";
 
 		t.addTag("cross");

@@ -7,3 +7,4 @@
 1.2.0 Adds support for Haxe 3
 1.2.1 Fixes compile time macro error under Haxe 3 rc2
 1.2.2 Added haxelib.json
+1.2.3 Fix issue where macros couldn't be used with the Injector.

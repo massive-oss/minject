@@ -2,7 +2,7 @@
 	"project": 
 	{
 		"name": "MassiveInject",
-		"version": "1.2.2",
+		"version": "1.2.3",
 		"id": "minject",
 		"dependencies": 
 		{
