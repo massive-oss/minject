@@ -230,6 +230,26 @@ private typedef StringMap<T> = Hash<T>;
 	}
 	
 	/**
+		Constructs an instance of theClass without satifying its dependencies.
+	**/
+	public function construct<T>(theClass:Class<T>):T
+	{
+		var injecteeDescription:InjecteeDescription;
+
+		if (injecteeDescriptions.exists(theClass))
+		{
+			injecteeDescription = injecteeDescriptions.get(theClass);
+		}
+		else
+		{
+			injecteeDescription = getInjectionPoints(theClass);
+		}
+
+		var injectionPoint:InjectionPoint = injecteeDescription.ctor;
+		return injectionPoint.applyInjection(theClass, this);
+	}
+
+	/**
 		Create an object of the given class, supplying its dependencies as 
 		constructor parameters if the used DI solution has support for 
 		constructor injection
@@ -249,21 +269,8 @@ private typedef StringMap<T> = Hash<T>;
 	**/
 	public function instantiate<T>(theClass:Class<T>):T
 	{
-		var injecteeDescription:InjecteeDescription;
-
-		if (injecteeDescriptions.exists(theClass))
-		{
-			injecteeDescription = injecteeDescriptions.get(theClass);
-		}
-		else
-		{
-			injecteeDescription = getInjectionPoints(theClass);
-		}
-
-		var injectionPoint:InjectionPoint = injecteeDescription.ctor;
-		var instance:Dynamic = injectionPoint.applyInjection(theClass, this);
+		var instance = construct(theClass);
 		injectInto(instance);
-
 		return instance;
 	}
 	

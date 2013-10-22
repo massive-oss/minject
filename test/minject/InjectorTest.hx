@@ -53,6 +53,7 @@ import minject.support.types.Interface1;
 import minject.support.types.Interface2;
 import minject.support.types.ComplexClass;
 import minject.support.injectees.SetterInjectee;
+import minject.support.injectees.RecursiveInjectee;
 
 class InjectorTest
  {
@@ -683,5 +684,13 @@ class InjectorTest
 		}
 		
 		Assert.isTrue(passed);
+	}
+
+	@Test
+	public function shouldInstantiateRecursiveInjectee()
+	{
+		injector.mapSingleton(RecursiveInjectee1);
+		injector.mapSingleton(RecursiveInjectee2);
+		injector.instantiate(RecursiveInjectee1);
 	}
 }
