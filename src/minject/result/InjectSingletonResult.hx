@@ -49,4 +49,9 @@ class InjectSingletonResult extends InjectionResult
 	{
 		return injector.instantiate(responseType);
 	}
+
+	override public function toString():String
+	{
+		return "singleton " + Type.getClassName(responseType);
+	}
 }
