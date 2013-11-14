@@ -125,10 +125,8 @@ class Exception
 			switch(stack.shift())
 			{
 				case FilePos(_, file, line): s += "\tat " + file + " (" + line + ")\n";
-				case Module(_):
 				case Method(classname, method): s += "\tat " + classname + "#" + method + "\n";
-				case Lambda(_):
-				case CFunction:
+				default:
 			}
 		}
 		return s;
