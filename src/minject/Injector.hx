@@ -510,20 +510,20 @@ private typedef StringMap<T> = Hash<T>;
 **/
 private class InjecteeSet
 {
-	#if (flash9 || cpp || java)
+	#if (flash9 || cpp || java || php)
 	var store:Dictionary<Dynamic, Bool>;
 	#end
 	
 	public function new()
 	{
-		#if (flash9 || cpp || java)
+		#if (flash9 || cpp || java || php)
 		store = new Dictionary(true);
 		#end
 	}
 
 	public function add(value:Dynamic)
 	{
-		#if (flash9 || cpp || java)
+		#if (flash9 || cpp || java || php)
 		store.set(value, true);
 		#else
 		value.__injected__ = true;
@@ -532,7 +532,7 @@ private class InjecteeSet
 
 	public function contains(value:Dynamic)
 	{
-		#if (flash9 || cpp || java)
+		#if (flash9 || cpp || java || php)
 		return store.exists(value);
 		#else
 		return value.__injected__ == true;
@@ -541,7 +541,7 @@ private class InjecteeSet
 
 	public function delete(value:Dynamic)
 	{
-		#if (flash9 || cpp || java)
+		#if (flash9 || cpp || java || php)
 		store.delete(value);
 		#else
 		Reflect.deleteField(value, "__injected__");
@@ -555,7 +555,7 @@ private class InjecteeSet
 	*/
 	public function iterator()
 	{
-		#if (flash9 || cpp || java)
+		#if (flash9 || cpp || java || php)
 		return store.iterator();
 		#else
 		return [].iterator();
