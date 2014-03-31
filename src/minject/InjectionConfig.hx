@@ -88,8 +88,8 @@ class InjectionConfig
 
 	public function toString():String
 	{
-		var named = (injectionName != null && injectionName != "") ?
-					' named "' + injectionName  + '" and' : "";
+		var named = (injectionName != null && injectionName != "") ? ' named "' + injectionName 
+			+ '" and' : "";
 		return "rule: [" + Type.getClassName(request) + "]" + named + " mapped to [" + result + "]";
 	}
 }

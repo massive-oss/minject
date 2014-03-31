@@ -4,7 +4,7 @@
 	"tags": ["cross","utility","massive"],
 	"description": "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.",
 	"contributors": ["massive"],
-	"releasenote": "Fix issue where macros couldn't be used with the Injector.",
+	"releasenote": "Fix for Haxe 3.1",
 	"version": "1.2.3",
 	"url": "http://github.com/massiveinteractive/minject",
 	"dependencies": 

@@ -40,12 +40,15 @@ class PropertyInjectionPoint extends InjectionPoint
 	
 	public override function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var injectionConfig:InjectionConfig = injector.getMapping(Type.resolveClass(propertyType), injectionName);
+		var injectionConfig:InjectionConfig = injector.getMapping(Type.resolveClass(propertyType), 
+			injectionName);
 		var injection:Dynamic = injectionConfig.getResponse(injector);
 
 		if (injection == null)
 		{
-			throw 'Injector is missing a rule to handle injection into property "' + propertyName + '" of object "' + target + '". Target dependency: "' + propertyType + '", named "' + injectionName + '"';
+			throw 'Injector is missing a rule to handle injection into property "' + propertyName + 
+				'" of object "' + target + '". Target dependency: "' + propertyType + 
+				'", named "' + injectionName + '"';
 		}
 
 		Reflect.setProperty(target, propertyName, injection);

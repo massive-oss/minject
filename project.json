@@ -14,7 +14,7 @@
 			"munit": "2.x",
 			"hamcrest": "1.x",
 			"mcover": "2.x",
-			"mtask": "2.x"
+			"mtask": "3.x"
 		}
 	}
 }

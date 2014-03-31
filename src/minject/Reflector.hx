@@ -30,8 +30,7 @@ class Reflector
 	public function new(){}
 
 	/**
-		Does the class specified by classOrClassName implement this superclass 
-		or interface?
+		Does the class specified by classOrClassName implement this superclass or interface?
 		
 		@param classOrClassName
 		@param superclass

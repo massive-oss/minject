@@ -49,8 +49,7 @@ private typedef StringMap<T> = Hash<T>;
 #if !macro @:build(minject.RTTI.build()) #end class Injector
 {
 	/**
-		A set of instances that have already had their dependencies satisfied 
-		by the injector.
+		A set of instances that have already had their dependencies satisfied by the injector.
 	**/
 	public var attendedToInjectees(default, null):InjecteeSet;
 
@@ -70,18 +69,16 @@ private typedef StringMap<T> = Hash<T>;
 	}
 	
 	/**
-		When asked for an instance of the class <code>whenAskedFor</code> 
-		inject the instance <code>useValue</code>.
+		When asked for an instance of the class `whenAskedFor` inject the instance `useValue`.
 		
-		<p>This is used to register an existing instance with the injector 
-		and treat it like a Singleton.</p>
+		This is used to register an existing instance with the injector and treat it like a 
+		Singleton.
 		
 		@param whenAskedFor A class or interface
 		@param useValue An instance
 		@param named An optional name (id)
 		
-		@returns A reference to the rule for this injection. To be used with 
-		<code>mapRule</code>
+		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
 	public function mapValue(whenAskedFor:Class<Dynamic>, useValue:Dynamic, ?named:String = ""):Dynamic
 	{
@@ -91,17 +88,16 @@ private typedef StringMap<T> = Hash<T>;
 	}
 	
 	/**
-		When asked for an instance of the class <code>whenAskedFor</code> 
-		inject a new instance of <code>instantiateClass</code>.
+		When asked for an instance of the class `whenAskedFor` inject a new instance of 
+		`instantiateClass`.
 		
-		<p>This will create a new instance for each injection.</p>
+		This will create a new instance for each injection.
 		
 		@param whenAskedFor A class or interface
 		@param instantiateClass A class to instantiate
 		@param named An optional name (id)
 
-		@returns A reference to the rule for this injection. To be used with 
-		<code>mapRule</code>
+		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
 	public function mapClass(whenAskedFor:Class<Dynamic>, instantiateClass:Class<Dynamic>, ?named:String=""):Dynamic
 	{
@@ -111,17 +107,15 @@ private typedef StringMap<T> = Hash<T>;
 	}
 	
 	/**
-		When asked for an instance of the class <code>whenAskedFor</code> 
-		inject an instance of <code>whenAskedFor</code>.
+		When asked for an instance of the class `whenAskedFor` inject an instance of `whenAskedFor`.
 		
-		<p>This will create an instance on the first injection, but will 
-		re-use that instance for subsequent injections.</p>
+		This will create an instance on the first injection, but will re-use that instance for 
+		subsequent injections.
 		
 		@param whenAskedFor A class or interface
 		@param named An optional name (id)
 		
-		@returns A reference to the rule for this injection. To be used with 
-		<code>mapRule</code>
+		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
 	public function mapSingleton(whenAskedFor:Class<Dynamic>, ?named:String="") :Dynamic
 	{
@@ -129,18 +123,17 @@ private typedef StringMap<T> = Hash<T>;
 	}
 	
 	/**
-		When asked for an instance of the class <code>whenAskedFor</code>
-		inject an instance of <code>useSingletonOf</code>.
+		When asked for an instance of the class `whenAskedFor`
+		inject an instance of `useSingletonOf`.
 		
-		<p>This will create an instance on the first injection, but will 
-		re-use that instance for subsequent injections.</p>
+		This will create an instance on the first injection, but will re-use that instance for 
+		subsequent injections.
 		
 		@param whenAskedFor A class or interface
 		@param useSingletonOf A class to instantiate
 		@param named An optional name (id)
 		
-		@returns A reference to the rule for this injection. To be used with 
-		<code>mapRule</code>
+		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
 	public function mapSingletonOf(whenAskedFor:Class<Dynamic>, useSingletonOf:Class<Dynamic>, ?named:String=""):Dynamic
 	{
@@ -150,18 +143,17 @@ private typedef StringMap<T> = Hash<T>;
 	}
 	
 	/**
-		When asked for an instance of the class <code>whenAskedFor</code>
-		use rule <code>useRule</code> to determine the correct injection.
+		When asked for an instance of the class `whenAskedFor`
+		use rule `useRule` to determine the correct injection.
 		
-		<p>This will use whatever injection is set by the given injection 
-		rule as created using one of the other mapping methods.</p>
+		This will use whatever injection is set by the given injection rule as created using one 
+		of the other mapping methods.
 		
 		@param whenAskedFor A class or interface
 		@param useRule The rule to use for the injection
 		@param named An optional name (id)
 		
-		@returns A reference to the rule for this injection. To be used with 
-		<code>mapRule</code>
+		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
 	public function mapRule(whenAskedFor:Class<Dynamic>, useRule:Dynamic, ?named:String = ""):Dynamic
 	{
@@ -170,8 +162,6 @@ private typedef StringMap<T> = Hash<T>;
 		return useRule;
 	}
 	
-	/**
-	**/
 	public function getMapping(forClass:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var requestName = getClassName(forClass) + "#" + named;
@@ -187,12 +177,11 @@ private typedef StringMap<T> = Hash<T>;
 	}
 	
 	/**
-	Perform an injection into an object, satisfying all it's dependencies
-	
-	<p>The <code>Injector</code> should throw an <code>Error</code> if 
-	it can't satisfy all dependencies of the injectee.</p>
-	
-	@param target The object to inject into - the Injectee
+		Perform an injection into an object, satisfying all it's dependencies
+		
+		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
+		
+		@param target The object to inject into - the Injectee
 	**/
 	public function injectInto(target:Dynamic):Void
 	{
@@ -203,7 +192,7 @@ private typedef StringMap<T> = Hash<T>;
 
 		attendedToInjectees.add(target);
 
-		//get injection points or cache them if this target's class wasn't encountered before
+		// get injection points or cache them if this target's class wasn't encountered before
 		var targetClass = Type.getClass(target);
 
 		var injecteeDescription:InjecteeDescription = null;
@@ -250,19 +239,16 @@ private typedef StringMap<T> = Hash<T>;
 	}
 
 	/**
-		Create an object of the given class, supplying its dependencies as 
-		constructor parameters if the used DI solution has support for 
-		constructor injection
+		Create an object of the given class, supplying its dependencies as constructor parameters 
+		if the used DI solution has support for constructor injection
 		
-		<p>Adapters for DI solutions that don't support constructor 
-		injection should just create a new instance and perform setter 
-		and/or method injection on that.</p>
+		Adapters for DI solutions that don't support constructor injection should just create a new 
+		instance and perform setter and/or method injection on that.
 		
-		<p>NOTE: This method will always create a new instance. If you need 
-		to retrieve an instance consider using <code>getInstance</code></p>
+		NOTE: This method will always create a new instance. If you need to retrieve an instance 
+		consider using `getInstance`
 		
-		<p>The <code>Injector</code> should throw an <code>Error</code> if 
-		it can't satisfy all dependencies of the injectee.</p>
+		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
 		
 		@param theClass The class to instantiate
 		@returns The created instance
@@ -295,7 +281,7 @@ private typedef StringMap<T> = Hash<T>;
 	/**
 		Does a rule exist to satsify such a request?
 
-		@param clazz A class or interface
+		@param forClass A class or interface
 		@param named An optional name (id)
 		@returns Whether such a mapping exists
 	**/
@@ -343,8 +329,8 @@ private typedef StringMap<T> = Hash<T>;
 	}
 
 	/**
-		Searches for an injection mapping in the ancestry of the injector. This 
-		method is called when a dependency cannot be satisfied by this injector.
+		Searches for an injection mapping in the ancestry of the injector. This method is called 
+		when a dependency cannot be satisfied by this injector.
 	**/
 	public function getAncestorMapping(forClass:Class<Dynamic>, named:String=null):InjectionConfig
 	{
@@ -364,8 +350,6 @@ private typedef StringMap<T> = Hash<T>;
 		
 		return null;
 	}
-
-	//-------------------------------------------------------------------------- private
 
 	function getInjectionPoints(forClass:Class<Dynamic>):InjecteeDescription
 	{
@@ -549,10 +533,10 @@ private class InjecteeSet
 	}
 
 	/**
-	Under dynamic targets that don't support weak refs (js, avm1, neko) this 
-	will always return an empty iterator due to values not being stored in this 
-	set. This is to avoid memory leaks.
-	*/
+		Under dynamic targets that don't support weak refs (js, avm1, neko) this will always 
+		return an empty iterator due to values not being stored in this set. This is to avoid 
+		memory leaks.
+	**/
 	public function iterator()
 	{
 		#if (flash9 || cpp || java || php)
