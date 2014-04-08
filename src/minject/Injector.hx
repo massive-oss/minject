@@ -24,7 +24,7 @@ package minject;
 
 import haxe.rtti.Meta;
 
-import mcore.data.Dictionary;
+import mdata.Dictionary;
 import minject.point.ConstructorInjectionPoint;
 import minject.point.InjectionPoint;
 import minject.point.MethodInjectionPoint;
@@ -37,46 +37,49 @@ import minject.result.InjectOtherRuleResult;
 import minject.result.InjectSingletonResult;
 import minject.result.InjectValueResult;
 
+#if haxe3
+import haxe.ds.StringMap;
+#else
+private typedef StringMap<T> = Hash<T>;
+#end
+
 /**
-The dependency injector.
-*/
-@:build(minject.RTTI.build()) class Injector
+	The dependency injector.
+**/
+#if !macro @:build(minject.RTTI.build()) #end class Injector
 {
 	/**
-	A dictionary of instances that have already had their dependencies satified 
-	by the injector.
-	*/
-	public var attendedToInjectees(default, null):Dictionary<Dynamic, Bool>;
+		A set of instances that have already had their dependencies satisfied by the injector.
+	**/
+	public var attendedToInjectees(default, null):InjecteeSet;
 
 	/**
-	The parent of this injector.
-	*/
+		The parent of this injector.
+	**/
 	public var parentInjector(default, set_parentInjector):Injector;
 
-	var injectionConfigs:Hash<InjectionConfig>;
+	var injectionConfigs:StringMap<InjectionConfig>;
 	var injecteeDescriptions:ClassHash<InjecteeDescription>;
 	
 	public function new()
 	{
-		injectionConfigs = new Hash<InjectionConfig>();
+		injectionConfigs = new StringMap<InjectionConfig>();
 		injecteeDescriptions = new ClassHash<InjecteeDescription>();
-		attendedToInjectees = new Dictionary<Dynamic, Bool>();
+		attendedToInjectees = new InjecteeSet();
 	}
 	
 	/**
-	When asked for an instance of the class <code>whenAskedFor</code> 
-	inject the instance <code>useValue</code>.
-	
-	<p>This is used to register an existing instance with the injector 
-	and treat it like a Singleton.</p>
-	
-	@param whenAskedFor A class or interface
-	@param useValue An instance
-	@param named An optional name (id)
-	
-	@returns A reference to the rule for this injection. To be used with 
-	<code>mapRule</code>
-	*/
+		When asked for an instance of the class `whenAskedFor` inject the instance `useValue`.
+		
+		This is used to register an existing instance with the injector and treat it like a 
+		Singleton.
+		
+		@param whenAskedFor A class or interface
+		@param useValue An instance
+		@param named An optional name (id)
+		
+		@returns A reference to the rule for this injection. To be used with `mapRule`
+	**/
 	public function mapValue(whenAskedFor:Class<Dynamic>, useValue:Dynamic, ?named:String = ""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -85,18 +88,17 @@ The dependency injector.
 	}
 	
 	/**
-	When asked for an instance of the class <code>whenAskedFor</code> 
-	inject a new instance of <code>instantiateClass</code>.
-	
-	<p>This will create a new instance for each injection.</p>
-	
-	@param whenAskedFor A class or interface
-	@param instantiateClass A class to instantiate
-	@param named An optional name (id)
+		When asked for an instance of the class `whenAskedFor` inject a new instance of 
+		`instantiateClass`.
+		
+		This will create a new instance for each injection.
+		
+		@param whenAskedFor A class or interface
+		@param instantiateClass A class to instantiate
+		@param named An optional name (id)
 
-	@returns A reference to the rule for this injection. To be used with 
-	<code>mapRule</code>
-	*/
+		@returns A reference to the rule for this injection. To be used with `mapRule`
+	**/
 	public function mapClass(whenAskedFor:Class<Dynamic>, instantiateClass:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -105,37 +107,34 @@ The dependency injector.
 	}
 	
 	/**
-	When asked for an instance of the class <code>whenAskedFor</code> 
-	inject an instance of <code>whenAskedFor</code>.
-	
-	<p>This will create an instance on the first injection, but will 
-	re-use that instance for subsequent injections.</p>
-	
-	@param whenAskedFor A class or interface
-	@param named An optional name (id)
-	
-	@returns A reference to the rule for this injection. To be used with 
-	<code>mapRule</code>
-	*/
+		When asked for an instance of the class `whenAskedFor` inject an instance of `whenAskedFor`.
+		
+		This will create an instance on the first injection, but will re-use that instance for 
+		subsequent injections.
+		
+		@param whenAskedFor A class or interface
+		@param named An optional name (id)
+		
+		@returns A reference to the rule for this injection. To be used with `mapRule`
+	**/
 	public function mapSingleton(whenAskedFor:Class<Dynamic>, ?named:String="") :Dynamic
 	{
 		return mapSingletonOf(whenAskedFor, whenAskedFor, named);
 	}
 	
 	/**
-	When asked for an instance of the class <code>whenAskedFor</code>
-	inject an instance of <code>useSingletonOf</code>.
-	
-	<p>This will create an instance on the first injection, but will 
-	re-use that instance for subsequent injections.</p>
-	
-	@param whenAskedFor A class or interface
-	@param useSingletonOf A class to instantiate
-	@param named An optional name (id)
-	
-	@returns A reference to the rule for this injection. To be used with 
-	<code>mapRule</code>
-	*/
+		When asked for an instance of the class `whenAskedFor`
+		inject an instance of `useSingletonOf`.
+		
+		This will create an instance on the first injection, but will re-use that instance for 
+		subsequent injections.
+		
+		@param whenAskedFor A class or interface
+		@param useSingletonOf A class to instantiate
+		@param named An optional name (id)
+		
+		@returns A reference to the rule for this injection. To be used with `mapRule`
+	**/
 	public function mapSingletonOf(whenAskedFor:Class<Dynamic>, useSingletonOf:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -144,19 +143,18 @@ The dependency injector.
 	}
 	
 	/**
-	When asked for an instance of the class <code>whenAskedFor</code>
-	use rule <code>useRule</code> to determine the correct injection.
-	
-	<p>This will use whatever injection is set by the given injection 
-	rule as created using one of the other mapping methods.</p>
-	
-	@param whenAskedFor A class or interface
-	@param useRule The rule to use for the injection
-	@param named An optional name (id)
-	
-	@returns A reference to the rule for this injection. To be used with 
-	<code>mapRule</code>
-	*/
+		When asked for an instance of the class `whenAskedFor`
+		use rule `useRule` to determine the correct injection.
+		
+		This will use whatever injection is set by the given injection rule as created using one 
+		of the other mapping methods.
+		
+		@param whenAskedFor A class or interface
+		@param useRule The rule to use for the injection
+		@param named An optional name (id)
+		
+		@returns A reference to the rule for this injection. To be used with `mapRule`
+	**/
 	public function mapRule(whenAskedFor:Class<Dynamic>, useRule:Dynamic, ?named:String = ""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
@@ -164,8 +162,6 @@ The dependency injector.
 		return useRule;
 	}
 	
-	/**
-	*/
 	public function getMapping(forClass:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var requestName = getClassName(forClass) + "#" + named;
@@ -181,23 +177,22 @@ The dependency injector.
 	}
 	
 	/**
-	Perform an injection into an object, satisfying all it's dependencies
-	
-	<p>The <code>Injector</code> should throw an <code>Error</code> if 
-	it can't satisfy all dependencies of the injectee.</p>
-	
-	@param target The object to inject into - the Injectee
-	*/
+		Perform an injection into an object, satisfying all it's dependencies
+		
+		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
+		
+		@param target The object to inject into - the Injectee
+	**/
 	public function injectInto(target:Dynamic):Void
 	{
-		if (attendedToInjectees.exists(target))
+		if (attendedToInjectees.contains(target))
 		{
 			return;
 		}
 
-		attendedToInjectees.set(target, true);
-		
-		//get injection points or cache them if this target's class wasn't encountered before
+		attendedToInjectees.add(target);
+
+		// get injection points or cache them if this target's class wasn't encountered before
 		var targetClass = Type.getClass(target);
 
 		var injecteeDescription:InjecteeDescription = null;
@@ -215,7 +210,7 @@ The dependency injector.
 
 		var injectionPoints:Array<Dynamic> = injecteeDescription.injectionPoints;
 		var length:Int = injectionPoints.length;
-		
+
 		for (i in 0...length)
 		{
 			var injectionPoint:InjectionPoint = injectionPoints[i];
@@ -224,24 +219,9 @@ The dependency injector.
 	}
 	
 	/**
-	Create an object of the given class, supplying its dependencies as 
-	constructor parameters if the used DI solution has support for 
-	constructor injection
-	
-	<p>Adapters for DI solutions that don't support constructor 
-	injection should just create a new instance and perform setter 
-	and/or method injection on that.</p>
-	
-	<p>NOTE: This method will always create a new instance. If you need 
-	to retrieve an instance consider using <code>getInstance</code></p>
-	
-	<p>The <code>Injector</code> should throw an <code>Error</code> if 
-	it can't satisfy all dependencies of the injectee.</p>
-	
-	@param theClass The class to instantiate
-	@returns The created instance
-	*/
-	public function instantiate<T>(theClass:Class<T>):T
+		Constructs an instance of theClass without satifying its dependencies.
+	**/
+	public function construct<T>(theClass:Class<T>):T
 	{
 		var injecteeDescription:InjecteeDescription;
 
@@ -255,18 +235,37 @@ The dependency injector.
 		}
 
 		var injectionPoint:InjectionPoint = injecteeDescription.ctor;
-		var instance:Dynamic = injectionPoint.applyInjection(theClass, this);
-		injectInto(instance);
+		return injectionPoint.applyInjection(theClass, this);
+	}
 
+	/**
+		Create an object of the given class, supplying its dependencies as constructor parameters 
+		if the used DI solution has support for constructor injection
+		
+		Adapters for DI solutions that don't support constructor injection should just create a new 
+		instance and perform setter and/or method injection on that.
+		
+		NOTE: This method will always create a new instance. If you need to retrieve an instance 
+		consider using `getInstance`
+		
+		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
+		
+		@param theClass The class to instantiate
+		@returns The created instance
+	**/
+	public function instantiate<T>(theClass:Class<T>):T
+	{
+		var instance = construct(theClass);
+		injectInto(instance);
 		return instance;
 	}
 	
 	/**
-	Remove a rule from the injector
+		Remove a rule from the injector
 
-	@param theClass A class or interface
-	@param named An optional name (id)
-	*/
+		@param theClass A class or interface
+		@param named An optional name (id)
+	**/
 	public function unmap(theClass:Class<Dynamic>, ?named:String=""):Void
 	{
 		var mapping = getConfigurationForRequest(theClass, named);
@@ -280,12 +279,12 @@ The dependency injector.
 	}
 
 	/**
-	Does a rule exist to satsify such a request?
+		Does a rule exist to satsify such a request?
 
-	@param clazz A class or interface
-	@param named An optional name (id)
-	@returns Whether such a mapping exists
-	*/
+		@param forClass A class or interface
+		@param named An optional name (id)
+		@returns Whether such a mapping exists
+	**/
 	public function hasMapping(forClass:Class<Dynamic>, ?named :String = '') :Bool
 	{
 		var mapping = getConfigurationForRequest(forClass, named);
@@ -299,12 +298,12 @@ The dependency injector.
 	}
 
 	/**
-	Create or retrieve an instance of the given class
-	
-	@param ofClass The class to retrieve.
-	@param named An optional name (id)
-	@return An instance
-	*/	
+		Create or retrieve an instance of the given class
+		
+		@param ofClass The class to retrieve.
+		@param named An optional name (id)
+		@return An instance
+	**/
 	public function getInstance<T>(ofClass:Class<T>, ?named:String=""):T
 	{
 		var mapping = getConfigurationForRequest(ofClass, named);
@@ -318,10 +317,10 @@ The dependency injector.
 	}
 	
 	/**
-	Create an injector that inherits rules from its parent
-	
-	@returns The injector 
-	*/	
+		Create an injector that inherits rules from its parent
+		
+		@returns The injector 
+	**/
 	public function createChildInjector():Injector
 	{
 		var injector = new Injector();
@@ -330,9 +329,9 @@ The dependency injector.
 	}
 
 	/**
-	Searches for an injection mapping in the ancestry of the injector. This 
-	method is called when a dependency cannot be satisfied by this injector.
-	*/
+		Searches for an injection mapping in the ancestry of the injector. This method is called 
+		when a dependency cannot be satisfied by this injector.
+	**/
 	public function getAncestorMapping(forClass:Class<Dynamic>, named:String=null):InjectionConfig
 	{
 		var parent = parentInjector;
@@ -351,8 +350,6 @@ The dependency injector.
 		
 		return null;
 	}
-
-	//-------------------------------------------------------------------------- private
 
 	function getInjectionPoints(forClass:Class<Dynamic>):InjecteeDescription
 	{
@@ -457,7 +454,7 @@ The dependency injector.
 		//restore own map of worked injectees if parent injector is removed
 		if (parentInjector != null && value == null)
 		{
-			attendedToInjectees = new Dictionary<Dynamic, Bool>();
+			attendedToInjectees = new InjecteeSet();
 		}
 
 		parentInjector = value;
@@ -497,13 +494,76 @@ The dependency injector.
 	}
 }
 
+/**
+	Contains the set of objects which have been injected into.
+	 
+	Under dynamic languages that don't support weak references this set a 
+	hidden property on an injectee when added, to mark it as injected. This is 
+	to avoid storing a direct reference of it here, causing it never to be 
+	available for GC.
+**/
+private class InjecteeSet
+{
+	#if (flash9 || cpp || java || php)
+	var store:Dictionary<Dynamic, Bool>;
+	#end
+	
+	public function new()
+	{
+		#if (flash9 || cpp || java || php)
+		store = new Dictionary(true);
+		#end
+	}
+
+	public function add(value:Dynamic)
+	{
+		#if (flash9 || cpp || java || php)
+		store.set(value, true);
+		#else
+		value.__injected__ = true;
+		#end
+	}
+
+	public function contains(value:Dynamic)
+	{
+		#if (flash9 || cpp || java || php)
+		return store.exists(value);
+		#else
+		return value.__injected__ == true;
+		#end
+	}
+
+	public function delete(value:Dynamic)
+	{
+		#if (flash9 || cpp || java || php)
+		store.delete(value);
+		#else
+		Reflect.deleteField(value, "__injected__");
+		#end
+	}
+
+	/**
+		Under dynamic targets that don't support weak refs (js, avm1, neko) this will always 
+		return an empty iterator due to values not being stored in this set. This is to avoid 
+		memory leaks.
+	**/
+	public function iterator()
+	{
+		#if (flash9 || cpp || java || php)
+		return store.iterator();
+		#else
+		return [].iterator();
+		#end
+	}
+}
+
 class ClassHash<T>
 {
-	var hash:Hash<T>;
+	var hash:StringMap<T>;
 
 	public function new()
 	{
-		hash = new Hash<T>();
+		hash = new StringMap<T>();
 	}
 
 	public function set(key:Class<Dynamic>, value:T):Void

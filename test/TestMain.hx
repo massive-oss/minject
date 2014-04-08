@@ -27,19 +27,6 @@ import massive.munit.client.JUnitReportClient;
 import massive.munit.client.SummaryReportClient;
 import massive.munit.TestRunner;
 
-#if js
-import js.Lib;
-import js.Dom;
-#end
-
-#if !sys
-    #if neko
-    typedef Sys = neko.Sys;
-    #elseif cpp
-    typedef Sys = cpp.Sys;
-    #end
-#end
-
 /**
  * Auto generated Test Application.
  * Refer to munit command line tool for more information (haxelib run munit)

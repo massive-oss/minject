@@ -1,6 +1,20 @@
 {
-	"name":"MassiveInject",
-	"version":"1.1.0",
-	"id":"minject",
-	"dependencies":{}
+	"project": 
+	{
+		"name": "MassiveInject",
+		"version": "1.3.0",
+		"id": "minject",
+		"devDependencies": 
+		{
+			"mcover": "2.x",
+			"hamcrest": "1.x",
+			"mtask": "3.x",
+			"munit": "2.x"
+		},
+		"dependencies": 
+		{
+			"mcore": ">=1.2 <2",
+			"mdata": "2"
+		}
+	}
 }

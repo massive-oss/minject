@@ -20,13 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package minject.support.types;
+package mcore.exception;
 
-#if haxe3
-class Class1 implements Interface1 implements Interface2
-#else
-class Class1 implements Interface1, implements Interface2
-#end
+import haxe.PosInfos;
+
+/**
+To be raised anywhere in which an argument provided is not what was expected.
+
+@see mcore.exception.Exception
+*/
+class ArgumentException extends Exception
 {
-	public function new() {}
+	public function new(?message:String="", ?cause:Dynamic = null, ?info:PosInfos)
+	{
+		super(message, cause, info);
+	}
 }

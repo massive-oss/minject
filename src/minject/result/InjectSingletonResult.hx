@@ -40,6 +40,7 @@ class InjectSingletonResult extends InjectionResult
 		if (response == null)
 		{
 			response = createResponse(injector);
+			injector.injectInto(response);
 		}
 
 		return response;
@@ -47,6 +48,11 @@ class InjectSingletonResult extends InjectionResult
 	
 	function createResponse(injector:Injector):Dynamic
 	{
-		return injector.instantiate(responseType);
+		return injector.construct(responseType);
+	}
+
+	override public function toString():String
+	{
+		return "singleton " + Type.getClassName(responseType);
 	}
 }

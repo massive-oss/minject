@@ -53,6 +53,7 @@ import minject.support.types.Interface1;
 import minject.support.types.Interface2;
 import minject.support.types.ComplexClass;
 import minject.support.injectees.SetterInjectee;
+import minject.support.injectees.RecursiveInjectee;
 
 class InjectorTest
  {
@@ -651,6 +652,18 @@ class InjectorTest
 		Assert.isTrue(passed);
 	}
 	
+	@Test
+	public function shouldRememberPreviouslyInjectedObjects()
+	{
+		var value = new Class1();
+		injector.mapValue(Class1, value);
+
+		var injectee1 = new ClassInjectee();
+		injector.injectInto(injectee1);
+		
+		Assert.isTrue(injector.attendedToInjectees.contains(injectee1));
+	}
+	
 	#if cpp
 		#if (!haxe_210 && (haxe_208||haxe_209))
 		@Ignore("Not supported in Haxe 2.08 or Haxe 2.09")
@@ -671,5 +684,13 @@ class InjectorTest
 		}
 		
 		Assert.isTrue(passed);
+	}
+
+	@Test
+	public function shouldInstantiateRecursiveInjectee()
+	{
+		injector.mapSingleton(RecursiveInjectee1);
+		injector.mapSingleton(RecursiveInjectee2);
+		injector.instantiate(RecursiveInjectee1);
 	}
 }
