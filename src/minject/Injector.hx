@@ -401,7 +401,7 @@ private typedef StringMap<T> = Hash<T>;
 				injectionPoints.push(injectionPoint);
 			}
 
-			processCustomInjectionPoints(forClass, field, fieldMeta, injectionPoints);
+			if(!post && !inject) processCustomInjectionPoints(forClass, field, fieldMeta, injectionPoints);
 		}
 
 		if (postConstructMethodPoints.length > 0)
