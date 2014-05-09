@@ -28,33 +28,28 @@ import haxe.macro.Expr;
 import haxe.macro.Type;
 using haxe.macro.Tools;
 
-class RTTI
+class Macro
 {
 	static var called = false;
 
-	public static function build()
+	public static function addMetadata()
 	{
-		generate();
-		return haxe.macro.Context.getBuildFields();
-	}
-
-	public static function generate()
-	{
-		if (called) return;
-		called = true;
-
-		Context.onGenerate(function(types){
-			for (type in types)
-			{
-				switch (type)
+		if (!called)
+		{
+			called = true;
+			Context.onGenerate(function(types){
+				for (type in types)
 				{
-					case TInst(t, params):
-					processInst(t, params);
-
-					default:
+					switch (type)
+					{
+						case TInst(t, params): processInst(t, params);
+						default:
+					}
 				}
-			}
-		});
+			});
+		}
+		
+		return haxe.macro.Context.getBuildFields();
 	}
 
 	static function processInst(t:Ref<ClassType>, params:Array<Type>)

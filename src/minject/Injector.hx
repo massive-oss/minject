@@ -38,7 +38,7 @@ import minject.result.InjectValueResult;
 /**
 	The dependency injector.
 **/
-#if !macro @:build(minject.RTTI.build()) #end class Injector
+#if !macro @:build(minject.Macro.addMetadata()) #end class Injector
 {
 	public static function keep(type:haxe.macro.Expr)
 	{
