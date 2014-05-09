@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -42,17 +42,10 @@ class InjectionConfig
 	{
 		if (this.injector != null) injector = this.injector;
 
-		if (result != null)
-		{
-			return result.getResponse(injector);
-		}
+		if (result != null) return result.getResponse(injector);
 		
 		var parentConfig = injector.getAncestorMapping(request, injectionName);
-
-		if (parentConfig != null)
-		{
-			return parentConfig.getResponse(injector);
-		}
+		if (parentConfig != null) return parentConfig.getResponse(injector);
 
 		return null;
 	}
@@ -69,15 +62,15 @@ class InjectionConfig
 
 	public function setResult(result:InjectionResult):Void
 	{
+		#if debug
 		if (this.result != null && result != null)
 		{
-			trace("Warning: Injector contains " + this +  "." +
-			"\nAttempting to overwrite this with mapping for [" + result + "]." +
-			'\nIf you have overwritten this mapping intentionally ' +
-			'you can use "injector.unmap()" prior to your replacement ' +
-			'mapping in order to avoid seeing this message.');
+			trace('Warning: Injector contains ${this.toString()}.\nAttempting to overwrite this ' +
+				'with mapping for [${result.toString()}].\nIf you have overwritten this mapping ' +
+				'intentionally you can use `injector.unmap()` prior to your replacement mapping ' +
+				'in order to avoid seeing this message.');
 		}
-
+		#end
 		this.result = result;
 	}
 
@@ -88,8 +81,7 @@ class InjectionConfig
 
 	public function toString():String
 	{
-		var named = (injectionName != null && injectionName != "") ? ' named "' + injectionName 
-			+ '" and' : "";
-		return "rule: [" + Type.getClassName(request) + "]" + named + " mapped to [" + result + "]";
+		var named = injectionName != null && injectionName != "" ? ' named "$injectionName" and' : "";
+		return 'rule: [' + Type.getClassName(request) + ']$named mapped to [$result]';
 	}
 }

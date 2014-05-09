@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -53,8 +53,7 @@ class PropertyInjectionPointTest
 		injector.mapSingleton(Class1);
 
 		var injectee = new ClassInjectee();
-		var meta = {inject:null, name:["property"], type:["minject.support.types.Class1"]};
-		var injectionPoint = new PropertyInjectionPoint(meta);
+		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1");
 		injectionPoint.applyInjection(injectee, injector);
 		
 		Assert.isTrue(Std.is( injectee.property, Class1));
@@ -64,8 +63,7 @@ class PropertyInjectionPointTest
 	public function injection_of_unmapped_property_type_throws_exception():Void
 	{
 		var injectee = new ClassInjectee();
-		var meta = {inject:null, name:["property"], type:["minject.support.types.Class1"]};
-		var injectionPoint = new PropertyInjectionPoint(meta);
+		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1");
 		var threw = false;
 
 		try
@@ -86,8 +84,7 @@ class PropertyInjectionPointTest
 		injector.mapSingleton(Class1);
 
 		var injectee = new SetterInjectee();
-		var meta = {inject:null, setter:["set_property"], name:["property"], type:["minject.support.types.Class1"]};
-		var injectionPoint = new PropertyInjectionPoint(meta);
+		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1");
 		injectionPoint.applyInjection(injectee, injector);
 		
 		Assert.isTrue(Std.is( injectee.property, Class1));
@@ -99,8 +96,7 @@ class PropertyInjectionPointTest
 		injector.mapSingleton(Class1, "name");
 
 		var injectee = new NamedClassInjectee();
-		var meta = {inject:["name"], name:["property"], type:["minject.support.types.Class1"]};
-		var injectionPoint = new PropertyInjectionPoint(meta);
+		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1", "name");
 		injectionPoint.applyInjection(injectee, injector);
 		
 		Assert.isTrue(Std.is( injectee.property, Class1));

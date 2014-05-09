@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -23,34 +23,21 @@ SOFTWARE.
 package minject.point;
 
 import minject.Injector;
-import haxe.rtti.CType;
-import mcore.util.Reflection;
 
-class PostConstructInjectionPoint extends InjectionPoint
+class PostConstructInjectionPoint implements InjectionPoint
 {
+	public var name(default, null):String;
 	public var order(default, null):Int;
 	
-	var methodName:String;
-	
-	public function new(meta:Dynamic, ?injector:Injector=null)
+	public function new(name:String, ?order:Int=0)
 	{
-		order = 0;
-		super(meta, injector);
+		this.name = name;
+		this.order = order;
 	}
 	
-	public override function applyInjection(target:Dynamic, injector:Injector):Dynamic
+	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		Reflection.callMethod(target, Reflect.field(target, methodName), []);
+		Reflect.callMethod(target, Reflect.field(target, name), []);
 		return target;
-	}
-	
-	override function initializeInjection(meta:Dynamic):Void
-	{
-		methodName = meta.name[0];
-
-		if (meta.post != null)
-		{
-			order = meta.post[0];
-		}
 	}
 }

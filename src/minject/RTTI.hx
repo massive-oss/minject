@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -26,6 +26,7 @@ package minject;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
+using haxe.macro.Tools;
 
 class RTTI
 {
@@ -60,31 +61,11 @@ class RTTI
 	{
 		var ref = t.get();
 
-		if (ref.isInterface)
-		{
-			if(Context.defined("cpp")
-				&&  (Context.defined("haxe_208") || Context.defined("haxe_209"))
-				&&  !Context.defined("haxe_210"))
-			{
-				Context.warning("Unable to add interface metadata for '" + ref.name + "'. Fixed in Haxe 2.10", Context.currentPos());
-			}
-			else
-			{
-				ref.meta.add("interface", [], ref.pos);
-			}
-		}
-
-		if (ref.constructor != null)
-		{
-			processField(ref, ref.constructor.get());
-		}
+		if (ref.isInterface) ref.meta.add("interface", [], ref.pos);
+		if (ref.constructor != null) processField(ref, ref.constructor.get());
 
 		var fields = ref.fields.get();
-
-		for (field in fields)
-		{
-			processField(ref, field);
-		}
+		for (field in fields) processField(ref, field);
 	}
 
 	static function processField(ref:ClassType, field:ClassField)
@@ -93,12 +74,14 @@ class RTTI
 
 		var meta = field.meta.get();
 		var abort = true;
+		var inject:MetadataEntry = null;
 
 		for (m in meta)
 		{
 			var name = m.name;
 			if (name == "inject" || name == "post")
 			{
+				if (name == "inject") inject = m;
 				abort = false;
 				break;
 			}
@@ -109,54 +92,50 @@ class RTTI
 		switch (field.kind)
 		{
 			case FVar(_, write):
-			switch (field.type)
-			{
-				// might need to recurse into typedefs here, incase people are silly - dp
-				case TType(t, _):
-				var def = t.get();
-				switch (def.type)
+				switch (field.type)
 				{
+					case TType(t, _):
+						var def = t.get();
+						switch (def.type)
+						{
+							case TInst(t, params):
+								processProperty(ref, field, t.get(), params);
+							default:
+						}
 					case TInst(t, params):
-					processProperty(ref, field, t.get(), params);
+						processProperty(ref, field, t.get(), params);
+					
+					case TAbstract(t, params):
+						processProperty(ref, field, t.get(), params);
 					default:
 				}
-				
-				case TInst(t, params):
-				processProperty(ref, field, t.get(), params);
-				
-				#if haxe3
-				case TAbstract(t, params):
-				processProperty(ref, field, t.get(), params);
-				#end
-				
-				default:
-			}
-			
 			case FMethod(_):
-			switch (field.type)
-			{
-				case TFun(args, _):
-				var types = [];
-				for (arg in args)
+				switch (field.type)
 				{
-					switch (arg.t)
+					case TFun(args, _):
+					var types = [];
+					for (i in 0...args.length)
 					{
-						case TInst(t, _):
-						var type = t.get();
-						var pack = type.pack;
-						var opt = arg.opt ? "true" : "false";
-						pack.push(type.name);
-						var typeName = pack.join(".");
-						types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + '}', ref.pos));
-						default:
+						var arg = args[i];
+						switch (arg.t)
+						{
+							case TInst(t, _):
+								var type = t.get();
+								var pack = type.pack;
+								var opt = arg.opt ? "true" : "false";
+								pack.push(type.name);
+								var typeName = pack.join(".");
+								var name = inject.params[i] == null ? "" : inject.params[i].toString();
+								if (name == null || name == "") types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + '}', ref.pos));
+								else types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + ',name:' + name + '}', ref.pos));
+							default:
+						}
 					}
-				}
 
-				field.meta.add("args", types, ref.pos);
-				field.meta.add("name", [Context.parse('"' + field.name + '"', ref.pos)], ref.pos);
-				
-				default:
-			}
+					field.meta.add("args", types, ref.pos);
+					
+					default:
+				}
 		}
 	}
 
@@ -189,7 +168,6 @@ class RTTI
 		}
 
 		field.meta.add("type", [Context.parse('"' + typeName + '"', ref.pos)], ref.pos);
-		field.meta.add("name", [Context.parse('"' + field.name + '"', ref.pos)], ref.pos);
 	}
 }
 #else

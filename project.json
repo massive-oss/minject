@@ -11,10 +11,6 @@
 			"mtask": "3.x",
 			"munit": "2.x"
 		},
-		"dependencies": 
-		{
-			"mcore": ">=1.2 <2",
-			"mdata": "2"
-		}
+		"dependencies":{}
 	}
 }

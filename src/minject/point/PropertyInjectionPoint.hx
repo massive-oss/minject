@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -22,52 +22,31 @@ SOFTWARE.
 
 package minject.point;
 
-import minject.InjectionConfig;
 import minject.Injector;
-import haxe.rtti.CType;
-import mcore.util.Reflection;
 
-class PropertyInjectionPoint extends InjectionPoint
+class PropertyInjectionPoint implements InjectionPoint
 {
-	var propertyName:String;
-	var propertyType:String;
+	var name:String;
+	var type:String;
 	var injectionName:String;
 
-	public function new(meta:Dynamic, ?injector:Injector=null)
+	public function new(name:String, type:String, ?injectionName:String=null)
 	{
-		super(meta, null);
+		this.name = name;
+		this.type = type;
+		this.injectionName = injectionName;
 	}
-	
-	public override function applyInjection(target:Dynamic, injector:Injector):Dynamic
-	{
-		var injectionConfig:InjectionConfig = injector.getMapping(Type.resolveClass(propertyType), 
-			injectionName);
-		var injection:Dynamic = injectionConfig.getResponse(injector);
 
+	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
+	{
+		var injectionConfig = injector.getMapping(Type.resolveClass(type), injectionName);
+		var injection = injectionConfig.getResponse(injector);
+		#if debug
 		if (injection == null)
-		{
-			throw 'Injector is missing a rule to handle injection into property "' + propertyName + 
-				'" of object "' + target + '". Target dependency: "' + propertyType + 
-				'", named "' + injectionName + '"';
-		}
-
-		Reflect.setProperty(target, propertyName, injection);
-		
+			throw 'Injector is missing a rule to handle injection into property "$name" ' +
+				'of object "$target". Target dependency: "$type", named "$injectionName"';
+		#end
+		Reflect.setProperty(target, name, injection);
 		return target;
-	}
-	
-	override function initializeInjection(meta:Dynamic):Void
-	{
-		propertyType = meta.type[0];
-		propertyName = meta.name[0];
-
-		if (meta.inject == null)
-		{
-			injectionName = "";
-		}
-		else
-		{
-			injectionName = meta.inject[0];
-		}
 	}
 }
