@@ -40,23 +40,6 @@ import minject.result.InjectValueResult;
 **/
 #if !macro @:build(minject.Macro.addMetadata()) #end class Injector
 {
-	public static function keep(type:haxe.macro.Expr)
-	{
-		#if macro
-		var type = haxe.macro.Context.typeof(type);
-		switch (type)
-		{
-			case haxe.macro.Type.TType(t, _):
-				t.get().meta.add("@:keep", [], haxe.macro.Context.currentPos());
-			default:
-		}
-		// var name = haxe.macro.TypeTools.toString(type);
-		// if (name.indexOf("Class<") == -1) return;
-		// name = name.substring(6, name.length - 1);
-		// haxe.macro.Compiler.keep(name);
-		#end
-	}
-
 	/**
 		A set of instances that have already had their dependencies satisfied by the injector.
 	**/
@@ -91,7 +74,7 @@ import minject.result.InjectValueResult;
 	**/
 	public macro function mapValue(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, useValue:haxe.macro.Expr, ?named:haxe.macro.Expr)
 	{
-		keep(whenAskedFor);
+		Macro.keep(whenAskedFor);
 		return macro $ethis._mapValue($whenAskedFor, $useValue, $named);
 	}
 
@@ -116,7 +99,7 @@ import minject.result.InjectValueResult;
 	**/
 	public macro function mapClass(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, instantiateClass:haxe.macro.Expr, ?named:haxe.macro.Expr)
 	{
-		keep(instantiateClass);
+		Macro.keep(instantiateClass);
 		return macro $ethis._mapClass($whenAskedFor, $instantiateClass, $named);
 	}
 
@@ -140,7 +123,7 @@ import minject.result.InjectValueResult;
 	**/
 	public macro function mapSingleton(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, ?named:haxe.macro.Expr)
 	{
-		keep(whenAskedFor);
+		Macro.keep(whenAskedFor);
 		return macro $ethis._mapSingleton($whenAskedFor, $named);
 	}
 
@@ -164,7 +147,7 @@ import minject.result.InjectValueResult;
 	**/
 	public macro function mapSingletonOf(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, useSingletonOf:haxe.macro.Expr, ?named:haxe.macro.Expr)
 	{
-		keep(useSingletonOf);
+		Macro.keep(useSingletonOf);
 		return macro $ethis._mapSingletonOf($whenAskedFor, $useSingletonOf, $named);
 	}
 
