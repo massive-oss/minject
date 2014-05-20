@@ -51,12 +51,12 @@ import minject.result.InjectValueResult;
 	public var parentInjector(default, set_parentInjector):Injector;
 
 	var injectionConfigs:Map<String, InjectionConfig>;
-	var injecteeDescriptions:ClassHash<InjecteeDescription>;
+	var injecteeDescriptions:ClassMap<InjecteeDescription>;
 	
 	public function new()
 	{
 		injectionConfigs = new Map();
-		injecteeDescriptions = new ClassHash<InjecteeDescription>();
+		injecteeDescriptions = new ClassMap();
 		attendedToInjectees = new InjecteeSet();
 	}
 	
@@ -543,31 +543,6 @@ class InjecteeSet
 		#else
 		return [].iterator();
 		#end
-	}
-}
-
-class ClassHash<T>
-{
-	var map:Map<String, T>;
-
-	public function new()
-	{
-		map = new Map();
-	}
-
-	public function set(key:Class<Dynamic>, value:T):Void
-	{
-		map.set(Type.getClassName(key), value);
-	}
-
-	public function get(key:Class<Dynamic>):T
-	{
-		return map.get(Type.getClassName(key));
-	}
-
-	public function exists(key:Class<Dynamic>):Bool
-	{
-		return map.exists(Type.getClassName(key));
 	}
 }
 
