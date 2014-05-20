@@ -48,7 +48,7 @@ import minject.result.InjectValueResult;
 	/**
 		The parent of this injector.
 	**/
-	public var parentInjector(default, set_parentInjector):Injector;
+	public var parentInjector(default, set):Injector;
 
 	var injectionConfigs:Map<String, InjectionConfig>;
 	var injecteeDescriptions:ClassMap<InjecteeDescription>;

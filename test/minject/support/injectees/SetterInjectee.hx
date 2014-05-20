@@ -30,7 +30,7 @@ class SetterInjectee
 	// the property directly, bypassing the setter.
 
 	@inject
-	public var property(get_property, set_property):Class1;
+	public var property(get, set):Class1;
 	
 	var _property:Class1;
 
