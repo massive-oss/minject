@@ -531,6 +531,9 @@ class InjecteeSet
 		#end
 	}
 
+	// deprecated
+	inline public function delete(value:Dynamic) remove(value);
+
 	/**
 		Under dynamic targets that don't support weak refs (js, avm1, neko) this will always 
 		return an empty iterator due to values not being stored in this set. This is to avoid 
