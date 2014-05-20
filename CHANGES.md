@@ -1,3 +1,11 @@
+## 1.4.0
+
+- Internal refactor, dce support, removed dependencies, only assert in debug.
+- Rename RTTI to something Macro, more cleanup.
+- Moved keep to minject.Macro
+- Extract ClassMap so that mmvc can use it
+- Update property syntax for Haxe 3
+
 ## 1.3.0
 
 - Attempting to add a little more detail around warning message for duplicate rule mappings

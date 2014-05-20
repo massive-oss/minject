@@ -2,7 +2,7 @@
 	"project": 
 	{
 		"name": "MassiveInject",
-		"version": "1.3.0",
+		"version": "1.4.0",
 		"id": "minject",
 		"devDependencies": 
 		{
@@ -11,6 +11,9 @@
 			"mtask": "3.x",
 			"munit": "2.x"
 		},
-		"dependencies":{}
+		"dependencies": 
+		{
+
+		}
 	}
 }
