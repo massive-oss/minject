@@ -72,13 +72,7 @@ import minject.result.InjectValueResult;
 		
 		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
-	public macro function mapValue(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, useValue:haxe.macro.Expr, ?named:haxe.macro.Expr)
-	{
-		Macro.keep(whenAskedFor);
-		return macro $ethis._mapValue($whenAskedFor, $useValue, $named);
-	}
-
-	public function _mapValue(whenAskedFor:Class<Dynamic>, useValue:Dynamic, ?named:String = ""):Dynamic
+	public function mapValue(whenAskedFor:Class<Dynamic>, useValue:Dynamic, ?named:String = ""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
 		config.setResult(new InjectValueResult(useValue));
@@ -97,13 +91,7 @@ import minject.result.InjectValueResult;
 
 		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
-	public macro function mapClass(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, instantiateClass:haxe.macro.Expr, ?named:haxe.macro.Expr)
-	{
-		Macro.keep(instantiateClass);
-		return macro $ethis._mapClass($whenAskedFor, $instantiateClass, $named);
-	}
-
-	public function _mapClass(whenAskedFor:Class<Dynamic>, instantiateClass:Class<Dynamic>, ?named:String=""):Dynamic
+	public function mapClass(whenAskedFor:Class<Dynamic>, instantiateClass:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
 		config.setResult(new InjectClassResult(instantiateClass));
@@ -121,15 +109,9 @@ import minject.result.InjectValueResult;
 		
 		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
-	public macro function mapSingleton(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, ?named:haxe.macro.Expr)
+	public function mapSingleton(whenAskedFor:Class<Dynamic>, ?named:String="") :Dynamic
 	{
-		Macro.keep(whenAskedFor);
-		return macro $ethis._mapSingleton($whenAskedFor, $named);
-	}
-
-	public function _mapSingleton(whenAskedFor:Class<Dynamic>, ?named:String="") :Dynamic
-	{
-		return _mapSingletonOf(whenAskedFor, whenAskedFor, named);
+		return mapSingletonOf(whenAskedFor, whenAskedFor, named);
 	}
 	
 	/**
@@ -145,13 +127,7 @@ import minject.result.InjectValueResult;
 		
 		@returns A reference to the rule for this injection. To be used with `mapRule`
 	**/
-	public macro function mapSingletonOf(ethis:haxe.macro.Expr, whenAskedFor:haxe.macro.Expr, useSingletonOf:haxe.macro.Expr, ?named:haxe.macro.Expr)
-	{
-		Macro.keep(useSingletonOf);
-		return macro $ethis._mapSingletonOf($whenAskedFor, $useSingletonOf, $named);
-	}
-
-	public function _mapSingletonOf(whenAskedFor:Class<Dynamic>, useSingletonOf:Class<Dynamic>, ?named:String=""):Dynamic
+	public function mapSingletonOf(whenAskedFor:Class<Dynamic>, useSingletonOf:Class<Dynamic>, ?named:String=""):Dynamic
 	{
 		var config = getMapping(whenAskedFor, named);
 		config.setResult(new InjectSingletonResult(useSingletonOf));

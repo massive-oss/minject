@@ -32,17 +32,6 @@ class Macro
 {
 	static var called = false;
 
-	public static function keep(type:Expr)
-	{
-		var type = haxe.macro.Context.typeof(type);
-		switch (type)
-		{
-			case haxe.macro.Type.TType(t, _):
-				t.get().meta.add("@:keep", [], haxe.macro.Context.currentPos());
-			default:
-		}
-	}
-
 	public static function addMetadata()
 	{
 		if (!called)
