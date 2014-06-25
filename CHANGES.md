@@ -1,3 +1,7 @@
+## 1.5.0
+
+- Removed macro approach to DCE support
+
 ## 1.4.0
 
 - Internal refactor, dce support, removed dependencies, only assert in debug.
