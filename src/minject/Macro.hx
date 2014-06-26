@@ -83,6 +83,7 @@ class Macro
 		}
 		
 		if (abort) return;
+		field.meta.add(":keep", [], Context.currentPos());
 		
 		switch (field.kind)
 		{
