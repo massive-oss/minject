@@ -1,3 +1,7 @@
+## 1.5.1
+
+- Add @:keep to all injected fields
+
 ## 1.5.0
 
 - Removed macro approach to DCE support
