@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -23,24 +23,17 @@ SOFTWARE.
 package minject.point;
 
 import minject.Injector;
+import minject.point.MethodInjectionPoint;
 
 class ConstructorInjectionPoint extends MethodInjectionPoint
 {
-	public function new(meta:Dynamic, forClass:Class<Dynamic>, ?injector:Injector=null)
+	public function new(args:Array<ArgInjectionInfo>)
 	{
-		super(meta, injector);
+		super('new', args);
 	}
 	
-	public override function applyInjection(target:Dynamic, injector:Injector):Dynamic
+	override public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var ofClass:Class<Dynamic> = target;
-		var withArgs:Array<Dynamic> = gatherParameterValues(target, injector);
-		return mcore.util.Types.createInstance(ofClass, withArgs);
-	}
-
-	override function initializeInjection(meta:Dynamic):Void
-	{
-		methodName = "new";
-		gatherParameters(meta);
+		return Type.createInstance(target, gatherArgs(target, injector));
 	}
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -26,11 +26,8 @@ import minject.Injector;
 
 class InjectionResult
  {
-	public function new()
-	{
-	}
-	
-	@:IgnoreCover
+	public function new() {}
+
 	public function getResponse(injector:Injector):Dynamic
 	{
 		return null;

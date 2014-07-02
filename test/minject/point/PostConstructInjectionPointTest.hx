@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -48,8 +48,7 @@ class PostConstructInjectionPointTest
 	public function post_construction_injection_into_method_with_order()
 	{
 		var injectee = new ClassInjectee();
-		var meta = {inject:null, name:["doSomeStuff"], post:[1]};
-		var injectionPoint = new PostConstructInjectionPoint(meta);
+		var injectionPoint = new PostConstructInjectionPoint("doSomeStuff", 1);
 		injectionPoint.applyInjection(injectee, injector);
 		Assert.isTrue(injectee.someProperty);
 	}
@@ -58,8 +57,7 @@ class PostConstructInjectionPointTest
 	public function post_construction_injection_into_method_without_order()
 	{
 		var injectee = new ClassInjectee();
-		var meta = {inject:null, name:["doSomeStuff"], post:null};
-		var injectionPoint = new PostConstructInjectionPoint(meta);
+		var injectionPoint = new PostConstructInjectionPoint("doSomeStuff");
 		injectionPoint.applyInjection(injectee, injector);
 		Assert.isTrue(injectee.someProperty);
 	}

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -23,30 +23,22 @@ SOFTWARE.
 package minject;
 
 import haxe.rtti.Meta;
-
-import mdata.Dictionary;
+import haxe.ds.WeakMap;
 import minject.point.ConstructorInjectionPoint;
 import minject.point.InjectionPoint;
 import minject.point.MethodInjectionPoint;
 import minject.point.NoParamsConstructorInjectionPoint;
 import minject.point.PostConstructInjectionPoint;
 import minject.point.PropertyInjectionPoint;
-
 import minject.result.InjectClassResult;
 import minject.result.InjectOtherRuleResult;
 import minject.result.InjectSingletonResult;
 import minject.result.InjectValueResult;
 
-#if haxe3
-import haxe.ds.StringMap;
-#else
-private typedef StringMap<T> = Hash<T>;
-#end
-
 /**
 	The dependency injector.
 **/
-#if !macro @:build(minject.RTTI.build()) #end class Injector
+#if !macro @:build(minject.Macro.addMetadata()) #end class Injector
 {
 	/**
 		A set of instances that have already had their dependencies satisfied by the injector.
@@ -56,15 +48,15 @@ private typedef StringMap<T> = Hash<T>;
 	/**
 		The parent of this injector.
 	**/
-	public var parentInjector(default, set_parentInjector):Injector;
+	public var parentInjector(default, set):Injector;
 
-	var injectionConfigs:StringMap<InjectionConfig>;
-	var injecteeDescriptions:ClassHash<InjecteeDescription>;
+	var injectionConfigs:Map<String, InjectionConfig>;
+	var injecteeDescriptions:ClassMap<InjecteeDescription>;
 	
 	public function new()
 	{
-		injectionConfigs = new StringMap<InjectionConfig>();
-		injecteeDescriptions = new ClassHash<InjecteeDescription>();
+		injectionConfigs = new Map();
+		injecteeDescriptions = new ClassMap();
 		attendedToInjectees = new InjecteeSet();
 	}
 	
@@ -162,7 +154,7 @@ private typedef StringMap<T> = Hash<T>;
 		return useRule;
 	}
 	
-	public function getMapping(forClass:Class<Dynamic>, ?named:String=""):Dynamic
+	public function getMapping(forClass:Class<Dynamic>, ?named:String=""):InjectionConfig
 	{
 		var requestName = getClassName(forClass) + "#" + named;
 		
@@ -285,7 +277,7 @@ private typedef StringMap<T> = Hash<T>;
 		@param named An optional name (id)
 		@returns Whether such a mapping exists
 	**/
-	public function hasMapping(forClass:Class<Dynamic>, ?named :String = '') :Bool
+	public function hasMapping(forClass:Class<Dynamic>, ?named:String = ''):Bool
 	{
 		var mapping = getConfigurationForRequest(forClass, named);
 		
@@ -355,10 +347,10 @@ private typedef StringMap<T> = Hash<T>;
 	{
 		var typeMeta = Meta.getType(forClass);
 
+		#if debug
 		if (typeMeta != null && Reflect.hasField(typeMeta, "interface"))
-		{
 			throw "Interfaces can't be used as instantiatable classes.";
-		}
+		#end
 
 		var fieldsMeta = getFields(forClass);
 
@@ -369,6 +361,7 @@ private typedef StringMap<T> = Hash<T>;
 		for (field in Reflect.fields(fieldsMeta))
 		{
 			var fieldMeta:Dynamic = Reflect.field(fieldsMeta, field);
+			// fieldMeta.name = field;
 
 			var inject = Reflect.hasField(fieldMeta, "inject");
 			var post = Reflect.hasField(fieldMeta, "post");
@@ -379,26 +372,28 @@ private typedef StringMap<T> = Hash<T>;
 			{
 				if (args.length > 0)
 				{
-					ctorInjectionPoint = new ConstructorInjectionPoint(fieldMeta, forClass, this);
+					ctorInjectionPoint = new ConstructorInjectionPoint(fieldMeta.args);
 				}
 			}
 			else if (Reflect.hasField(fieldMeta, "args")) // method
 			{
 				if (inject) // injection
 				{
-					var injectionPoint = new MethodInjectionPoint(fieldMeta, this);
-					injectionPoints.push(injectionPoint);
+					var point = new MethodInjectionPoint(field, fieldMeta.args);
+					injectionPoints.push(point);
 				}
 				else if (post) // post construction
 				{
-					var injectionPoint = new PostConstructInjectionPoint(fieldMeta, this);
-					postConstructMethodPoints.push(injectionPoint);
+					var order = fieldMeta.post == null ? 0 : fieldMeta.post[0];
+					var point = new PostConstructInjectionPoint(field, order);
+					postConstructMethodPoints.push(point);
 				}
 			}
 			else if (type != null) // property
 			{
-				var injectionPoint = new PropertyInjectionPoint(fieldMeta, this);
-				injectionPoints.push(injectionPoint);
+				var name = fieldMeta.inject == null ? null : fieldMeta.inject[0];
+				var point = new PropertyInjectionPoint(field, fieldMeta.type[0], name);
+				injectionPoints.push(point);
 			}
 
 			if(!post && !inject) processCustomInjectionPoints(forClass, field, fieldMeta, injectionPoints);
@@ -407,17 +402,11 @@ private typedef StringMap<T> = Hash<T>;
 		if (postConstructMethodPoints.length > 0)
 		{
 			postConstructMethodPoints.sort(function(a, b) { return a.order - b.order; });
-			
-			for (point in postConstructMethodPoints)
-			{
-				injectionPoints.push(point);
-			}
+			for (point in postConstructMethodPoints) injectionPoints.push(point);
 		}
 
 		if (ctorInjectionPoint == null)
-		{
 			ctorInjectionPoint = new NoParamsConstructorInjectionPoint();
-		}
 
 		var injecteeDescription = new InjecteeDescription(ctorInjectionPoint, injectionPoints);
 		injecteeDescriptions.set(forClass, injecteeDescription);
@@ -436,13 +425,11 @@ private typedef StringMap<T> = Hash<T>;
 	{
 		var requestName = getClassName(forClass) + '#' + named;
 		
-		if(!injectionConfigs.exists(requestName))
+		if (!injectionConfigs.exists(requestName))
 		{
-			if (traverseAncestors && parentInjector != null && parentInjector.hasMapping(forClass, named))
-			{
-				return getAncestorMapping(forClass, named);
-			}
-
+			if (traverseAncestors && parentInjector != null 
+				&& parentInjector.hasMapping(forClass, named))
+					return getAncestorMapping(forClass, named);
 			return null;
 		}
 
@@ -451,19 +438,13 @@ private typedef StringMap<T> = Hash<T>;
 
 	function set_parentInjector(value:Injector):Injector
 	{
-		//restore own map of worked injectees if parent injector is removed
-		if (parentInjector != null && value == null)
-		{
-			attendedToInjectees = new InjecteeSet();
-		}
+		// restore own map of worked injectees if parent injector is removed
+		if (parentInjector != null && value == null) attendedToInjectees = new InjecteeSet();
 
 		parentInjector = value;
 
-		//use parent's map of worked injectees
-		if (parentInjector != null)
-		{
-			attendedToInjectees = parentInjector.attendedToInjectees;
-		}
+		// use parent's map of worked injectees
+		if (parentInjector != null) attendedToInjectees = parentInjector.attendedToInjectees;
 
 		return parentInjector;
 	}
@@ -477,19 +458,13 @@ private typedef StringMap<T> = Hash<T>;
 	function getFields(type:Class<Dynamic>)
 	{
 		var meta = {};
-
 		while (type != null)
 		{
 			var typeMeta = haxe.rtti.Meta.getFields(type);
-
 			for (field in Reflect.fields(typeMeta))
-			{
 				Reflect.setField(meta, field, Reflect.field(typeMeta, field));
-			}
-
 			type = Type.getSuperClass(type);
 		}
-
 		return meta;
 	}
 }
@@ -502,23 +477,23 @@ private typedef StringMap<T> = Hash<T>;
 	to avoid storing a direct reference of it here, causing it never to be 
 	available for GC.
 **/
-private class InjecteeSet
+class InjecteeSet
 {
 	#if (flash9 || cpp || java || php)
-	var store:Dictionary<Dynamic, Bool>;
+	var map:WeakMap<Dynamic, Bool>;
 	#end
 	
 	public function new()
 	{
 		#if (flash9 || cpp || java || php)
-		store = new Dictionary(true);
+		map = new WeakMap();
 		#end
 	}
 
 	public function add(value:Dynamic)
 	{
 		#if (flash9 || cpp || java || php)
-		store.set(value, true);
+		map.set(value, true);
 		#else
 		value.__injected__ = true;
 		#end
@@ -527,20 +502,23 @@ private class InjecteeSet
 	public function contains(value:Dynamic)
 	{
 		#if (flash9 || cpp || java || php)
-		return store.exists(value);
+		return map.exists(value);
 		#else
 		return value.__injected__ == true;
 		#end
 	}
 
-	public function delete(value:Dynamic)
+	public function remove(value:Dynamic)
 	{
 		#if (flash9 || cpp || java || php)
-		store.delete(value);
+		map.remove(value);
 		#else
 		Reflect.deleteField(value, "__injected__");
 		#end
 	}
+
+	// deprecated
+	inline public function delete(value:Dynamic) remove(value);
 
 	/**
 		Under dynamic targets that don't support weak refs (js, avm1, neko) this will always 
@@ -550,35 +528,10 @@ private class InjecteeSet
 	public function iterator()
 	{
 		#if (flash9 || cpp || java || php)
-		return store.iterator();
+		return map.iterator();
 		#else
 		return [].iterator();
 		#end
-	}
-}
-
-class ClassHash<T>
-{
-	var hash:StringMap<T>;
-
-	public function new()
-	{
-		hash = new StringMap<T>();
-	}
-
-	public function set(key:Class<Dynamic>, value:T):Void
-	{
-		hash.set(Type.getClassName(key), value);
-	}
-
-	public function get(key:Class<Dynamic>):T
-	{
-		return hash.get(Type.getClassName(key));
-	}
-
-	public function exists(key:Class<Dynamic>):Bool
-	{
-		return hash.exists(Type.getClassName(key));
 	}
 }
 

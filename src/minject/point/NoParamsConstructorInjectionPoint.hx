@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -23,17 +23,13 @@ SOFTWARE.
 package minject.point;
 
 import minject.Injector;
-import haxe.rtti.CType;
 
-class NoParamsConstructorInjectionPoint extends InjectionPoint
+class NoParamsConstructorInjectionPoint implements InjectionPoint
 {
-	public function new()
-	{
-		super(null, null);
-	}
+	public function new() {}
 	
-	public override function applyInjection(target:Dynamic, injector:Injector):Dynamic
+	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		return mcore.util.Types.createInstance(target, []);
+		return Type.createInstance(target, []);
 	}
 }

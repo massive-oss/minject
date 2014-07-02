@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -34,7 +34,7 @@ class InjectValueResult extends InjectionResult
 		this.value = value;
 	}
 	
-	public override function getResponse(injector:Injector):Dynamic
+	override public function getResponse(injector:Injector):Dynamic
 	{
 		return value;
 	}

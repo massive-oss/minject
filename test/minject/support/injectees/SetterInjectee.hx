@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -30,7 +30,7 @@ class SetterInjectee
 	// the property directly, bypassing the setter.
 
 	@inject
-	public var property(get_property, set_property):Class1;
+	public var property(get, set):Class1;
 	
 	var _property:Class1;
 

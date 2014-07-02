@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -22,113 +22,59 @@ SOFTWARE.
 
 package minject.point;
 
-import minject.InjectionConfig;
 import minject.Injector;
-import haxe.rtti.CType;
-import mcore.util.Reflection;
 
-class MethodInjectionPoint extends InjectionPoint
+class MethodInjectionPoint implements InjectionPoint
 {
-	var methodName:String;
-	var _parameterInjectionConfigs:Array<Dynamic>;
-	var requiredParameters:Int;
+	public var name(default, null):String;
+	public var args(default, null):Array<ArgInjectionInfo>;
 	
-	public function new(meta:Dynamic, ?injector:Injector=null)
+	public function new(name:String, args:Array<ArgInjectionInfo>)
 	{
-		requiredParameters = 0;
-		super(meta, injector);
+		this.name = name;
+		this.args = args;
+
+		#if debug
+		for (arg in args)
+			if (arg.type == "Dynamic")
+				throw 'Error in method definition of injectee. Required parameters can\'t have non class type.';
+		#end
 	}
 	
-	override public function applyInjection(target:Dynamic, injector:Injector):Dynamic
+	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var parameters:Array<Dynamic> = gatherParameterValues(target, injector);
-		var method:Dynamic = Reflect.field(target, methodName);
-		Reflection.callMethod(target, method, parameters);
+		Reflect.callMethod(target, Reflect.field(target, name), gatherArgs(target, injector));
 		return target;
 	}
 	
-	override function initializeInjection(meta:Dynamic):Void
+	function gatherArgs(target:Dynamic, injector:Injector):Array<Dynamic>
 	{
-		methodName = meta.name[0];
-		gatherParameters(meta);
-	}
-	
-	function gatherParameters(meta:Dynamic):Void
-	{
-		var nameArgs = meta.inject;
-		var args:Array<Dynamic> = meta.args;
+		var values = [];
 
-		if (nameArgs == null) nameArgs = [];
-		_parameterInjectionConfigs = [];
-
-		var i = 0;
 		for (arg in args)
 		{
-			var injectionName = "";
+			var name = arg.name == null ? "" : arg.name;
+			var config = injector.getMapping(Type.resolveClass(arg.type), arg.name);
+			var injection = config.getResponse(injector);
 
-			if (i < nameArgs.length)
+			#if debug
+			if (injection == null && !arg.opt)
 			{
-				injectionName = nameArgs[i];
+				var targetName = Type.getClassName(Type.getClass(target));
+				var requestName = Type.getClassName(config.request);
+				throw 'Injector is missing a rule to handle injection into target $targetName. ' +
+					'Target dependency: $requestName, method: $name, named: ' + arg.name;
 			}
-
-			var parameterTypeName = arg.type;
-
-			if (arg.opt)
-			{
-				if (parameterTypeName == "Dynamic")
-				{
-					//TODO: Find a way to trace name of affected class here
-					throw 'Error in method definition of injectee. Required parameters can\'t have non class type.';
-				}
-			}
-			else
-			{
-				requiredParameters++;
-			}
-
-			_parameterInjectionConfigs.push(new ParameterInjectionConfig(parameterTypeName, injectionName));
-			
-			i++;
-		}
-	}
-	
-	function gatherParameterValues(target:Dynamic, injector:Injector):Array<Dynamic>
-	{
-
-		var parameters: Array<Dynamic> = [];
-		var length: Int = _parameterInjectionConfigs.length;
-
-		for (i in 0...length)
-		{
-			var parameterConfig = _parameterInjectionConfigs[i];
-			var config = injector.getMapping(Type.resolveClass(parameterConfig.typeName), parameterConfig.injectionName);
-			
-			var injection:Dynamic = config.getResponse(injector);
-			if (injection == null)
-			{
-				if (i >= requiredParameters)
-				{
-					break;
-				}
-				
-				throw 'Injector is missing a rule to handle injection into target ' + Type.getClassName(Type.getClass(target)) + '. Target dependency: ' + Type.getClassName(config.request) + ', method: ' + methodName + ', parameter: ' + (i + 1) + ', named: ' + parameterConfig.injectionName;
-			}
-			
-			parameters[i] = injection;
+			#end
+			values.push(injection);
 		}
 
-		return parameters;
+		return values;
 	}
 }
 
-class ParameterInjectionConfig
-{
-	public var typeName:String;
-	public var injectionName:String;
-
-	public function new(typeName:String, injectionName:String)
-	{
-		this.typeName = typeName;
-		this.injectionName = injectionName;
-	}
+typedef ArgInjectionInfo = {
+	var opt:Bool;
+	var type:String;
+	@:optional var name:String;
 }

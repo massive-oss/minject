@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Massive Interactive
+Copyright (c) 2012-2014 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -48,8 +48,7 @@ class ConstructorInjectionPointTest
 	@Test
 	public function one_parameter_constructor_injection()
 	{
-		var meta = {inject:null, name:["new"], args:[{type:"minject.support.types.Class1", opt:false}]};
-		var point = new ConstructorInjectionPoint(meta, OneParameterConstructorInjectee);
+		var point = new ConstructorInjectionPoint([{type:"minject.support.types.Class1", opt:false}]);
 
 		injector.mapSingleton(Class1);
 		var injectee = point.applyInjection(OneParameterConstructorInjectee, injector);
