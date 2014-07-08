@@ -166,6 +166,4 @@ class Macro
 		field.meta.add("type", [Context.parse('"' + typeName + '"', ref.pos)], ref.pos);
 	}
 }
-#else
-class RTTI{}
 #end

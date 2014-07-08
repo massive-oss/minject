@@ -24,12 +24,11 @@
 -cp test
 -neko bin/test/neko_test.n
 
-# --next
+--next
 
-# -main TestMain
-# -debug
-# -lib munit
-# -lib mdata
-# -cp src
-# -cp test
-# -cpp bin/test/cpp_test
+-main TestMain
+-debug
+-lib munit
+-cp src
+-cp test
+-cpp bin/test/cpp_test

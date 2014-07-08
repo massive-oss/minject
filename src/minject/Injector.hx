@@ -24,6 +24,7 @@ package minject;
 
 import haxe.rtti.Meta;
 import haxe.ds.WeakMap;
+import haxe.ds.ObjectMap;
 import minject.point.ConstructorInjectionPoint;
 import minject.point.InjectionPoint;
 import minject.point.MethodInjectionPoint;
@@ -469,14 +470,18 @@ import minject.result.InjectValueResult;
 **/
 class InjecteeSet
 {
-	#if (flash9 || cpp || java || php)
-	var map:WeakMap<Dynamic, Bool>;
+	#if (flash9 || java || php)
+	var map:WeakMap<{}, Bool>;
+	#elseif cpp
+	var map:ObjectMap<{}, Bool>;
 	#end
-	
+
 	public function new()
 	{
-		#if (flash9 || cpp || java || php)
-		map = new WeakMap();
+		#if (flash9 || java || php)
+		map = new WeakMap<{}, Bool>();
+		#elseif cpp
+		map = new ObjectMap<{}, Bool>();
 		#end
 	}
 
