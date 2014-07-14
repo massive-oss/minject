@@ -43,8 +43,11 @@ class PropertyInjectionPoint implements InjectionPoint
 		var injection = injectionConfig.getResponse(injector);
 		#if debug
 		if (injection == null)
+		{
+			var targetName = Type.getClassName(Type.getClass(target));
 			throw 'Injector is missing a rule to handle injection into property "$name" ' +
-				'of object "$target". Target dependency: "$type", named "$injectionName"';
+				'of object "$targetName". Target dependency: "$type", named "$injectionName"';
+		}
 		#end
 		Reflect.setProperty(target, name, injection);
 		return target;
