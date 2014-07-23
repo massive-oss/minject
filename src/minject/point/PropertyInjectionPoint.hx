@@ -27,19 +27,19 @@ import minject.Injector;
 class PropertyInjectionPoint implements InjectionPoint
 {
 	var name:String;
-	var type:String;
+	var type:Class<Dynamic>;
 	var injectionName:String;
 
 	public function new(name:String, type:String, ?injectionName:String=null)
 	{
 		this.name = name;
-		this.type = type;
+		this.type = Type.resolveClass(type);
 		this.injectionName = injectionName;
 	}
 
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var injectionConfig = injector.getMapping(Type.resolveClass(type), injectionName);
+		var injectionConfig = injector.getMapping(type, injectionName);
 		var injection = injectionConfig.getResponse(injector);
 		#if debug
 		if (injection == null)
