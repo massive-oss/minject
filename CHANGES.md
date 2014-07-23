@@ -1,3 +1,7 @@
+## 1.5.2
+
+- Use Map to track injected instances under cpp as WeakMap is not implemented.
+
 ## 1.5.1
 
 - Add @:keep to all injected fields
