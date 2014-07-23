@@ -31,15 +31,13 @@ using haxe.macro.Tools;
 class Macro
 {
 	static var called = false;
-	static var metaTags:Array<String>;
+	static var metaTags:Array<String> = ["inject", "post"];
 
-	public static function addMetadata(?tags:Array<String>=null)
+	public static function addMetadata()
 	{
 		if (!called)
 		{
 			called = true;
-			metaTags = tags == null ? ["inject", "post"] : tags;
-
 			Context.onGenerate(function(types){
 				for (type in types)
 				{
