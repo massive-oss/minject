@@ -64,7 +64,7 @@ class PropertyInjectionPointTest
 	{
 		var injectee = new ClassInjectee();
 		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1");
-		var threw = false;
+		var error = '';
 
 		try
 		{
@@ -72,10 +72,14 @@ class PropertyInjectionPointTest
 		}
 		catch (e:Dynamic)
 		{
-			threw = true;
+			error = e;
 		}
-		
-		Assert.isTrue(threw);
+
+		var expected:String = 'Injector is missing a rule to handle injection into property "property" of object "minject.support.injectees.ClassInjectee". Target dependency: "minject.support.types.Class1", named "null"';
+		#if js
+		expected = StringTools.replace(expected, 'null', 'undefined');
+		#end
+		Assert.isTrue(error == expected);
 	}
 
 	@Test

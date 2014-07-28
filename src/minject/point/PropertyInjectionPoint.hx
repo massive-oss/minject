@@ -27,26 +27,26 @@ import minject.Injector;
 class PropertyInjectionPoint implements InjectionPoint
 {
 	var name:String;
-	var type:String;
+	var type:Class<Dynamic>;
 	var injectionName:String;
 
 	public function new(name:String, type:String, ?injectionName:String=null)
 	{
 		this.name = name;
-		this.type = type;
+		this.type = Type.resolveClass(type);
 		this.injectionName = injectionName;
 	}
 
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var injectionConfig = injector.getMapping(Type.resolveClass(type), injectionName);
+		var injectionConfig = injector.getMapping(type, injectionName);
 		var injection = injectionConfig.getResponse(injector);
 		#if debug
 		if (injection == null)
 		{
 			var targetName = Type.getClassName(Type.getClass(target));
 			throw 'Injector is missing a rule to handle injection into property "$name" ' +
-				'of object "$targetName". Target dependency: "$type", named "$injectionName"';
+				'of object "$targetName". Target dependency: "${Type.getClassName(type)}", named "$injectionName"';
 		}
 		#end
 		Reflect.setProperty(target, name, injection);
