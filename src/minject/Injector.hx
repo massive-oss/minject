@@ -396,6 +396,8 @@ import minject.result.InjectValueResult;
 				var point = new PropertyInjectionPoint(field, fieldMeta.type[0], name);
 				injectionPoints.push(point);
 			}
+
+			if(!post && !inject) processCustomInjectionPoints(forClass, field, fieldMeta, injectionPoints);
 		}
 
 		if (postConstructMethodPoints.length > 0)
@@ -410,6 +412,14 @@ import minject.result.InjectValueResult;
 		var injecteeDescription = new InjecteeDescription(ctorInjectionPoint, injectionPoints);
 		injecteeDescriptions.set(forClass, injecteeDescription);
 		return injecteeDescription;
+	}
+
+	/**
+	Provides a hook for framework extensions to add InjectionPoints for custom metadata.
+	*/
+	function processCustomInjectionPoints(clazz:Class<Dynamic>, field:String, fieldMeta:Dynamic, injectionPoints:Array<InjectionPoint>)
+	{
+		// override in subclass to handle custom metadata and insert InjectionPoints into the injectionPoints array;
 	}
 
 	function getConfigurationForRequest(forClass:Class<Dynamic>, named:String, ?traverseAncestors:Bool=true):InjectionConfig

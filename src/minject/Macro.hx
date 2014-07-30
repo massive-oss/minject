@@ -31,6 +31,7 @@ using haxe.macro.Tools;
 class Macro
 {
 	static var called = false;
+	static var metaTags:Array<String> = ["inject", "post"];
 
 	public static function addMetadata()
 	{
@@ -74,7 +75,7 @@ class Macro
 		for (m in meta)
 		{
 			var name = m.name;
-			if (name == "inject" || name == "post")
+			if(Lambda.indexOf(metaTags,name) > -1)
 			{
 				if (name == "inject") inject = m;
 				abort = false;
@@ -106,6 +107,7 @@ class Macro
 					default:
 				}
 			case FMethod(_):
+
 				switch (field.type)
 				{
 					case TFun(args, _):
@@ -122,7 +124,7 @@ class Macro
 								pack.push(type.name);
 								var typeName = pack.join(".");
 								var name = inject.params[i] == null ? "" : inject.params[i].toString();
-								if (name == null || name == "") types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + '}', ref.pos));
+								if (name == null || name == "") types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + ',pos:'+ i +'}', ref.pos));
 								else types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + ',name:' + name + '}', ref.pos));
 							default:
 						}
