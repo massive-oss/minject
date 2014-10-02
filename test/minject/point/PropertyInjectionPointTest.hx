@@ -31,7 +31,7 @@ import minject.support.types.Class1;
 
 class PropertyInjectionPointTest
 {
- 	var injector:Injector;
+	var injector:Injector;
 
 	public function new(){}
 	
@@ -53,7 +53,7 @@ class PropertyInjectionPointTest
 		injector.mapSingleton(Class1);
 
 		var injectee = new ClassInjectee();
-		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1");
+		var injectionPoint = new PropertyInjectionPoint("property", Class1);
 		injectionPoint.applyInjection(injectee, injector);
 		
 		Assert.isTrue(Std.is( injectee.property, Class1));
@@ -63,7 +63,7 @@ class PropertyInjectionPointTest
 	public function injection_of_unmapped_property_type_throws_exception():Void
 	{
 		var injectee = new ClassInjectee();
-		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1");
+		var injectionPoint = new PropertyInjectionPoint("property", Class1);
 		var error = '';
 
 		try
@@ -88,7 +88,7 @@ class PropertyInjectionPointTest
 		injector.mapSingleton(Class1);
 
 		var injectee = new SetterInjectee();
-		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1");
+		var injectionPoint = new PropertyInjectionPoint("property", Class1);
 		injectionPoint.applyInjection(injectee, injector);
 		
 		Assert.isTrue(Std.is( injectee.property, Class1));
@@ -100,7 +100,7 @@ class PropertyInjectionPointTest
 		injector.mapSingleton(Class1, "name");
 
 		var injectee = new NamedClassInjectee();
-		var injectionPoint = new PropertyInjectionPoint("property", "minject.support.types.Class1", "name");
+		var injectionPoint = new PropertyInjectionPoint("property", Class1, "name");
 		injectionPoint.applyInjection(injectee, injector);
 		
 		Assert.isTrue(Std.is( injectee.property, Class1));

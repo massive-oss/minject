@@ -22,6 +22,7 @@ SOFTWARE.
 
 package minject;
 
+import minject.support.types.Class1Extension;
 import massive.munit.Assert;
 import minject.support.injectees.ClassInjectee;
 import minject.support.injectees.childinjectors.InjectorCopyRule;
@@ -143,6 +144,27 @@ class ChildInjectorTest
 		childInjector.injectInto(injectee);
 		Assert.areEqual(injectee.property, class1);
 	}
+
+    @Test
+    public function childInjectorHasMappingWhenExistsOnParentInjectorUsingParentSetter():Void
+    {
+        var childInjector = new Injector();
+        childInjector.parentInjector = injector;
+        var class1 = new Class1();
+        injector.mapValue(Class1, class1);
+
+        Assert.isTrue(childInjector.hasMapping(Class1));
+    }
+
+    @Test
+    public function existingConfigsshouldNotOverwriteAlreadyMappedChildConfigs():Void {
+        var childInjector = new Injector();
+        childInjector.mapClass(Class1, Class1Extension);
+        injector.mapValue(Class1, Class1);
+        childInjector.parentInjector = injector;
+
+        Assert.isTrue(Std.is(childInjector.getInstance(Class1), Class1Extension));
+    }
 	
     @Test
     public function childInjectorHasMappingWhenExistsOnParentInjector():Void
