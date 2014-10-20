@@ -48,7 +48,8 @@ class MethodInjectionPoint implements InjectionPoint
 	function makeRequestNames():Void
 	{
 		requestNames = [];
-		for (i in 0...args.length) {
+		for (i in 0...args.length)
+		{
 			var arg = args[i];
 			var requestName:String = RequestHasher.resolveRequest(Type.resolveClass(arg.type), arg.name);
 			requestNames.push(requestName);
@@ -69,7 +70,8 @@ class MethodInjectionPoint implements InjectionPoint
 			var arg = args[i];
 			var name = arg.name == null ? "" : arg.name;
 			var config = injector.getConfig(requestNames[i]);
-			if(arg.opt && config == null) {
+			if(arg.opt && config == null)
+			{
 				values.push(null);
 				continue;
 			}

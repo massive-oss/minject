@@ -166,9 +166,11 @@ import minject.result.InjectValueResult;
 		return config;
 	}
 
-	public function setConfig(requestName:String, v:InjectionConfig):Void {
+	function setConfig(requestName:String, v:InjectionConfig):Void
+	{
 		injectionConfigs.set(requestName, v);
-		for (i in 0...children.length) {
+		for (i in 0...children.length)
+		{
 			var child = children[i];
 			if(!child.hasConfig(requestName))
 				child.setConfig(requestName, v);
@@ -346,7 +348,7 @@ import minject.result.InjectValueResult;
 
 		while (parent != null)
 		{
-			var parentConfig = parent.getConfigurationNoAncestors(forClass, named);
+			var parentConfig = parent.getConfigurationForRequest(forClass, named);
 
 			if (parentConfig != null && parentConfig.hasOwnResponse())
 			{
@@ -430,12 +432,6 @@ import minject.result.InjectValueResult;
 	}
 
 	function getConfigurationForRequest(forClass:Class<Dynamic>, named:String):InjectionConfig
-	{
-		var requestName:String = RequestHasher.resolveRequest(forClass, named);
-		return injectionConfigs.get(requestName);
-	}
-
-	function getConfigurationNoAncestors(forClass:Class<Dynamic>, named:String):InjectionConfig
 	{
 		var requestName:String = RequestHasher.resolveRequest(forClass, named);
 		return injectionConfigs.get(requestName);
