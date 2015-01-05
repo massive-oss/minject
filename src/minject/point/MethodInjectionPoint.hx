@@ -75,13 +75,13 @@ class MethodInjectionPoint implements InjectionPoint
 				values.push(null);
 				continue;
 			}
-			var injection = config.getResponse(injector);
+			var injection = (config != null) ? config.getResponse(injector) : null;
 
 			#if debug
 			if (injection == null && !arg.opt)
 			{
 				var targetName = Type.getClassName(Type.getClass(target));
-				var requestName = Type.getClassName(config.request);
+				var requestName = (config == null) ? "unknown" : Type.getClassName(config.request);
 				throw 'Injector is missing a rule to handle injection into target $targetName. ' +
 					'Target dependency: $requestName, method: $name, named: ' + arg.name;
 			}
