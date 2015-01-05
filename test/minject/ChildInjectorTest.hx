@@ -1,22 +1,22 @@
 /*
 Copyright (c) 2012-2014 Massive Interactive
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of 
-this software and associated documentation files (the "Software"), to deal in 
-the Software without restriction, including without limitation the rights to 
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-of the Software, and to permit persons to whom the Software is furnished to do 
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
 so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all 
+The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
@@ -39,9 +39,9 @@ import minject.support.types.Class1;
 class ChildInjectorTest
  {
 	public function new(){}
-	
+
 	var injector:Injector;
-	
+
 	@Before
 	public function runBeforeEachTest():Void
 	{
@@ -53,14 +53,14 @@ class ChildInjectorTest
 	{
 		injector = null;
 	}
-	
+
 	@Test
 	public function injectorCreatesChildInjector():Void
 	{
 		var childInjector = injector.createChildInjector();
 		Assert.isType(childInjector, Injector);
 	}
-	
+
 	@Test
 	public function injectorUsesChildInjectorForSpecifiedRule():Void
 	{
@@ -71,18 +71,18 @@ class ChildInjectorTest
 		leftChildInjector.mapClass(RobotAnkle, RobotAnkle);
 		leftChildInjector.mapClass(RobotFoot, LeftRobotFoot);
 		leftFootRule.setInjector(leftChildInjector);
-		
+
 		var rightFootRule = injector.mapClass(RobotLeg, RobotLeg, "rightLeg");
 		var rightChildInjector = injector.createChildInjector();
 		rightChildInjector.mapClass(RobotAnkle, RobotAnkle);
 		rightChildInjector.mapClass(RobotFoot, RightRobotFoot);
 		rightFootRule.setInjector(rightChildInjector);
-		
+
 		var robotBody = injector.instantiate(RobotBody);
 		Assert.isType(robotBody.rightLeg.ankle.foot, RightRobotFoot);
 		Assert.isType(robotBody.leftLeg.ankle.foot, LeftRobotFoot);
 	}
-	
+
 	@Test
 	public function childInjectorUsesParentInjectorForMissingRules():Void
 	{
@@ -106,7 +106,7 @@ class ChildInjectorTest
 		Assert.isType(robotBody.rightLeg.ankle.foot.toes, RobotToes);
 		Assert.isType(robotBody.leftLeg.ankle.foot.toes, RobotToes);
 	}
-	
+
 	@Test
 	public function childInjectorDoesntReturnToParentAfterUsingParentInjectorForMissingRules():Void
 	{
@@ -127,22 +127,6 @@ class ChildInjectorTest
 		var robotBody = injector.instantiate(RobotBody);
 		Assert.isType(robotBody.rightLeg.ankle.foot, RightRobotFoot);
 		Assert.isType(robotBody.leftLeg.ankle.foot, LeftRobotFoot);
-	}
-	
-	@Test
-	public function childInjectorUsesParentsMapOfWorkedInjectees():Void
-	{
-		var childInjector = injector.createChildInjector();
-		
-		var class1 = new Class1();
-		var class2 = new Class1();
-
-		injector.mapValue(Class1, class1);
-		childInjector.mapValue(Class1, class2);
-
-		var injectee = injector.instantiate(ClassInjectee);
-		childInjector.injectInto(injectee);
-		Assert.areEqual(injectee.property, class1);
 	}
 
     @Test
@@ -165,24 +149,24 @@ class ChildInjectorTest
 
         Assert.isTrue(Std.is(childInjector.getInstance(Class1), Class1Extension));
     }
-	
+
     @Test
     public function childInjectorHasMappingWhenExistsOnParentInjector():Void
     {
         var childInjector = injector.createChildInjector();
         var class1 = new Class1();
-        injector.mapValue(Class1, class1);  
-        
+        injector.mapValue(Class1, class1);
+
         Assert.isTrue(childInjector.hasMapping(Class1));
     }
-    
+
     @Test
     public function childInjectorDoesNotHaveMappingWhenDoesNotExistOnParentInjector():Void
     {
         var childInjector = injector.createChildInjector();
         Assert.isFalse(childInjector.hasMapping(Class1));
     }
-    
+
     @Test
     public function grandChildInjectorSuppliesInjectionFromAncestor():Void
     {
@@ -192,10 +176,10 @@ class ChildInjectorTest
 
         injector.mapSingleton(Class1);
         grandChildInjector.injectInto(injectee);
-        
+
         Assert.isType(injectee.property, Class1);
     }
-	
+
 	@Test
 	public function injectorCanCreateChildInjectorDuringInjection():Void
 	{
