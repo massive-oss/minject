@@ -1,3 +1,8 @@
+## 1.6.0
+
+- fixed issue with injection exception message not displaying
+- Property Injection Point performance improvement
+
 ## 1.5.2
 
 - Use Map to track injected instances under cpp as WeakMap is not implemented.

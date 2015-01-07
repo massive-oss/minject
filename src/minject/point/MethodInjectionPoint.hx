@@ -28,6 +28,8 @@ class MethodInjectionPoint implements InjectionPoint
 {
 	public var name(default, null):String;
 	public var args(default, null):Array<ArgInjectionInfo>;
+
+	var requestNames:Array<String>;
 	
 	public function new(name:String, args:Array<ArgInjectionInfo>)
 	{
@@ -39,8 +41,21 @@ class MethodInjectionPoint implements InjectionPoint
 			if (arg.type == "Dynamic")
 				throw 'Error in method definition of injectee. Required parameters can\'t have non class type.';
 		#end
+
+		makeRequestNames();
 	}
-	
+
+	function makeRequestNames():Void
+	{
+		requestNames = [];
+		for (i in 0...args.length)
+		{
+			var arg = args[i];
+			var requestName:String = RequestHasher.resolveRequest(Type.resolveClass(arg.type), arg.name);
+			requestNames.push(requestName);
+		}
+	}
+
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
 		Reflect.callMethod(target, Reflect.field(target, name), gatherArgs(target, injector));
@@ -50,18 +65,23 @@ class MethodInjectionPoint implements InjectionPoint
 	function gatherArgs(target:Dynamic, injector:Injector):Array<Dynamic>
 	{
 		var values = [];
-
-		for (arg in args)
+		for (i in 0...args.length)
 		{
+			var arg = args[i];
 			var name = arg.name == null ? "" : arg.name;
-			var config = injector.getMapping(Type.resolveClass(arg.type), arg.name);
-			var injection = config.getResponse(injector);
+			var config = injector.getConfig(requestNames[i]);
+			if(arg.opt && config == null)
+			{
+				values.push(null);
+				continue;
+			}
+			var injection = (config != null) ? config.getResponse(injector) : null;
 
 			#if debug
 			if (injection == null && !arg.opt)
 			{
 				var targetName = Type.getClassName(Type.getClass(target));
-				var requestName = Type.getClassName(config.request);
+				var requestName = (config == null) ? "unknown" : Type.getClassName(config.request);
 				throw 'Injector is missing a rule to handle injection into target $targetName. ' +
 					'Target dependency: $requestName, method: $name, named: ' + arg.name;
 			}
