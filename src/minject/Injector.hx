@@ -42,14 +42,9 @@ import minject.result.InjectValueResult;
 #if !macro @:build(minject.Macro.addMetadata()) #end class Injector
 {
 	/**
-		A set of instances that have already had their dependencies satisfied by the injector.
-	**/
-	public var attendedToInjectees(default, null):InjecteeSet;
-
-	/**
 		The parent of this injector.
 	**/
-	public var parentInjector(default, set):Injector;
+	public var parentInjector(default, null):Injector;
 
 	var injectionConfigs:Map<String, InjectionConfig>;
 	var injecteeDescriptions:ClassMap<InjecteeDescription>;
@@ -58,7 +53,6 @@ import minject.result.InjectValueResult;
 	{
 		injectionConfigs = new Map();
 		injecteeDescriptions = new ClassMap();
-		attendedToInjectees = new InjecteeSet();
 	}
 	
 	/**
@@ -178,13 +172,6 @@ import minject.result.InjectValueResult;
 	**/
 	public function injectInto(target:Dynamic):Void
 	{
-		if (attendedToInjectees.contains(target))
-		{
-			return;
-		}
-
-		attendedToInjectees.add(target);
-
 		// get injection points or cache them if this target's class wasn't encountered before
 		var targetClass = Type.getClass(target);
 
@@ -427,19 +414,6 @@ import minject.result.InjectValueResult;
 		return injectionConfigs.get(requestName);
 	}
 
-	function set_parentInjector(value:Injector):Injector
-	{
-		// restore own map of worked injectees if parent injector is removed
-		if (parentInjector != null && value == null) attendedToInjectees = new InjecteeSet();
-
-		parentInjector = value;
-
-		// use parent's map of worked injectees
-		if (parentInjector != null) attendedToInjectees = parentInjector.attendedToInjectees;
-
-		return parentInjector;
-	}
-
 	function getClassName(forClass:Class<Dynamic>):String
 	{
 		if (forClass == null) return "Dynamic";
@@ -457,76 +431,6 @@ import minject.result.InjectValueResult;
 			type = Type.getSuperClass(type);
 		}
 		return meta;
-	}
-}
-
-/**
-	Contains the set of objects which have been injected into.
-	 
-	Under dynamic languages that don't support weak references this set a 
-	hidden property on an injectee when added, to mark it as injected. This is 
-	to avoid storing a direct reference of it here, causing it never to be 
-	available for GC.
-**/
-class InjecteeSet
-{
-	#if (flash9 || java || php)
-	var map:WeakMap<{}, Bool>;
-	#elseif cpp
-	var map:ObjectMap<{}, Bool>;
-	#end
-
-	public function new()
-	{
-		#if (flash9 || java || php)
-		map = new WeakMap<{}, Bool>();
-		#elseif cpp
-		map = new ObjectMap<{}, Bool>();
-		#end
-	}
-
-	public function add(value:Dynamic)
-	{
-		#if (flash9 || cpp || java || php)
-		map.set(value, true);
-		#else
-		value.__injected__ = true;
-		#end
-	}
-
-	public function contains(value:Dynamic)
-	{
-		#if (flash9 || cpp || java || php)
-		return map.exists(value);
-		#else
-		return value.__injected__ == true;
-		#end
-	}
-
-	public function remove(value:Dynamic)
-	{
-		#if (flash9 || cpp || java || php)
-		map.remove(value);
-		#else
-		Reflect.deleteField(value, "__injected__");
-		#end
-	}
-
-	// deprecated
-	inline public function delete(value:Dynamic) remove(value);
-
-	/**
-		Under dynamic targets that don't support weak refs (js, avm1, neko) this will always 
-		return an empty iterator due to values not being stored in this set. This is to avoid 
-		memory leaks.
-	**/
-	public function iterator()
-	{
-		#if (flash9 || cpp || java || php)
-		return map.iterator();
-		#else
-		return [].iterator();
-		#end
 	}
 }
 
