@@ -2,7 +2,7 @@ package minject;
 
 import minject.point.InjectionPoint;
 
-class InjectorDescription
+class InjectorInfo
 {
 	public var ctor:InjectionPoint;
 	public var injectionPoints:Array<InjectionPoint>;

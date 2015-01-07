@@ -40,8 +40,8 @@ import minject.result.*;
 	// map of injector rules by className#name
 	var rules = new Map<String, InjectorRule>();
 
-	// map of injector descriptions by className
-	var descriptions = new Map<String, InjectorDescription>();
+	// map of injector infos by className
+	var infos = new Map<String, InjectorInfo>();
 	
 	public function new() {}
 	
@@ -135,13 +135,12 @@ import minject.result.*;
 	**/
 	public function injectInto(target:Dynamic):Void
 	{
-		var theClass = Type.getClass(target);
-		var description = getDescription(theClass);
+		var info = getInfo(Type.getClass(target));
 
 		// no injections for class
-		if (description == null) return;
+		if (info == null) return;
 
-		for (injectionPoint in description.injectionPoints)
+		for (injectionPoint in info.injectionPoints)
 			injectionPoint.applyInjection(target, this);
 	}
 	
@@ -150,8 +149,8 @@ import minject.result.*;
 	**/
 	public function construct<T>(theClass:Class<T>):T
 	{
-		var description = getDescription(theClass);
-		return description.ctor.applyInjection(theClass, this);
+		var info = getInfo(theClass);
+		return info.ctor.applyInjection(theClass, this);
 	}
 
 	/**
@@ -311,17 +310,17 @@ import minject.result.*;
 
 	// private
 	
-	function getDescription(forClass:Class<Dynamic>):InjectorDescription
+	function getInfo(forClass:Class<Dynamic>):InjectorInfo
 	{
 		var name = Type.getClassName(forClass);
-		if (descriptions.exists(name))
-			return descriptions.get(name);
-		var description = createDescription(forClass);
-		descriptions.set(name, description);
-		return description;
+		if (infos.exists(name))
+			return infos.get(name);
+		var info = createInfo(forClass);
+		infos.set(name, info);
+		return info;
 	}
 
-	function createDescription(forClass:Class<Dynamic>):InjectorDescription
+	function createInfo(forClass:Class<Dynamic>):InjectorInfo
 	{
 		var typeMeta = Meta.getType(forClass);
 
@@ -383,7 +382,7 @@ import minject.result.*;
 		if (ctorInjectionPoint == null)
 			ctorInjectionPoint = new ConstructorInjectionPoint([]);
 
-		return new InjectorDescription(ctorInjectionPoint, injectionPoints);
+		return new InjectorInfo(ctorInjectionPoint, injectionPoints);
 	}
 
 	function getRuleForRequest(forClass:Class<Dynamic>, named:String, ?traverseAncestors:Bool=true):InjectorRule
