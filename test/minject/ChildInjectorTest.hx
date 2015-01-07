@@ -127,23 +127,7 @@ class ChildInjectorTest
 		Assert.isType(robotBody.rightLeg.ankle.foot, RightRobotFoot);
 		Assert.isType(robotBody.leftLeg.ankle.foot, LeftRobotFoot);
 	}
-	
-	@Test
-	public function childInjectorUsesParentsMapOfWorkedInjectees():Void
-	{
-		var childInjector = injector.createChildInjector();
-		
-		var class1 = new Class1();
-		var class2 = new Class1();
 
-		injector.mapValue(Class1, class1);
-		childInjector.mapValue(Class1, class2);
-
-		var injectee = injector.instantiate(ClassInjectee);
-		childInjector.injectInto(injectee);
-		Assert.areEqual(injectee.property, class1);
-	}
-	
     @Test
     public function childInjectorHasMappingWhenExistsOnParentInjector():Void
     {
