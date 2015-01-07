@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2014 Massive Interactive
+Copyright (c) 2012-2015 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -24,13 +24,12 @@ package minject;
 
 import minject.result.InjectionResult;
 
-class InjectionConfig
+class InjectorRule
 {
 	public var request:Class<Dynamic>;
 	public var injectionName:String;
-
-	var injector:Injector;
-	var result:InjectionResult;
+	public var injector:Injector;
+	public var result:InjectionResult;
 	
 	public function new(request:Class<Dynamic>, injectionName:String)
 	{
@@ -44,7 +43,7 @@ class InjectionConfig
 
 		if (result != null) return result.getResponse(injector);
 		
-		var parentConfig = injector.getAncestorMapping(request, injectionName);
+		var parentConfig = injector.getAncestorRule(request, injectionName);
 		if (parentConfig != null) return parentConfig.getResponse(injector);
 
 		return null;
@@ -52,12 +51,12 @@ class InjectionConfig
 
 	public function hasResponse(injector:Injector):Bool
 	{
-		return (result != null);
+		return result != null;
 	}
 
 	public function hasOwnResponse():Bool
 	{
-		return (result != null);
+		return result != null;
 	}
 
 	public function setResult(result:InjectionResult):Void
@@ -74,14 +73,11 @@ class InjectionConfig
 		this.result = result;
 	}
 
-	public function setInjector(injector:Injector):Void
-	{
-		this.injector = injector;
-	}
-
+	#if debug
 	public function toString():String
 	{
 		var named = injectionName != null && injectionName != "" ? ' named "$injectionName" and' : "";
 		return 'rule: [' + Type.getClassName(request) + ']$named mapped to [$result]';
 	}
+	#end
 }

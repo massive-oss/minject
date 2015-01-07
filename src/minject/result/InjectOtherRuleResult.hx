@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2014 Massive Interactive
+Copyright (c) 2012-2015 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -22,14 +22,14 @@ SOFTWARE.
 
 package minject.result;
 
-import minject.InjectionConfig;
+import minject.InjectorRule;
 import minject.Injector;
 
 class InjectOtherRuleResult extends InjectionResult
 {
-	var rule:InjectionConfig;
+	var rule:InjectorRule;
 	
-	public function new(rule:InjectionConfig)
+	public function new(rule:InjectorRule)
 	{
 		super();
 		this.rule = rule;
@@ -40,8 +40,10 @@ class InjectOtherRuleResult extends InjectionResult
 		return rule.getResponse(injector);
 	}
 
+	#if debug
 	override public function toString()
 	{
 		return rule.toString();
 	}
+	#end
 }

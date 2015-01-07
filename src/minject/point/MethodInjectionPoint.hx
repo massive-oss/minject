@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2014 Massive Interactive
+Copyright (c) 2012-2015 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -54,7 +54,7 @@ class MethodInjectionPoint implements InjectionPoint
 		for (arg in args)
 		{
 			var name = arg.name == null ? "" : arg.name;
-			var config = injector.getMapping(Type.resolveClass(arg.type), arg.name);
+			var config = injector.getRule(Type.resolveClass(arg.type), arg.name);
 			var injection = config.getResponse(injector);
 
 			#if debug

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2014 Massive Interactive
+Copyright (c) 2012-2015 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -528,33 +528,33 @@ class InjectorTest
 	}
 	
 	@Test
-	public function hasMappingFailsForUnmappedUnnamedClass():Void
+	public function hasRuleFailsForUnmappedUnnamedClass():Void
 	{
-		Assert.isFalse(injector.hasMapping(Class1));
+		Assert.isFalse(injector.hasRule(Class1));
 	}
 	
 	@Test
-	public function hasMappingFailsForUnmappedNamedClass():Void
+	public function hasRuleFailsForUnmappedNamedClass():Void
 	{
-		Assert.isFalse(injector.hasMapping(Class1, "namedClass"));
+		Assert.isFalse(injector.hasRule(Class1, "namedClass"));
 	}
 	
 	@Test
-	public function hasMappingSucceedsForMappedUnnamedClass():Void
+	public function hasRuleSucceedsForMappedUnnamedClass():Void
 	{
 		injector.mapClass(Class1, Class1);
-		Assert.isTrue(injector.hasMapping(Class1));
+		Assert.isTrue(injector.hasRule(Class1));
 	}
 	
 	@Test
-	public function hasMappingSucceedsForMappedNamedClass():Void
+	public function hasRuleSucceedsForMappedNamedClass():Void
 	{
 		injector.mapClass(Class1, Class1, "namedClass");
-		Assert.isTrue(injector.hasMapping(Class1, "namedClass"));
+		Assert.isTrue(injector.hasRule(Class1, "namedClass"));
 	}
 
 	@Test
-	public function getMappingResponseSucceedsForMappedUnnamedClass():Void
+	public function getRuleResponseSucceedsForMappedUnnamedClass():Void
 	{
 		var class1 = new Class1();
 		injector.mapValue(Class1, class1);
@@ -562,7 +562,7 @@ class InjectorTest
 	}
 
 	@Test
-	public function getMappingResponseSucceedsForMappedNamedClass():Void
+	public function getRuleResponseSucceedsForMappedNamedClass():Void
 	{
 		var class1 = new Class1();
 		injector.mapValue(Class1, class1, "namedClass");
@@ -619,7 +619,7 @@ class InjectorTest
 	}
 
 	@Test
-	public function getMappingResponseFailsForUnmappedUnnamedClass():Void
+	public function getRuleResponseFailsForUnmappedUnnamedClass():Void
 	{
 		var passed = false;
 
@@ -636,7 +636,7 @@ class InjectorTest
 	}
 	
 	@Test
-	public function getMappingResponseFailsForUnmappedNamedClass():Void
+	public function getRuleResponseFailsForUnmappedNamedClass():Void
 	{
 		var passed = false;
 		

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2014 Massive Interactive
+Copyright (c) 2012-2015 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -69,13 +69,13 @@ class ChildInjectorTest
 		var leftChildInjector = injector.createChildInjector();
 		leftChildInjector.mapClass(RobotAnkle, RobotAnkle);
 		leftChildInjector.mapClass(RobotFoot, LeftRobotFoot);
-		leftFootRule.setInjector(leftChildInjector);
+		leftFootRule.injector = leftChildInjector;
 		
 		var rightFootRule = injector.mapClass(RobotLeg, RobotLeg, "rightLeg");
 		var rightChildInjector = injector.createChildInjector();
 		rightChildInjector.mapClass(RobotAnkle, RobotAnkle);
 		rightChildInjector.mapClass(RobotFoot, RightRobotFoot);
-		rightFootRule.setInjector(rightChildInjector);
+		rightFootRule.injector = rightChildInjector;
 		
 		var robotBody = injector.instantiate(RobotBody);
 		Assert.isType(robotBody.rightLeg.ankle.foot, RightRobotFoot);
@@ -92,13 +92,13 @@ class ChildInjectorTest
 		var leftChildInjector = injector.createChildInjector();
 		leftChildInjector.mapClass(RobotAnkle, RobotAnkle);
 		leftChildInjector.mapClass(RobotFoot, LeftRobotFoot);
-		leftFootRule.setInjector(leftChildInjector);
+		leftFootRule.injector = leftChildInjector;
 
 		var rightFootRule = injector.mapClass(RobotLeg, RobotLeg, "rightLeg");
 		var rightChildInjector = injector.createChildInjector();
 		rightChildInjector.mapClass(RobotAnkle, RobotAnkle);
 		rightChildInjector.mapClass(RobotFoot, RightRobotFoot);
-		rightFootRule.setInjector(rightChildInjector);
+		rightFootRule.injector = rightChildInjector;
 
 		var robotBody = injector.instantiate(RobotBody);
 
@@ -116,12 +116,12 @@ class ChildInjectorTest
 		var leftFootRule = injector.mapClass(RobotLeg, RobotLeg, "leftLeg");
 		var leftChildInjector = injector.createChildInjector();
 		leftChildInjector.mapClass(RobotFoot, LeftRobotFoot);
-		leftFootRule.setInjector(leftChildInjector);
+		leftFootRule.injector = leftChildInjector;
 
 		var rightFootRule = injector.mapClass(RobotLeg, RobotLeg, "rightLeg");
 		var rightChildInjector = injector.createChildInjector();
 		rightChildInjector.mapClass(RobotFoot, RightRobotFoot);
-		rightFootRule.setInjector(rightChildInjector);
+		rightFootRule.injector = rightChildInjector;
 
 		var robotBody = injector.instantiate(RobotBody);
 		Assert.isType(robotBody.rightLeg.ankle.foot, RightRobotFoot);
@@ -135,14 +135,14 @@ class ChildInjectorTest
         var class1 = new Class1();
         injector.mapValue(Class1, class1);  
         
-        Assert.isTrue(childInjector.hasMapping(Class1));
+        Assert.isTrue(childInjector.hasRule(Class1));
     }
     
     @Test
     public function childInjectorDoesNotHaveMappingWhenDoesNotExistOnParentInjector():Void
     {
         var childInjector = injector.createChildInjector();
-        Assert.isFalse(childInjector.hasMapping(Class1));
+        Assert.isFalse(childInjector.hasRule(Class1));
     }
     
     @Test

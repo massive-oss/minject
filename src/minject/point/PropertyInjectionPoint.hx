@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2014 Massive Interactive
+Copyright (c) 2012-2015 Massive Interactive
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
@@ -26,9 +26,9 @@ import minject.Injector;
 
 class PropertyInjectionPoint implements InjectionPoint
 {
-	var name:String;
-	var type:Class<Dynamic>;
-	var injectionName:String;
+	public var name(default, null):String;
+	public var type(default, null):Class<Dynamic>;
+	public var injectionName(default, null):String;
 
 	public function new(name:String, type:String, ?injectionName:String=null)
 	{
@@ -39,17 +39,20 @@ class PropertyInjectionPoint implements InjectionPoint
 
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var injectionConfig = injector.getMapping(type, injectionName);
-		var injection = injectionConfig.getResponse(injector);
+		var response = injector.getRule(type, injectionName).getResponse(injector);
+		
 		#if debug
-		if (injection == null)
+		if (response == null)
 		{
 			var targetName = Type.getClassName(Type.getClass(target));
-			throw 'Injector is missing a rule to handle injection into property "$name" ' +
-				'of object "$targetName". Target dependency: "${Type.getClassName(type)}", named "$injectionName"';
+			var typeName = Type.getClassName(type);
+			throw 'Injector is missing a rule to handle injection into ' +
+				'property "$name" of object "$targetName". Target ' +
+				'dependency: "$typeName", named "$injectionName"';
 		}
 		#end
-		Reflect.setProperty(target, name, injection);
+
+		Reflect.setProperty(target, name, response);
 		return target;
 	}
 }
