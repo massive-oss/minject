@@ -27,7 +27,7 @@ import minject.Injector;
 import minject.support.injectees.OneParameterConstructorInjectee;
 import minject.support.types.Class1;
 
-class ConstructorInjectionPointTest
+@:keep class ConstructorInjectionPointTest
 {
  	var injector:Injector;
 

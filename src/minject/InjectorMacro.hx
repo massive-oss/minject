@@ -24,12 +24,14 @@ package minject;
 
 #if macro
 import haxe.macro.Context;
+import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 using haxe.macro.Tools;
 
 class InjectorMacro
 {
+	static var keepers = new Map<String, Bool>();
 	static var called = false;
 
 	public static function addMetadata()
@@ -52,6 +54,35 @@ class InjectorMacro
 		return haxe.macro.Context.getBuildFields();
 	}
 
+	public static function keep(expr:Expr)
+	{
+		switch (Context.typeof(expr))
+		{
+			case TType(t, _):
+				var type = t.get();
+
+				var name = type.name;
+				name = name.substring(6, name.length - 1);
+
+				if (keepers.exists(name)) return;
+				keepers.set(name, true);
+				Sys.println(name);
+				var module = Context.getModule(type.module);
+
+				for (moduleType in module) switch (moduleType)
+				{
+					case TInst(t, _):
+						var theClass = t.get();
+						var className = theClass.pack.concat([theClass.name]).join('.');
+						if (className != name) continue;
+						if (theClass.constructor != null)
+							theClass.constructor.get().meta.add(':keep', [], Context.currentPos());
+					case _:
+				}
+			case _:
+		}
+	}
+
 	static function processInst(t:Ref<ClassType>, params:Array<Type>)
 	{
 		var ref = t.get();
@@ -59,8 +90,21 @@ class InjectorMacro
 		if (ref.isInterface) ref.meta.add("interface", [], ref.pos);
 		if (ref.constructor != null) processField(ref, ref.constructor.get());
 
+		var keep = new Map<String, Bool>();
 		var fields = ref.fields.get();
-		for (field in fields) processField(ref, field);
+		for (field in fields)
+		{
+			processField(ref, field);
+			switch (field.kind)
+			{
+				case FVar(_, write): keep.set('set_' + field.name, true);
+				case _:
+			}
+		}
+
+		for (field in fields)
+			if (keep.exists(field.name))
+				field.meta.add(':keep', [], Context.currentPos());
 	}
 
 	static function processField(ref:ClassType, field:ClassField)

@@ -31,7 +31,7 @@ import minject.support.injectees.OneParameterMethodInjectee;
 import minject.support.types.Class1;
 import minject.support.types.Interface1;
 
-class MethodInjectionPointTest
+@:keep class MethodInjectionPointTest
 {
  	var injector:Injector;
 

@@ -26,7 +26,7 @@ import massive.munit.Assert;
 import minject.Injector;
 import minject.support.injectees.ClassInjectee;
 
-class PostConstructInjectionPointTest
+@:keep class PostConstructInjectionPointTest
 {
 	var injector:Injector;
 

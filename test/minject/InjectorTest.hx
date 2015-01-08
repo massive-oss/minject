@@ -55,7 +55,7 @@ import minject.support.types.ComplexClass;
 import minject.support.injectees.SetterInjectee;
 import minject.support.injectees.RecursiveInjectee;
 
-class InjectorTest
+@:keep class InjectorTest
  {
 	public function new(){}
 

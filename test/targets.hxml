@@ -1,34 +1,42 @@
--main TestMain
--debug
--lib munit
--cp src
--cp test
--swf-version 9
 -swf bin/test/as3_test.swf
-
---next
-
 -main TestMain
 -debug
 -lib munit
 -cp src
 -cp test
+-dce full
+-swf-version 9
+--macro keep('TestSuite')
+
+--next
+
 -js bin/test/js_test.js
-
---next
-
 -main TestMain
 -debug
 -lib munit
 -cp src
 -cp test
+-dce full
+--macro keep('TestSuite')
+
+--next
+
 -neko bin/test/neko_test.n
-
---next
-
 -main TestMain
 -debug
 -lib munit
 -cp src
 -cp test
+-dce full
+--macro keep('TestSuite')
+
+--next
+
 -cpp bin/test/cpp_test
+-main TestMain
+-debug
+-lib munit
+-cp src
+-cp test
+-dce full
+--macro keep('TestSuite')

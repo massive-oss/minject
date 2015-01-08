@@ -35,7 +35,7 @@ import minject.support.injectees.childinjectors.RobotLeg;
 import minject.support.injectees.childinjectors.RobotToes;
 import minject.support.types.Class1;
 
-class ChildInjectorTest
+@:keep class ChildInjectorTest
  {
 	public function new(){}
 

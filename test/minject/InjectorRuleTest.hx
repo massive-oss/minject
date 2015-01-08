@@ -31,8 +31,8 @@ import minject.result.InjectValueResult;
 import minject.support.types.Class1;
 import minject.support.types.Class1Extension;
 
-class InjectorRuleTest
- {
+@:keep class InjectorRuleTest
+{
 	public function new(){}
 
 	var injector:Injector;

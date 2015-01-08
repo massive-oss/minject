@@ -29,7 +29,7 @@ import minject.support.injectees.SetterInjectee;
 import minject.support.injectees.NamedClassInjectee;
 import minject.support.types.Class1;
 
-class PropertyInjectionPointTest
+@:keep class PropertyInjectionPointTest
 {
  	var injector:Injector;
 

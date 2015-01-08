@@ -12,13 +12,13 @@ class InjectionExample
 	public function new()
 	{
 		injector = new Injector();
-		
+
 		initializeContext();
 
 		var foo = new Foo();
 		injector.injectInto(foo);
 
-		trace(foo);	
+		trace(foo);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class TypeA
 class TypeB
 {
 	public var id:Int;
-	
+
 	public function new()
 	{
 		id = 0;

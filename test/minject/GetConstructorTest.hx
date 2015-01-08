@@ -24,7 +24,7 @@ package minject;
 
 import massive.munit.Assert;
 
-class GetConstructorTest
+@:keep class GetConstructorTest
  {
 	public function new(){}
 
