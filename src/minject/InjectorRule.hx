@@ -1,22 +1,22 @@
 /*
 Copyright (c) 2012-2015 Massive Interactive
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of 
-this software and associated documentation files (the "Software"), to deal in 
-the Software without restriction, including without limitation the rights to 
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-of the Software, and to permit persons to whom the Software is furnished to do 
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
 so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all 
+The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
@@ -30,7 +30,7 @@ class InjectorRule
 	public var injectionName:String;
 	public var injector:Injector;
 	public var result:InjectionResult;
-	
+
 	public function new(request:Class<Dynamic>, injectionName:String)
 	{
 		this.request = request;
@@ -40,13 +40,12 @@ class InjectorRule
 	public function getResponse(injector:Injector):Dynamic
 	{
 		if (this.injector != null) injector = this.injector;
-
 		if (result != null) return result.getResponse(injector);
-		
-		var parentConfig = injector.getAncestorRule(request, injectionName);
-		if (parentConfig != null) return parentConfig.getResponse(injector);
 
-		return null;
+		var parent = injector.getAncestorRule(request, injectionName);
+		if (parent == null) return null;
+
+		return parent.getResponse(injector);
 	}
 
 	public function hasResponse(injector:Injector):Bool
@@ -64,10 +63,12 @@ class InjectorRule
 		#if debug
 		if (this.result != null && result != null)
 		{
-			trace('Warning: Injector contains ${this.toString()}.\nAttempting to overwrite this ' +
-				'with mapping for [${result.toString()}].\nIf you have overwritten this mapping ' +
-				'intentionally you can use `injector.unmap()` prior to your replacement mapping ' +
-				'in order to avoid seeing this message.');
+			var desc = result.toString();
+			trace('Warning: Injector contains ${this.toString()}.\n' +
+				'Attempting to overwrite this with mapping for [$desc].\n' +
+				'If you have overwritten this mapping intentionally you can ' +
+				'use `injector.unmap()` prior to your replacement mapping in ' +
+				'order to avoid seeing this message.');
 		}
 		#end
 		this.result = result;
@@ -76,8 +77,10 @@ class InjectorRule
 	#if debug
 	public function toString():String
 	{
-		var named = injectionName != null && injectionName != "" ? ' named "$injectionName" and' : "";
-		return 'rule: [' + Type.getClassName(request) + ']$named mapped to [$result]';
+		var named = injectionName != null && injectionName != '' ?
+			' named "$injectionName" and' : '';
+		return 'rule: [' + Type.getClassName(request) +
+			']$named mapped to [$result]';
 	}
 	#end
 }

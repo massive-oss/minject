@@ -1,22 +1,22 @@
 /*
 Copyright (c) 2012-2015 Massive Interactive
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of 
-this software and associated documentation files (the "Software"), to deal in 
-the Software without restriction, including without limitation the rights to 
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-of the Software, and to permit persons to whom the Software is furnished to do 
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
 so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all 
+The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
@@ -58,9 +58,9 @@ import minject.support.injectees.RecursiveInjectee;
 class InjectorTest
  {
 	public function new(){}
-	
+
 	var injector:Injector;
-	
+
 	@Before
 	public function setup():Void
 	{
@@ -72,7 +72,7 @@ class InjectorTest
 	{
 		injector = null;
 	}
-	
+
 	@Test
 	public function unbind()
 	{
@@ -108,7 +108,7 @@ class InjectorTest
 		Assert.areEqual(value, injectee1.property); //"Value should have been injected"
 		Assert.areEqual(injectee1.property, injectee2.property); //"Injected values should be equal"
 	}
-	
+
 	@Test
 	public function bindValueByInterface():Void
 	{
@@ -119,7 +119,7 @@ class InjectorTest
 		injector.injectInto(injectee);
 		Assert.areEqual(value, injectee.property);//"Value should have been injected"
 	}
-	
+
 	@Test
 	public function bindNamedValue():Void
 	{
@@ -130,7 +130,7 @@ class InjectorTest
 		injector.injectInto(injectee);
 		Assert.areEqual(value, injectee.property);//"Named value should have been injected"
 	}
-	
+
 	@Test
 	public function bindNamedValueByInterface():Void
 	{
@@ -141,7 +141,7 @@ class InjectorTest
 		injector.injectInto(injectee);
 		Assert.areEqual(value, injectee.property);//"Named value should have been injected"
 	}
-	
+
 	@Test
 	public function bindFalsyValue():Void
 	{
@@ -153,7 +153,7 @@ class InjectorTest
 
 		Assert.areEqual(value, injectee.property);//"Value should have been injected"
 	}
-	
+
 	@Test
 	public function boundValueIsNotInjectedInto():Void
 	{
@@ -162,15 +162,15 @@ class InjectorTest
 
 		injector.mapValue(InterfaceInjectee, value);
 		injector.injectInto(injectee);
-		
+
 		Assert.isNull(value.property);//"value shouldn't have been injected into"
 	}
-	
+
 	@Test
 	public function bindMultipleInterfacesToOneSingletonClass():Void
 	{
 		var injectee = new MultipleSingletonsOfSameClassInjectee();
-		
+
 		injector.mapSingletonOf(Interface1, Class1);
 		injector.mapSingletonOf(Interface2, Class1);
 
@@ -183,7 +183,7 @@ class InjectorTest
 		var same = untyped (injectee.property1 == injectee.property2);
 		Assert.isFalse(same);//"Singleton Values 'property1' and 'property2' should not be identical"
 	}
-	
+
 	@Test
 	public function bindClass():Void
 	{
@@ -198,7 +198,7 @@ class InjectorTest
 		Assert.isNotNull(injectee1.property); //"Instance of Class should have been injected"
 		Assert.isFalse(injectee1.property == injectee2.property); //"Injected values should be different"
 	}
-	
+
 	@Test
 	public function boundClassIsInjectedInto():Void
 	{
@@ -212,7 +212,7 @@ class InjectorTest
 		Assert.isNotNull(injectee.property);//"Complex Value should have been injected"
 		Assert.areEqual(value, injectee.property.value);//"Nested value should have been injected"
 	}
-	
+
 	@Test
 	public function bindClassByInterface():Void
 	{
@@ -221,7 +221,7 @@ class InjectorTest
 		injector.injectInto(injectee);
 		Assert.isNotNull(injectee.property);//"Instance of Class should have been injected"
 	}
-	
+
 	@Test
 	public function bindNamedClass():Void
 	{
@@ -230,7 +230,7 @@ class InjectorTest
 		injector.injectInto(injectee);
 		Assert.isNotNull(injectee.property);//"Instance of named Class should have been injected"
 	}
-	
+
 	@Test
 	public function bindNamedClassByInterface():Void
 	{
@@ -239,7 +239,7 @@ class InjectorTest
 		injector.injectInto(injectee);
 		Assert.isNotNull(injectee.property);//"Instance of named Class should have been injected"
 	}
-	
+
 	@Test
 	public function bindSingleton():Void
 	{
@@ -250,11 +250,11 @@ class InjectorTest
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.property);//"Instance of Class should have been injected"
-		
+
 		injector.injectInto(injectee2);
 		Assert.areEqual(injectee1.property, injectee2.property);//"Injected values should be equal"
 	}
-	
+
 	@Test
 	public function bindSingletonOf():Void
 	{
@@ -269,22 +269,22 @@ class InjectorTest
 		injector.injectInto(injectee2);
 		Assert.areEqual(injectee1.property, injectee2.property);//"Injected values should be equal"
 	}
-	
+
 	@Test
 	public function bindDifferentlyNamedSingletonsBySameInterface():Void
 	{
 		var injectee = new TwoNamedInterfaceFieldsInjectee();
-		
+
 		injector.mapSingletonOf(Interface1, Class1, TwoNamedInterfaceFieldsInjectee.NAME1);
 		injector.mapSingletonOf(Interface1, Class2, TwoNamedInterfaceFieldsInjectee.NAME2);
-		
+
 		injector.injectInto(injectee);
-		
+
 		Assert.isTrue(Std.is(injectee.property1, Class1));//'Property "property1" should be of type "Class1"'
 		Assert.isTrue(Std.is(injectee.property2, Class2));//'Property "property2" should be of type "Class2"'
 		Assert.isFalse(injectee.property1 == injectee.property2);//'Properties "property1" and "property2" should have received different singletons'
 	}
-	
+
 	@Test
 	public function performSetterInjection():Void
 	{
@@ -295,11 +295,11 @@ class InjectorTest
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.property);//"Instance of Class should have been injected"
-		
+
 		injector.injectInto(injectee2);
 		Assert.isFalse(injectee1.property == injectee2.property);//"Injected values should be different"
 	}
-	
+
 	@Test
 	public function performMethodInjectionWithOneParameter():Void
 	{
@@ -307,14 +307,14 @@ class InjectorTest
 		var injectee2 = new OneParameterMethodInjectee();
 
 		injector.mapClass(Class1, Class1);
-		
+
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency());//"Instance of Class should have been injected"
 
 		injector.injectInto(injectee2);
 		Assert.isFalse(injectee1.getDependency() == injectee2.getDependency());//"Injected values should be different"
 	}
-	
+
 	@Test
 	public function performMethodInjectionWithOneNamedParameter():Void
 	{
@@ -322,14 +322,14 @@ class InjectorTest
 		var injectee2 = new OneNamedParameterMethodInjectee();
 
 		injector.mapClass(Class1, Class1, OneNamedParameterMethodInjectee.NAME);
-		
+
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency());//"Instance of Class should have been injected for named Class1 parameter"
 
 		injector.injectInto(injectee2);
 		Assert.isFalse(injectee1.getDependency() == injectee2.getDependency());//"Injected values should be different"
 	}
-	
+
 	@Test
 	public function performMethodInjectionWithTwoParameters():Void
 	{
@@ -347,7 +347,7 @@ class InjectorTest
 		Assert.isFalse(injectee1.getDependency1() == injectee2.getDependency1());//"Injected values should be different"
 		Assert.isFalse(injectee1.getDependency2() == injectee2.getDependency2());//"Injected values for Interface should be different"
 	}
-	
+
 	@Test
 	public function performMethodInjectionWithTwoNamedParameters():Void
 	{
@@ -365,7 +365,7 @@ class InjectorTest
 		Assert.isFalse(injectee1.getDependency1() == injectee2.getDependency1());//"Injected values should be different"
 		Assert.isFalse(injectee1.getDependency2() == injectee2.getDependency2());//"Injected values for Interface should be different"
 	}
-	
+
 	@Test
 	public function performMethodInjectionWithMixedParameters():Void
 	{
@@ -375,7 +375,7 @@ class InjectorTest
 		injector.mapClass(Class1, Class1, MixedParametersMethodInjectee.NAME1);
 		injector.mapClass(Class1, Class1);
 		injector.mapClass(Interface1, Class1, MixedParametersMethodInjectee.NAME2);
-		
+
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency1());//"Instance of Class should have been injected for named Class1 parameter"
 		Assert.isNotNull(injectee1.getDependency2());//"Instance of Class should have been injected for unnamed Class1 parameter"
@@ -386,7 +386,7 @@ class InjectorTest
 		Assert.isFalse(injectee1.getDependency2() == injectee2.getDependency2());//"Injected values for unnamed Class1 should be different"
 		Assert.isFalse(injectee1.getDependency3() == injectee2.getDependency3());//"Injected values for named Interface should be different"
 	}
-	
+
 	@Test
 	public function performConstructorInjectionWithOneParameter():Void
 	{
@@ -395,7 +395,7 @@ class InjectorTest
 		var injectee = injector.instantiate(OneParameterConstructorInjectee);
 		Assert.isNotNull(injectee.getDependency());//"Instance of Class should have been injected for Class1 parameter"
 	}
-	
+
 	@Test
 	public function performConstructorInjectionWithTwoParameters():Void
 	{
@@ -407,7 +407,7 @@ class InjectorTest
 		Assert.isNotNull(injectee.getDependency1());//"Instance of Class should have been injected for named Class1 parameter"
 		Assert.areEqual(injectee.getDependency2(), "stringDependency");//"The String 'stringDependency' should have been injected for String parameter"
 	}
-	
+
 	@Test
 	public function performConstructorInjectionWithOneNamedParameter():Void
 	{
@@ -415,7 +415,7 @@ class InjectorTest
 		var injectee = injector.instantiate(OneNamedParameterConstructorInjectee);
 		Assert.isNotNull(injectee.getDependency());//"Instance of Class should have been injected for named Class1 parameter"
 	}
-	
+
 	@Test
 	public function performConstructorInjectionWithTwoNamedParameter():Void
 	{
@@ -427,7 +427,7 @@ class InjectorTest
 		Assert.isNotNull(injectee.getDependency1());//"Instance of Class should have been injected for named Class1 parameter"
 		Assert.areEqual(injectee.getDependency2(), stringValue);//"The String 'stringDependency' should have been injected for named String parameter"
 	}
-	
+
 	@Test
 	public function performConstructorInjectionWithMixedParameters():Void
 	{
@@ -440,7 +440,7 @@ class InjectorTest
 		Assert.isNotNull(injectee.getDependency2());//"Instance of Class should have been injected for unnamed Class1 parameter"
 		Assert.isNotNull(injectee.getDependency3());//"Instance of Class should have been injected for Interface"
 	}
-	
+
 	@Test
 	public function performNamedArrayInjection():Void
 	{
@@ -452,7 +452,7 @@ class InjectorTest
 		Assert.isNotNull(injectee.array);//"Instance 'array' should have been injected for named Array parameter"
 		Assert.areEqual(array, injectee.array);//"Instance field 'array' should be identical to local variable 'array'"
 	}
-	
+
 	@Test
 	public function performMappedRuleInjection():Void
 	{
@@ -462,7 +462,7 @@ class InjectorTest
 		var injectee = injector.instantiate(MultipleSingletonsOfSameClassInjectee);
 		Assert.areEqual(injectee.property1, injectee.property2);//"Instance field 'property1' should be identical to Instance field 'property2'"
 	}
-	
+
 	@Test
 	public function performMappedNamedRuleInjection():Void
 	{
@@ -477,15 +477,15 @@ class InjectorTest
 		Assert.areEqual(injectee.property1, injectee.namedProperty1);//"Instance field 'property1' should be identical to Instance field 'namedProperty1'"
 		Assert.areEqual(injectee.property1, injectee.namedProperty2);//"Instance field 'property1' should be identical to Instance field 'namedProperty2'"
 	}
-	
+
 	@Test
 	public function performInjectionIntoValueWithRecursiveSingeltonDependency():Void
 	{
 		var injectee = new InterfaceInjectee();
-		
+
 		injector.mapValue(InterfaceInjectee, injectee);
 		injector.mapSingletonOf(Interface1, RecursiveInterfaceInjectee);
-		
+
 		injector.injectInto(injectee);
 		Assert.isTrue(true); // need to assert something
 
@@ -493,7 +493,7 @@ class InjectorTest
 		//Assert.areEqual(injectee.property1, injectee.namedProperty1);//"Instance field 'property1' should be identical to Instance field 'namedProperty1'"
 		//Assert.areEqual(injectee.property1, injectee.namedProperty2);//"Instance field 'property1' should be identical to Instance field 'namedProperty2'"
 	}
-	
+
 	@Test
 	public function injectXMLValue() : Void
 	{
@@ -505,7 +505,7 @@ class InjectorTest
 
 		Assert.areEqual(injectee.property, value);//'injected value should be indentical to mapped value'
 	}
-	
+
 	@Test
 	public function postConstructIsCalled():Void
 	{
@@ -514,10 +514,10 @@ class InjectorTest
 
 		injector.mapValue(Class1, value);
 		injector.injectInto(injectee);
-		
+
 		Assert.isTrue(injectee.someProperty);
 	}
-	
+
 	@Test
 	public function postConstructMethodsCalledAsOrdered():Void
 	{
@@ -526,26 +526,26 @@ class InjectorTest
 
 		Assert.isTrue(injectee.loadedAsOrdered);
 	}
-	
+
 	@Test
 	public function hasRuleFailsForUnmappedUnnamedClass():Void
 	{
 		Assert.isFalse(injector.hasRule(Class1));
 	}
-	
+
 	@Test
 	public function hasRuleFailsForUnmappedNamedClass():Void
 	{
 		Assert.isFalse(injector.hasRule(Class1, "namedClass"));
 	}
-	
+
 	@Test
 	public function hasRuleSucceedsForMappedUnnamedClass():Void
 	{
 		injector.mapClass(Class1, Class1);
 		Assert.isTrue(injector.hasRule(Class1));
 	}
-	
+
 	@Test
 	public function hasRuleSucceedsForMappedNamedClass():Void
 	{
@@ -581,7 +581,7 @@ class InjectorTest
 		var injectee2 = injector.instantiate(ClassInjectee);
 		Assert.isFalse(injectee1.property == injectee2.property);//'injectee1.property is not the same instance as injectee2.property'
 	}
-	
+
 	@Test
 	public function haltOnMissingDependency():Void
 	{
@@ -596,10 +596,10 @@ class InjectorTest
 		{
 			passed = true;
 		}
-		
+
 		Assert.isTrue(passed);
 	}
-	
+
 	@Test
 	public function haltOnMissingNamedDependency():Void
 	{
@@ -614,7 +614,7 @@ class InjectorTest
 		{
 			passed = true;
 		}
-		
+
 		Assert.isTrue(passed);
 	}
 
@@ -631,15 +631,15 @@ class InjectorTest
 		{
 			passed = true;
 		}
-		
+
 		Assert.isTrue(passed);
 	}
-	
+
 	@Test
 	public function getRuleResponseFailsForUnmappedNamedClass():Void
 	{
 		var passed = false;
-		
+
 		try
 		{
 			injector.getInstance(Class1, "namedClass");
@@ -648,10 +648,10 @@ class InjectorTest
 		{
 			passed = true;
 		}
-		
+
 		Assert.isTrue(passed);
 	}
-	
+
 	#if cpp
 		#if (!haxe_210 && (haxe_208||haxe_209))
 		@Ignore("Not supported in Haxe 2.08 or Haxe 2.09")
@@ -663,14 +663,14 @@ class InjectorTest
 		var passed = false;
 
 		try
-		{	
+		{
 			injector.instantiate(Interface1);
 		}
 		catch (e:Dynamic)
 		{
 			passed = true;
 		}
-		
+
 		Assert.isTrue(passed);
 	}
 
