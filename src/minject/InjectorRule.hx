@@ -26,14 +26,14 @@ import minject.result.InjectionResult;
 
 class InjectorRule
 {
-	public var request:Class<Dynamic>;
+	public var type:String;
 	public var injectionName:String;
 	public var injector:Injector;
 	public var result:InjectionResult;
 
-	public function new(request:Class<Dynamic>, injectionName:String)
+	public function new(type:String, injectionName:String)
 	{
-		this.request = request;
+		this.type = type;
 		this.injectionName = injectionName;
 	}
 
@@ -42,7 +42,7 @@ class InjectorRule
 		if (this.injector != null) injector = this.injector;
 		if (result != null) return result.getResponse(injector);
 
-		var parent = injector.getAncestorRule(request, injectionName);
+		var parent = injector.getAncestorRule(type, injectionName);
 		if (parent == null) return null;
 
 		return parent.getResponse(injector);
@@ -79,8 +79,7 @@ class InjectorRule
 	{
 		var named = injectionName != null && injectionName != '' ?
 			' named "$injectionName" and' : '';
-		return 'rule: [' + Type.getClassName(request) +
-			']$named mapped to [$result]';
+		return 'rule: [$type]$named mapped to [$result]';
 	}
 	#end
 }

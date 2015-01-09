@@ -48,7 +48,7 @@ import minject.support.types.Class1;
 	@Test
 	public function one_parameter_constructor_injection()
 	{
-		var point = new ConstructorInjectionPoint([{type:"minject.support.types.Class1", opt:false}]);
+		var point = new ConstructorInjectionPoint(['minject.support.types.Class1', '', '']);
 
 		injector.mapSingleton(Class1);
 		var injectee = point.applyInjection(OneParameterConstructorInjectee, injector);

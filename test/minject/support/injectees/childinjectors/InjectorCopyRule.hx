@@ -30,7 +30,7 @@ class InjectorCopyRule extends InjectorRule
 {
 	public function new()
 	{
-		super(Injector, "");
+		super('minject.Injector', '');
 	}
 
 	public override function getResponse(injector:Injector):Dynamic

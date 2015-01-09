@@ -27,7 +27,7 @@ import minject.point.MethodInjectionPoint;
 
 class ConstructorInjectionPoint extends MethodInjectionPoint
 {
-	public function new(args:Array<ArgInjectionInfo>)
+	public function new(args:Array<String>)
 	{
 		super('new', args);
 	}

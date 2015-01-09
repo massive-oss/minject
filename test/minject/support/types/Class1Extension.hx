@@ -24,7 +24,8 @@ package minject.support.types;
 
 class Class1Extension extends Class1
 {
-	public function new()
+	// the test using the class is a bit contrived, hence the @:keep
+	@:keep public function new()
 	{
 		super();
 	}

@@ -27,33 +27,19 @@ import haxe.macro.Context;
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.Type;
+
 using haxe.macro.Tools;
+using Lambda;
 
 class InjectorMacro
 {
-	static var keepers = new Map<String, Bool>();
-	static var called = false;
+	static var keptTypes = new Map<String, Bool>();
 
-	public static function addMetadata()
-	{
-		if (!called)
-		{
-			called = true;
-			Context.onGenerate(function(types){
-				for (type in types)
-				{
-					switch (type)
-					{
-						case TInst(t, params): processInst(t, params);
-						default:
-					}
-				}
-			});
-		}
-
-		return haxe.macro.Context.getBuildFields();
-	}
-
+	/**
+		Called by the injector at macro time to tell the compiler which
+		constructors should be kept (as they are mapped in for instantiation
+		by the injector with Type.createInstance)
+	**/
 	public static function keep(expr:Expr)
 	{
 		switch (Context.typeof(expr))
@@ -64,9 +50,9 @@ class InjectorMacro
 				var name = type.name;
 				name = name.substring(6, name.length - 1);
 
-				if (keepers.exists(name)) return;
-				keepers.set(name, true);
-				Sys.println(name);
+				if (keptTypes.exists(name)) return;
+				keptTypes.set(name, true);
+
 				var module = Context.getModule(type.module);
 
 				for (moduleType in module) switch (moduleType)
@@ -83,131 +69,129 @@ class InjectorMacro
 		}
 	}
 
-	static function processInst(t:Ref<ClassType>, params:Array<Type>)
+	/**
+		Returns a string expression for the supplied value
+
+		- if expr is a type (String, foo.Bar) result is path
+		- anything else is returned as is, ie: 'Void -> Void' or a ref to such
+	**/
+	public static function getType(expr:Expr):Expr
+	{
+		switch (Context.typeof(expr))
+		{
+			case TType(t, _):
+				var type = t.get();
+				var name = type.name;
+				var name = name.substring(6, name.length - 1);
+				return macro $v{name};
+			case _:
+				return expr;
+		}
+	}
+
+	/**
+		Do not call this method, it is called by Injector as a build macro.
+	**/
+	public static function addMetadata():Array<Field>
+	{
+		Context.onGenerate(processTypes);
+		return Context.getBuildFields();
+	}
+
+	static function processTypes(types:Array<Type>):Void
+	{
+		for (type in types) switch (type)
+		{
+			case TInst(t, _): processInst(t);
+			default:
+		}
+	}
+
+	static function processInst(t:Ref<ClassType>):Void
 	{
 		var ref = t.get();
 
+		// add meta to interfaces, there's no otherway of telling at runtime!
 		if (ref.isInterface) ref.meta.add("interface", [], ref.pos);
-		if (ref.constructor != null) processField(ref, ref.constructor.get());
 
+		var infos = [];
 		var keep = new Map<String, Bool>();
-		var fields = ref.fields.get();
-		for (field in fields)
-		{
-			processField(ref, field);
-			switch (field.kind)
-			{
-				case FVar(_, write): keep.set('set_' + field.name, true);
-				case _:
-			}
-		}
 
+		// process constructor
+		if (ref.constructor != null) processField(ref.constructor.get(), infos, keep);
+
+		// process fields
+		var fields = ref.fields.get();
+		for (field in fields) processField(field, infos, keep);
+
+		// keep additional injectee fields (setters)
 		for (field in fields)
 			if (keep.exists(field.name))
 				field.meta.add(':keep', [], Context.currentPos());
+
+		// sort rtti to ensure post constructors are last and in order
+		infos.sort(function (a, b) return a.order - b.order);
+
+		// add rtti to type
+		var rtti = infos.map(function (info) return macro $v{info.rtti});
+		if (rtti.length > 0) ref.meta.add('rtti', rtti, ref.pos);
 	}
 
-	static function processField(ref:ClassType, field:ClassField)
+	static function processField(field:ClassField, infos:Array<{order:Int, rtti:Array<String>}>, keep:Map<String, Bool>):Void
 	{
 		if (!field.isPublic) return;
 
+		// find minject metadata
 		var meta = field.meta.get();
-		var abort = true;
-		var inject:MetadataEntry = null;
+		var inject = meta.find(function (meta) return meta.name == 'inject');
+		var post = meta.find(function (meta) return meta.name == 'post');
 
-		for (m in meta)
+		// only process public fields with minject metadata
+		if (inject == null && post == null) return;
+
+		// keep injected fields
+		field.meta.add(':keep', [], Context.currentPos());
+
+		// extract injection names from metadata
+		var names = [];
+		if (inject != null)
 		{
-			var name = m.name;
-			if (name == "inject" || name == "post")
-			{
-				if (name == "inject") inject = m;
-				abort = false;
-				break;
-			}
+			names = inject.params;
+			field.meta.remove('inject');
 		}
 
-		if (abort) return;
-		field.meta.add(":keep", [], Context.currentPos());
+		// extract post construct order from metadata
+		var order = 0;
+		if (post != null)
+		{
+			order = post.params.length > 0 ? post.params[0].getValue() + 1 : 1;
+			field.meta.remove('post');
+		}
+
+		var rtti = [field.name];
+		infos.push({order:order, rtti:rtti});
 
 		switch (field.kind)
 		{
-			case FVar(_, write):
-				switch (field.type)
-				{
-					case TType(t, _):
-						var def = t.get();
-						switch (def.type)
-						{
-							case TInst(t, params):
-								processProperty(ref, field, t.get(), params);
-							default:
-						}
-					case TInst(t, params):
-						processProperty(ref, field, t.get(), params);
-
-					case TAbstract(t, params):
-						processProperty(ref, field, t.get(), params);
-					default:
-				}
+			case FVar(_, _):
+				keep.set('set_' + field.name, true);
+				rtti.push(field.type.toString());
+				if (names.length > 0) rtti.push(names[0].getValue());
+				else rtti.push('');
 			case FMethod(_):
 				switch (field.type)
 				{
 					case TFun(args, _):
-					var types = [];
-					for (i in 0...args.length)
-					{
-						var arg = args[i];
-						switch (arg.t)
+						for (i in 0...args.length)
 						{
-							case TInst(t, _):
-								var type = t.get();
-								var pack = type.pack;
-								var opt = arg.opt ? "true" : "false";
-								pack.push(type.name);
-								var typeName = pack.join(".");
-								var name = inject.params[i] == null ? "" : inject.params[i].toString();
-								if (name == null || name == "") types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + '}', ref.pos));
-								else types.push(Context.parse('{type:"' + pack.join(".") + '",opt:' + opt + ',name:' + name + '}', ref.pos));
-							default:
+							var arg = args[i];
+							rtti.push(arg.t.toString());
+							rtti.push(names[i] == null ? '' : names[i].getValue());
+							rtti.push(arg.opt ? 'o' : '');
 						}
-					}
-
-					field.meta.add("args", types, ref.pos);
-
 					default:
 				}
 		}
-	}
-
-	static function processProperty(ref:ClassType, field:ClassField, type:BaseType, params)
-	{
-		var pack = type.pack;
-		pack.push(type.name);
-
-		var typeName = pack.join(".");
-
-		var metas = type.meta.get();
-		for (meta in metas)
-		{
-			if (meta.name == ":native")
-			{
-				switch (meta.params[0].expr)
-				{
-					case EConst(c):
-					switch (c)
-					{
-						case CString(s):
-						typeName = s;
-
-						default:
-					}
-
-					default:
-				}
-			}
-		}
-
-		field.meta.add("type", [Context.parse('"' + typeName + '"', ref.pos)], ref.pos);
 	}
 }
 #end

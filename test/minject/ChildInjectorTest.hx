@@ -166,7 +166,7 @@ import minject.support.types.Class1;
 		var injectee = injector.getInstance(InjectorInjectee);
 
 		Assert.isNotNull(injectee.injector);
-		Assert.isTrue(injectee.injector.parentInjector == injector);
-		Assert.isTrue(injectee.nestedInjectee.nestedInjectee.injector.parentInjector.parentInjector.parentInjector == injector);
+		Assert.isTrue(injectee.injector.parent == injector);
+		Assert.isTrue(injectee.nestedInjectee.nestedInjectee.injector.parent.parent.parent == injector);
 	}
 }

@@ -19,6 +19,7 @@ class InjectionExample
 		injector.injectInto(foo);
 
 		trace(foo);
+		trace(foo.cb());
 	}
 
 	/**
@@ -31,6 +32,7 @@ class InjectionExample
 	{
 		injector.mapSingleton(TypeA);
 		injector.mapClass(TypeB, TypeB, "foo");
+		injector.mapTypeValue('Void -> String', function () return 'Hello!');
 
 		var a = injector.getInstance(TypeA);
 		a.id = 123;
@@ -53,11 +55,21 @@ class Foo
 	@inject("bar")
 	public var c:TypeB;
 
+	@inject
+	public var cb:Void -> String;
+
+	@inject public var array:Array<Int>;
+	@inject public var int:Int;
+    @inject public var iter:Iterable<Int>;
+    @inject public var enumValue:Type.ValueType;
+    @inject public var fn:String->String->Bool;
+    @inject public var flags:haxe.EnumFlags<Type.ValueType>;
+
 	public function new(){}
 
 	public function toString():String
 	{
-		return "Foo \n	a: " + a + "\n	b: " + b + "\n	c: " + c;
+		return 'Foo\n	a: $a\n	b: $b\n	c: $c';
 	}
 }
 
@@ -72,7 +84,7 @@ class TypeA
 
 	public function toString():String
 	{
-		return "TypeA " + id;
+		return 'TypeA $id';
 	}
 }
 
@@ -87,7 +99,7 @@ class TypeB
 
 	public function toString():String
 	{
-		return "TypeB " + id;
+		return 'TypeB $id';
 	}
 }
 
@@ -100,6 +112,6 @@ class TypeC extends TypeB
 
 	override public function toString():String
 	{
-		return "TypeC " + id;
+		return 'TypeC $id';
 	}
 }

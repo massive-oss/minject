@@ -53,7 +53,7 @@ import minject.support.types.Interface1;
 	public function injection_of_named_parameters_into_method()
 	{
 		var injectee = new OneNamedParameterMethodInjectee();
-		var injectionPoint = new MethodInjectionPoint("setDependency", [{name:"name", type:"minject.support.types.Class1", opt:false}]);
+		var injectionPoint = new MethodInjectionPoint("setDependency", ['minject.support.types.Class1','name','']);
 
 		injector.mapSingleton(Class1, "name");
 		injectionPoint.applyInjection(injectee, injector);
@@ -65,7 +65,7 @@ import minject.support.types.Interface1;
 	public function injection_of_two_unnamed_properties_into_method()
 	{
 		var injectee = new TwoParametersMethodInjectee();
-		var injectionPoint = new MethodInjectionPoint("setDependencies", [{type:"minject.support.types.Class1", opt:false}, {type:"minject.support.types.Interface1", opt:false}]);
+		var injectionPoint = new MethodInjectionPoint("setDependencies", ['minject.support.types.Class1','','','minject.support.types.Interface1','','']);
 
 		injector.mapSingleton(Class1);
 		injector.mapSingletonOf(Interface1, Class1);
@@ -79,7 +79,7 @@ import minject.support.types.Interface1;
 	public function injection_of_one_required_one_optional_parameter_into_method()
 	{
 		var injectee = new OneRequiredOneOptionalPropertyMethodInjectee();
-		var injectionPoint = new MethodInjectionPoint("setDependencies", [{type:"minject.support.types.Class1", opt:false}, {type:"minject.support.types.Interface1", opt:true}]);
+		var injectionPoint = new MethodInjectionPoint("setDependencies", ['minject.support.types.Class1','','','minject.support.types.Interface1','','o']);
 
 		injector.mapSingleton(Class1);
 		injectionPoint.applyInjection(injectee, injector);
@@ -95,7 +95,7 @@ import minject.support.types.Interface1;
 
 		try
 		{
-			var injectionPoint = new MethodInjectionPoint("test", [{type:"Dynamic", opt:true}]);
+			var injectionPoint = new MethodInjectionPoint("test", ['Dynamic','','o']);
 		}
 		catch (e:Dynamic)
 		{
@@ -109,7 +109,7 @@ import minject.support.types.Interface1;
 	public function injection_of_unmapped_parameter_into_method_throws_exception()
 	{
 		var injectee = new OneParameterMethodInjectee();
-		var injectionPoint = new MethodInjectionPoint("setDependency", [{name:"name", type:"minject.support.types.Class1", opt:false}]);
+		var injectionPoint = new MethodInjectionPoint("setDependency", ['minject.support.types.Class1','name','']);
 		var passed = false;
 
 		try
