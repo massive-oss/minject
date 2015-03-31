@@ -72,13 +72,21 @@ class InjectorMacro
 	/**
 		Returns a string expression for the supplied value
 
-		- if expr is a type (String, foo.Bar) result is path
+		- if expr is a type (String, foo.Bar) result is full type path
 		- anything else is returned as is, ie: 'Void -> Void' or a ref to such
 	**/
 	public static function getType(expr:Expr):Expr
 	{
-		var type = Context.getType(expr.toString()).toString();
-		return macro $v{type};
+		return switch (Context.typeof(expr))
+		{
+			case TType(_, _):
+				var expr = expr.toString();
+				var type = Context.getType(expr).toString();
+				macro $v{type};
+			case _:
+				expr;
+		}
+
 	}
 
 	/**
