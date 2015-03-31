@@ -77,16 +77,8 @@ class InjectorMacro
 	**/
 	public static function getType(expr:Expr):Expr
 	{
-		switch (Context.typeof(expr))
-		{
-			case TType(t, _):
-				var type = t.get();
-				var name = type.name;
-				var name = name.substring(6, name.length - 1);
-				return macro $v{name};
-			case _:
-				return expr;
-		}
+		var type = Context.getType(expr.toString()).toString();
+		return macro $v{type};
 	}
 
 	/**

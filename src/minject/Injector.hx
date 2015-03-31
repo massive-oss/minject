@@ -278,7 +278,6 @@ class Injector
 	public function getTypeRule(forType:String, ?named:String=''):InjectorRule
 	{
 		var requestName = getRequestName(forType, named);
-
 		if (rules.exists(requestName))
 			return rules.get(requestName);
 
@@ -309,7 +308,7 @@ class Injector
 
 	public function mapTypeRule(forType:String, useRule:InjectorRule, ?named:String=''):InjectorRule
 	{
-		var rule = getRule(forType, named);
+		var rule = getTypeRule(forType, named);
 		rule.setResult(new InjectOtherRuleResult(useRule));
 		return useRule;
 	}
@@ -400,7 +399,6 @@ class Injector
 			for (field in fields)
 			{
 				var name = field[0];
-
 				if (name == 'new')
 				{
 					ctor = new ConstructorInjectionPoint(field.slice(1));
