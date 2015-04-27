@@ -25,6 +25,7 @@ package minject;
 import massive.munit.Assert;
 import minject.Injector;
 import minject.support.injectees.ClassInjectee;
+import minject.support.injectees.InheritanceInjectee;
 import minject.support.injectees.InterfaceInjectee;
 import minject.support.injectees.NamedClassInjectee;
 import minject.support.injectees.NamedInterfaceInjectee;
@@ -196,6 +197,26 @@ import minject.support.injectees.RecursiveInjectee;
 
 		Assert.isNotNull(injectee1.property);
 		Assert.isFalse(injectee1.property == injectee2.property);
+	}
+
+	@Test
+	public function bindInheritedClass():Void
+	{
+		injector.mapClass(Class1, Class1);
+		injector.mapClass(Class2, Class2);
+
+		var injectee1 = new InheritanceInjectee();
+		injector.injectInto(injectee1);
+
+		var injectee2 = new InheritanceInjectee();
+		injector.injectInto(injectee2);
+
+		Assert.isNotNull(injectee1.property);
+		Assert.isNotNull(injectee1.property2);
+		Assert.isTrue(injectee1.someProperty);
+		Assert.isTrue(injectee1.extraProperty);
+		Assert.isFalse(injectee1.property == injectee2.property);
+		Assert.isFalse(injectee1.property2 == injectee2.property2);
 	}
 
 	@Test
