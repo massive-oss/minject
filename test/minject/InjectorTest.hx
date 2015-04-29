@@ -26,6 +26,7 @@ import massive.munit.Assert;
 import minject.Injector;
 import minject.support.injectees.ClassInjectee;
 import minject.support.injectees.InheritanceInjectee;
+import minject.support.injectees.TypedefInjectee;
 import minject.support.injectees.InterfaceInjectee;
 import minject.support.injectees.NamedClassInjectee;
 import minject.support.injectees.NamedInterfaceInjectee;
@@ -217,6 +218,21 @@ import minject.support.injectees.RecursiveInjectee;
 		Assert.isTrue(injectee1.extraProperty);
 		Assert.isFalse(injectee1.property == injectee2.property);
 		Assert.isFalse(injectee1.property2 == injectee2.property2);
+	}
+
+	@Test
+	public function bindTypedef():Void
+	{
+		injector.mapClass(Typedef1, Typedef1);
+		injector.mapClass(TypedefInjectee, TypedefInjectee);
+
+		Assert.isTrue(injector.hasRule(Typedef1));
+		Assert.isTrue(injector.hasRule(Class1));
+
+		var injectee1 = new TypedefInjectee();
+		injector.injectInto(injectee1);
+
+		Assert.isNotNull(injectee1.property);
 	}
 
 	@Test
