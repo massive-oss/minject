@@ -59,15 +59,20 @@ class MethodInjectionPoint implements InjectionPoint
 			var argName = args[index++];
 			var opt = args[index++] == 'o';
 
-			var rule = injector.getTypeRule(type, argName);
-			var response = rule.getResponse(injector);
+			var response = injector.getTypeRule(type, argName).getResponse(injector);
+			if (response == null)
+			{
+				var index = type.indexOf("<");
+				type = (index>-1) ? type.substr(0, index) : type;
+				response = injector.getTypeRule(type, argName).getResponse(injector);
+			}
 
 			#if debug
 			if (response == null && !opt)
 			{
 				var targetName = Type.getClassName(Type.getClass(target));
 				throw 'Injector is missing a rule to handle injection into ' +
-					'target "$targetName". Target dependency: "${rule.type}", ' +
+					'target "$targetName". Target dependency: "$type", ' +
 					'method: "$name", named: "$argName"';
 			}
 			#end
