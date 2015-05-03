@@ -40,6 +40,12 @@ class PropertyInjectionPoint implements InjectionPoint
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
 		var response = injector.getTypeRule(type, injectionName).getResponse(injector);
+		if (response == null)
+		{
+			var index = type.indexOf("<");
+			type = (index>-1) ? type.substr(0, index) : type;
+			response = injector.getTypeRule(type, injectionName).getResponse(injector);
+		}
 
 		#if debug
 		if (response == null)

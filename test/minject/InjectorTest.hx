@@ -27,6 +27,7 @@ import minject.Injector;
 import minject.support.injectees.ClassInjectee;
 import minject.support.injectees.InheritanceInjectee;
 import minject.support.injectees.TypedefInjectee;
+import minject.support.injectees.TypeParamInjectee;
 import minject.support.injectees.InterfaceInjectee;
 import minject.support.injectees.NamedClassInjectee;
 import minject.support.injectees.NamedInterfaceInjectee;
@@ -233,6 +234,25 @@ import minject.support.injectees.RecursiveInjectee;
 		injector.injectInto(injectee1);
 
 		Assert.isNotNull(injectee1.property);
+	}
+
+	@Test
+	public function bindTypeParams():Void
+	{
+		// These 2 rules should match on the full type, so do not need a name.
+		injector.mapValue("Array<String>", ["Jason","David"]);
+		injector.mapValue("Array<Int>", [0,1,2]);
+		// These 2 rules should match an Array with any type parameter - hence the need for names.
+		injector.mapValue(Array, ["London","Sydney","Perth"], "cities");
+		injector.mapValue(Array, [8416535,4840600,2021200], "populations");
+
+		var injectee = new TypeParamInjectee();
+		injector.injectInto(injectee);
+
+		Assert.areEqual("Jason", injectee.names[0]);
+		Assert.areEqual(0, injectee.numbers[0]);
+		Assert.areEqual("London", injectee.cities[0]);
+		Assert.areEqual(8416535, injectee.populations[0]);
 	}
 
 	@Test

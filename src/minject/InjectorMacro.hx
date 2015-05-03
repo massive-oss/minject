@@ -82,7 +82,9 @@ class InjectorMacro
 			case TType(_, _):
 				var expr = expr.toString();
 				var type = Context.getType(expr).follow().toString();
-				macro $v{type};
+				var index = type.indexOf("<");
+				var typeWithoutParams = (index>-1) ? type.substr(0, index) : type;
+				macro $v{typeWithoutParams};
 			case _:
 				expr;
 		}
