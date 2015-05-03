@@ -81,7 +81,7 @@ class InjectorMacro
 		{
 			case TType(_, _):
 				var expr = expr.toString();
-				var type = Context.getType(expr).toString();
+				var type = Context.getType(expr).follow().toString();
 				macro $v{type};
 			case _:
 				expr;
@@ -175,7 +175,7 @@ class InjectorMacro
 		{
 			case FVar(_, _):
 				keep.set('set_' + field.name, true);
-				rtti.push(field.type.toString());
+				rtti.push(field.type.follow().toString());
 				if (names.length > 0) rtti.push(names[0].getValue());
 				else rtti.push('');
 			case FMethod(_):
@@ -185,7 +185,7 @@ class InjectorMacro
 						for (i in 0...args.length)
 						{
 							var arg = args[i];
-							rtti.push(arg.t.toString());
+							rtti.push(arg.t.follow().toString());
 							rtti.push(names[i] == null ? '' : names[i].getValue());
 							rtti.push(arg.opt ? 'o' : '');
 						}

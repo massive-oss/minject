@@ -383,6 +383,16 @@ class Injector
 
 	function createInfo(forClass:Class<Dynamic>):InjectorInfo
 	{
+		var info = new InjectorInfo(null, []);
+		addClassToInfo(forClass,info);
+
+		if (info.ctor == null) info.ctor = new ConstructorInjectionPoint([]);
+
+		return info;
+	}
+
+	function addClassToInfo(forClass:Class<Dynamic>, info:InjectorInfo):Void
+	{
 		var typeMeta = Meta.getType(forClass);
 
 		#if debug
@@ -390,8 +400,9 @@ class Injector
 			throw 'Interfaces can\'t be used as instantiatable classes.';
 		#end
 
-		var ctor = null;
-		var points:Array<InjectionPoint> = [];
+		var superClass = Type.getSuperClass(forClass);
+		if (superClass != null) addClassToInfo(superClass,info);
+
 		var fields:Array<Array<String>> = cast typeMeta.rtti;
 
 		if (fields != null)
@@ -401,22 +412,18 @@ class Injector
 				var name = field[0];
 				if (name == 'new')
 				{
-					ctor = new ConstructorInjectionPoint(field.slice(1));
+					info.ctor = new ConstructorInjectionPoint(field.slice(1));
 				}
 				else if (field.length == 3)
 				{
-					points.push(new PropertyInjectionPoint(name, field[1], field[2]));
+					info.injectionPoints.push(new PropertyInjectionPoint(name, field[1], field[2]));
 				}
 				else
 				{
-					points.push(new MethodInjectionPoint(name, field.slice(1)));
+					info.injectionPoints.push(new MethodInjectionPoint(name, field.slice(1)));
 				}
 			}
 		}
-
-		if (ctor == null) ctor = new ConstructorInjectionPoint([]);
-
-		return new InjectorInfo(ctor, points);
 	}
 
 	function getRuleForRequest(type:String, named:String,
