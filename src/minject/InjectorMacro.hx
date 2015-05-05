@@ -75,20 +75,23 @@ class InjectorMacro
 		- if expr is a type (String, foo.Bar) result is full type path
 		- anything else is returned as is, ie: 'Void -> Void' or a ref to such
 	**/
-	public static function getType(expr:Expr):Expr
+	public static function getTypeName(expr:Expr):Expr
 	{
-		return switch (Context.typeof(expr))
+		switch (Context.typeof(expr))
 		{
 			case TType(_, _):
 				var expr = expr.toString();
-				var type = Context.getType(expr).follow().toString();
-				var index = type.indexOf("<");
-				var typeWithoutParams = (index>-1) ? type.substr(0, index) : type;
-				macro $v{typeWithoutParams};
-			case _:
-				expr;
+				try
+				{
+					var type = Context.getType(expr).follow().toString();
+					var index = type.indexOf("<");
+					var typeWithoutParams = (index>-1) ? type.substr(0, index) : type;
+					return macro $v{typeWithoutParams};
+				}
+				catch (e:Dynamic) {}
+			default:
 		}
-
+		return macro minject.Injector.getTypeName($expr);
 	}
 
 	/**

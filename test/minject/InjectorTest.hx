@@ -22,6 +22,8 @@ SOFTWARE.
 
 package minject;
 
+import Type;
+
 import massive.munit.Assert;
 import minject.Injector;
 import minject.support.injectees.ClassInjectee;
@@ -735,5 +737,37 @@ import minject.support.injectees.RecursiveInjectee;
 		injector.mapValue(Int, 10, 'sessionExpiry');
 		var value = injector.getResponse(Int, 'sessionExpiry');
 		Assert.areEqual(10, value);
+	}
+
+	@Test
+	public function should_map_type_by_class_reference()
+	{
+		var reference = Class1;
+		injector.mapValue(reference, new Class1());
+		Assert.isTrue(injector.hasRule(Class1));
+	}
+
+	@Test
+	public function should_map_type_by_instance_reference()
+	{
+		var reference = new Class1();
+		injector.mapValue(reference, new Class1());
+		Assert.isTrue(injector.hasRule(Class1));
+	}
+
+	@Test
+	public function should_map_type_by_enum_reference()
+	{
+		var reference = ValueType;
+		injector.mapValue(reference, TObject);
+		Assert.isTrue(injector.hasRule(ValueType));
+	}
+
+	@Test
+	public function should_map_type_by_enum_value_reference()
+	{
+		var reference = ValueType.TObject;
+		injector.mapValue(reference, TObject);
+		Assert.isTrue(injector.hasRule(ValueType));
 	}
 }

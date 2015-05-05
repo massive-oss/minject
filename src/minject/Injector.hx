@@ -34,6 +34,28 @@ import minject.result.*;
 #if !macro @:build(minject.InjectorMacro.addMetadata()) #end
 class Injector
 {
+	public static function getTypeName(value:Dynamic)
+	{
+		if (Std.is(value, String)) return value;
+
+		var name = switch (Type.typeof(value))
+		{
+			case TInt: 'Int';
+			case TBool: 'Bool';
+			case TClass(c): Type.getClassName(c);
+			case TEnum(e): Type.getEnumName(e);
+			default: null;
+		}
+
+		if (name == null)
+			try name = Type.getClassName(value) catch (e:Dynamic) {}
+		if (name == null)
+			try name = Type.getEnumName(value) catch (e:Dynamic) {}
+		if (name != null)
+			return name;
+		throw 'Could not determine type name of $value';
+	}
+
 	/**
 		The parent of this injector
 	**/
@@ -63,7 +85,7 @@ class Injector
 	public macro function mapValue(ethis:Expr, forType:Expr, useValue:Expr, ?named:Expr):Expr
 	{
 		InjectorMacro.keep(forType);
-		var type = InjectorMacro.getType(forType);
+		var type = InjectorMacro.getTypeName(forType);
 		return macro $ethis.mapTypeValue($type, $useValue, $named);
 	}
 
@@ -153,7 +175,7 @@ class Injector
 	**/
 	public macro function unmap(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var type = InjectorMacro.getType(forType);
+		var type = InjectorMacro.getTypeName(forType);
 		return macro $ethis.unmapType($type, $named);
 	}
 
@@ -178,7 +200,7 @@ class Injector
 	**/
 	public macro function hasRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var type = InjectorMacro.getType(forType);
+		var type = InjectorMacro.getTypeName(forType);
 		return macro $ethis.hasTypeRule($type, $named);
 	}
 
@@ -194,7 +216,7 @@ class Injector
 	**/
 	public macro function getRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var type = InjectorMacro.getType(forType);
+		var type = InjectorMacro.getTypeName(forType);
 		return macro $ethis.getTypeRule($type, $named);
 	}
 
@@ -224,7 +246,7 @@ class Injector
 	**/
 	public macro function mapRule(ethis:Expr, forType:Expr, useRule:Expr, ?named:Expr):Expr
 	{
-		var type = InjectorMacro.getType(forType);
+		var type = InjectorMacro.getTypeName(forType);
 		return macro $ethis.mapTypeRule($type, $useRule, $named);
 	}
 
@@ -331,7 +353,7 @@ class Injector
 	**/
 	public macro function getResponse(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var type = InjectorMacro.getType(forType);
+		var type = InjectorMacro.getTypeName(forType);
 		return macro $ethis.getTypeResponse($type, $named);
 	}
 
