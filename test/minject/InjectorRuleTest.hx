@@ -50,14 +50,14 @@ import minject.support.types.Class1Extension;
 	}
 
 	@Test
-	public function ruleIsInstantiated():Void
+	public function rule_is_instantiated():Void
 	{
 		var rule = new InjectorRule('minject.support.types.Class1', '');
 		Assert.isTrue(Std.is(rule, InjectorRule));
 	}
 
 	@Test
-	public function injectionTypeValueReturnsRespone():Void
+	public function injection_type_value_returns_respone():Void
 	{
 		var response = new Class1();
 		var rule = new InjectorRule('minject.support.types.Class1', '');
@@ -68,7 +68,7 @@ import minject.support.types.Class1Extension;
 	}
 
 	@Test
-	public function injectionTypeClassReturnsRespone():Void
+	public function injection_type_class_returns_respone():Void
 	{
 		var rule = new InjectorRule('minject.support.types.Class1', '');
 		rule.setResult(new InjectClassResult(Class1));
@@ -78,7 +78,7 @@ import minject.support.types.Class1Extension;
 	}
 
 	@Test
-	public function injectionTypeSingletonReturnsResponse():Void
+	public function injection_type_singleton_returns_response():Void
 	{
 		var rule = new InjectorRule('minject.support.types.Class1', '');
 		rule.setResult(new InjectSingletonResult(Class1));
@@ -88,7 +88,7 @@ import minject.support.types.Class1Extension;
 	}
 
 	@Test
-	public function sameSingletonIsReturnedOnSecondResponse():Void
+	public function same_singleton_is_returned_on_second_response():Void
 	{
 		var rule = new InjectorRule('minject.support.types.Class1', '');
 		rule.setResult(new InjectSingletonResult(Class1));
@@ -99,7 +99,7 @@ import minject.support.types.Class1Extension;
 	}
 
 	@Test
-	public function sameNamedSingletonIsReturnedOnSecondResponse():Void
+	public function same_named_singleton_is_returned_on_second_response():Void
 	{
 		var rule = new InjectorRule('minject.support.types.Class1', "named");
 		rule.setResult(new InjectSingletonResult(Class1));
@@ -110,7 +110,7 @@ import minject.support.types.Class1Extension;
 	}
 
 	@Test
-	public function callingSetResultBetweenUsagesChangesResponse():Void
+	public function calling_set_result_between_usages_changes_response():Void
 	{
 		var rule = new InjectorRule('minject.support.types.Class1', '');
 		rule.setResult(new InjectSingletonResult(Class1));
@@ -123,7 +123,7 @@ import minject.support.types.Class1Extension;
 	}
 
 	@Test
-	public function injectionTypeOtherRuleReturnsOtherRulesResponse():Void
+	public function injection_type_other_rule_returns_other_rules_response():Void
 	{
 		var rule = new InjectorRule('minject.support.types.Class1', '');
 		var otherConfig = new InjectorRule('minject.support.types.Class1Extension', '');

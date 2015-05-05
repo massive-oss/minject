@@ -54,16 +54,17 @@ import minject.support.types.Class1;
 	}
 
 	@Test
-	public function injectorCreatesChildInjector():Void
+	public function injector_creates_child_injector():Void
 	{
 		var childInjector = injector.createChildInjector();
 		Assert.isType(childInjector, Injector);
 	}
 
 	@Test
-	public function injectorUsesChildInjectorForSpecifiedRule():Void
+	public function injector_uses_child_injector_for_specified_rule():Void
 	{
 		injector.mapClass(RobotFoot, RobotFoot);
+		injector.mapClass(RobotToes, RobotToes);
 
 		var leftFootRule = injector.mapClass(RobotLeg, RobotLeg, "leftLeg");
 		var leftChildInjector = injector.createChildInjector();
@@ -83,7 +84,7 @@ import minject.support.types.Class1;
 	}
 
 	@Test
-	public function childInjectorUsesParentInjectorForMissingRules():Void
+	public function child_injector_uses_parent_injector_for_missing_rules():Void
 	{
 		injector.mapClass(RobotFoot, RobotFoot);
 		injector.mapClass(RobotToes, RobotToes);
@@ -107,7 +108,7 @@ import minject.support.types.Class1;
 	}
 
 	@Test
-	public function childInjectorDoesntReturnToParentAfterUsingParentInjectorForMissingRules():Void
+	public function child_injector_doesnt_return_to_parent_after_using_parent_injector_for_missing_rules():Void
 	{
 		injector.mapClass(RobotAnkle, RobotAnkle);
 		injector.mapClass(RobotFoot, RobotFoot);
@@ -129,7 +130,7 @@ import minject.support.types.Class1;
 	}
 
     @Test
-    public function childInjectorHasMappingWhenExistsOnParentInjector():Void
+    public function child_injector_has_mapping_when_exists_on_parent_injector():Void
     {
         var childInjector = injector.createChildInjector();
         var class1 = new Class1();
@@ -139,14 +140,14 @@ import minject.support.types.Class1;
     }
 
     @Test
-    public function childInjectorDoesNotHaveMappingWhenDoesNotExistOnParentInjector():Void
+    public function child_injector_does_not_have_mapping_when_does_not_exist_on_parent_injector():Void
     {
         var childInjector = injector.createChildInjector();
         Assert.isFalse(childInjector.hasRule(Class1));
     }
 
     @Test
-    public function grandChildInjectorSuppliesInjectionFromAncestor():Void
+    public function grand_child_injector_supplies_injection_from_ancestor():Void
     {
         var injectee = new ClassInjectee();
         var childInjector = injector.createChildInjector();
@@ -159,7 +160,7 @@ import minject.support.types.Class1;
     }
 
 	@Test
-	public function injectorCanCreateChildInjectorDuringInjection():Void
+	public function can_create_child_injector_during_injection():Void
 	{
 		injector.mapRule(Injector, new InjectorCopyRule());
 		injector.mapClass(InjectorInjectee, InjectorInjectee);

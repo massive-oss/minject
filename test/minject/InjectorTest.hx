@@ -71,7 +71,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@After
-	public function tearDown():Void
+	public function tear_down():Void
 	{
 		injector = null;
 	}
@@ -97,7 +97,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function injectorInjectsBoundValueIntoAllInjectees():Void
+	public function injector_injects_bound_value_into_all_injectees():Void
 	{
 		var value = new Class1();
 		injector.mapValue(Class1, value);
@@ -113,7 +113,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindValueByInterface():Void
+	public function bind_value_by_interface():Void
 	{
 		var injectee = new InterfaceInjectee();
 		var value = new Class1();
@@ -124,7 +124,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindNamedValue():Void
+	public function bind_named_value():Void
 	{
 		var injectee = new NamedClassInjectee();
 		var value = new Class1();
@@ -135,7 +135,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindNamedValueByInterface():Void
+	public function bind_named_value_by_interface():Void
 	{
 		var injectee = new NamedInterfaceInjectee();
 		var value = new Class1();
@@ -146,7 +146,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindFalsyValue():Void
+	public function bind_falsy_value():Void
 	{
 		var injectee = new StringInjectee();
 		var value = "test";
@@ -158,7 +158,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function boundValueIsNotInjectedInto():Void
+	public function bound_value_is_not_injected_into():Void
 	{
 		var injectee = new RecursiveInterfaceInjectee();
 		var value = new InterfaceInjectee();
@@ -170,7 +170,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindMultipleInterfacesToOneSingletonClass():Void
+	public function bind_multiple_interfaces_to_one_singleton_class():Void
 	{
 		var injectee = new MultipleSingletonsOfSameClassInjectee();
 
@@ -187,7 +187,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindClass():Void
+	public function bind_class():Void
 	{
 		injector.mapClass(Class1, Class1);
 
@@ -202,7 +202,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindInheritedClass():Void
+	public function bind_inherited_class():Void
 	{
 		injector.mapClass(Class1, Class1);
 		injector.mapClass(Class2, Class2);
@@ -222,7 +222,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindTypedef():Void
+	public function bind_typedef():Void
 	{
 		injector.mapClass(Typedef1, Typedef1);
 		injector.mapClass(TypedefInjectee, TypedefInjectee);
@@ -237,7 +237,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindTypeParams():Void
+	public function bind_type_params():Void
 	{
 		// These 2 rules should match on the full type, so do not need a name.
 		injector.mapValue("Array<String>", ["Jason","David"]);
@@ -256,7 +256,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function boundClassIsInjectedInto():Void
+	public function bound_class_is_injected_into():Void
 	{
 		var injectee = new ComplexClassInjectee();
 		var value = new Class1();
@@ -270,7 +270,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindClassByInterface():Void
+	public function bind_class_by_interface():Void
 	{
 		var injectee = new InterfaceInjectee();
 		injector.mapClass(Interface1, Class1);
@@ -279,7 +279,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindNamedClass():Void
+	public function bind_named_class():Void
 	{
 		var injectee:NamedClassInjectee = new NamedClassInjectee();
 		injector.mapClass(Class1, Class1, NamedClassInjectee.NAME);
@@ -288,7 +288,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindNamedClassByInterface():Void
+	public function bind_named_class_by_interface():Void
 	{
 		var injectee = new NamedInterfaceInjectee();
 		injector.mapClass(Interface1, Class1, NamedClassInjectee.NAME);
@@ -297,7 +297,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindSingleton():Void
+	public function bind_singleton():Void
 	{
 		var injectee1:ClassInjectee = new ClassInjectee();
 		var injectee2:ClassInjectee = new ClassInjectee();
@@ -312,7 +312,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindSingletonOf():Void
+	public function bind_singleton_of():Void
 	{
 		var injectee1 = new InterfaceInjectee();
 		var injectee2 = new InterfaceInjectee();
@@ -327,7 +327,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function bindDifferentlyNamedSingletonsBySameInterface():Void
+	public function bind_differently_named_singletons_by_same_interface():Void
 	{
 		var injectee = new TwoNamedInterfaceFieldsInjectee();
 
@@ -342,7 +342,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performSetterInjection():Void
+	public function perform_setter_injection():Void
 	{
 		var injectee1:SetterInjectee = new SetterInjectee();
 		var injectee2:SetterInjectee = new SetterInjectee();
@@ -357,7 +357,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performMethodInjectionWithOneParameter():Void
+	public function perform_method_injection_with_one_parameter():Void
 	{
 		var injectee1 = new OneParameterMethodInjectee();
 		var injectee2 = new OneParameterMethodInjectee();
@@ -372,7 +372,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performMethodInjectionWithOneNamedParameter():Void
+	public function perform_method_injection_with_one_named_parameter():Void
 	{
 		var injectee1 = new OneNamedParameterMethodInjectee();
 		var injectee2 = new OneNamedParameterMethodInjectee();
@@ -387,7 +387,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performMethodInjectionWithTwoParameters():Void
+	public function perform_method_injection_with_two_parameters():Void
 	{
 		var injectee1 = new TwoParametersMethodInjectee();
 		var injectee2 = new TwoParametersMethodInjectee();
@@ -405,7 +405,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performMethodInjectionWithTwoNamedParameters():Void
+	public function perform_method_injection_with_two_named_parameters():Void
 	{
 		var injectee1 = new TwoNamedParametersMethodInjectee();
 		var injectee2 = new TwoNamedParametersMethodInjectee();
@@ -423,7 +423,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performMethodInjectionWithMixedParameters():Void
+	public function perform_method_injection_with_mixed_parameters():Void
 	{
 		var injectee1 = new MixedParametersMethodInjectee();
 		var injectee2 = new MixedParametersMethodInjectee();
@@ -444,7 +444,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performConstructorInjectionWithOneParameter():Void
+	public function perform_constructor_injection_with_one_parameter():Void
 	{
 		injector.mapClass(Class1, Class1);
 
@@ -453,7 +453,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performConstructorInjectionWithTwoParameters():Void
+	public function perform_constructor_injection_with_two_parameters():Void
 	{
 		injector.mapClass(Class1, Class1);
 		injector.mapValue(String, "stringDependency");
@@ -465,7 +465,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performConstructorInjectionWithOneNamedParameter():Void
+	public function perform_constructor_injection_with_one_named_parameter():Void
 	{
 		injector.mapClass(Class1, Class1, OneNamedParameterConstructorInjectee.NAME);
 		var injectee = injector.instantiate(OneNamedParameterConstructorInjectee);
@@ -473,7 +473,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performConstructorInjectionWithTwoNamedParameter():Void
+	public function perform_constructor_injection_with_two_named_parameter():Void
 	{
 		var stringValue = "stringDependency";
 		injector.mapClass(Class1, Class1, TwoNamedParametersConstructorInjectee.NAME1);
@@ -485,7 +485,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performConstructorInjectionWithMixedParameters():Void
+	public function perform_constructor_injection_with_mixed_parameters():Void
 	{
 		injector.mapClass(Class1, Class1, MixedParametersConstructorInjectee.NAME1);
 		injector.mapClass(Class1, Class1);
@@ -498,7 +498,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performNamedArrayInjection():Void
+	public function perform_named_array_injection():Void
 	{
 		var array = ["value1", "value2", "value3"];
 
@@ -510,7 +510,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performMappedRuleInjection():Void
+	public function perform_mapped_rule_injection():Void
 	{
 		var rule = injector.mapSingletonOf(Interface1, Class1);
 		injector.mapRule(Interface2, rule);
@@ -520,7 +520,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performMappedNamedRuleInjection():Void
+	public function perform_mapped_named_rule_injection():Void
 	{
 		var rule = injector.mapSingletonOf(Interface1, Class1);
 
@@ -535,7 +535,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function performInjectionIntoValueWithRecursiveSingeltonDependency():Void
+	public function perform_injection_into_value_with_recursive_singelton_dependency():Void
 	{
 		var injectee = new InterfaceInjectee();
 
@@ -547,7 +547,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function injectXMLValue() : Void
+	public function inject_x_m_l_value() : Void
 	{
 		var injectee = new XMLInjectee();
 		var value = Xml.parse("<test/>");
@@ -559,7 +559,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function postConstructIsCalled():Void
+	public function post_construct_is_called():Void
 	{
 		var injectee = new ClassInjectee();
 		var value = new Class1();
@@ -571,7 +571,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function postConstructMethodsCalledAsOrdered():Void
+	public function post_construct_methods_called_as_ordered():Void
 	{
 		var injectee = new OrderedPostConstructInjectee();
 		injector.injectInto(injectee);
@@ -580,33 +580,33 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function hasRuleFailsForUnmappedUnnamedClass():Void
+	public function has_rule_fails_for_unmapped_unnamed_class():Void
 	{
 		Assert.isFalse(injector.hasRule(Class1));
 	}
 
 	@Test
-	public function hasRuleFailsForUnmappedNamedClass():Void
+	public function has_rule_fails_for_unmapped_named_class():Void
 	{
 		Assert.isFalse(injector.hasRule(Class1, "namedClass"));
 	}
 
 	@Test
-	public function hasRuleSucceedsForMappedUnnamedClass():Void
+	public function has_rule_succeeds_for_mapped_unnamed_class():Void
 	{
 		injector.mapClass(Class1, Class1);
 		Assert.isTrue(injector.hasRule(Class1));
 	}
 
 	@Test
-	public function hasRuleSucceedsForMappedNamedClass():Void
+	public function has_rule_succeeds_for_mapped_named_class():Void
 	{
 		injector.mapClass(Class1, Class1, "namedClass");
 		Assert.isTrue(injector.hasRule(Class1, "namedClass"));
 	}
 
 	@Test
-	public function getRuleResponseSucceedsForMappedUnnamedClass():Void
+	public function get_rule_response_succeeds_for_mapped_unnamed_class():Void
 	{
 		var class1 = new Class1();
 		injector.mapValue(Class1, class1);
@@ -614,7 +614,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function getRuleResponseSucceedsForMappedNamedClass():Void
+	public function get_rule_response_succeeds_for_mapped_named_class():Void
 	{
 		var class1 = new Class1();
 		injector.mapValue(Class1, class1, "namedClass");
@@ -622,7 +622,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function injectorRemovesSingletonInstanceOnRuleRemoval():Void
+	public function injector_removes_singleton_instance_on_rule_removal():Void
 	{
 		injector.mapSingleton(Class1);
 
@@ -635,7 +635,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function haltOnMissingDependency():Void
+	public function halt_on_missing_dependency():Void
 	{
 		var injectee = new InterfaceInjectee();
 		var passed = false;
@@ -653,7 +653,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function haltOnMissingNamedDependency():Void
+	public function halt_on_missing_named_dependency():Void
 	{
 		var injectee = new NamedClassInjectee();
 		var passed = false;
@@ -671,7 +671,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function getRuleResponseFailsForUnmappedUnnamedClass():Void
+	public function get_rule_response_fails_for_unmapped_unnamed_class():Void
 	{
 		var passed = false;
 
@@ -688,7 +688,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function getRuleResponseFailsForUnmappedNamedClass():Void
+	public function get_rule_response_fails_for_unmapped_named_class():Void
 	{
 		var passed = false;
 
@@ -704,13 +704,8 @@ import minject.support.injectees.RecursiveInjectee;
 		Assert.isTrue(passed);
 	}
 
-	#if cpp
-		#if (!haxe_210 && (haxe_208||haxe_209))
-		@Ignore("Not supported in Haxe 2.08 or Haxe 2.09")
-		#end
-	#end
 	@Test
-	public function instantiateThrowsMeaningfulErrorOnInterfaceInstantiation() : Void
+	public function instantiate_throws_meaningful_error_on_interface_instantiation() : Void
 	{
 		var passed = false;
 
@@ -727,10 +722,18 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function shouldInstantiateRecursiveInjectee()
+	public function should_instantiate_recursive_injectee()
 	{
 		injector.mapSingleton(RecursiveInjectee1);
 		injector.mapSingleton(RecursiveInjectee2);
 		injector.instantiate(RecursiveInjectee1);
+	}
+
+	@Test
+	public function should_get_response()
+	{
+		injector.mapValue(Int, 10, 'sessionExpiry');
+		var value = injector.getResponse(Int, 'sessionExpiry');
+		Assert.areEqual(10, value);
 	}
 }

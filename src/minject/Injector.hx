@@ -47,6 +47,8 @@ class Injector
 
 	public function new() {}
 
+	//-------------------------------------------------------------------------- mapping
+
 	/**
 		When asked for an instance of the type `forType` inject the instance `useValue`.
 
@@ -84,15 +86,15 @@ class Injector
 
 		@returns A reference to the rule for this injection which can be used with `mapRule`
 	**/
-	public macro function mapClass(ethis:Expr, forType:Expr,
-		instantiateClass:Expr, ?named:Expr):Expr
+	public macro function mapClass(ethis:Expr, forType:Expr, instantiateClass:Expr,
+		?named:Expr):Expr
 	{
 		InjectorMacro.keep(instantiateClass);
 		return macro $ethis._mapClass($forType, $instantiateClass, $named);
 	}
 
-	public function _mapClass(forType:Class<Dynamic>,
-		instantiateClass:Class<Dynamic>, ?named:String):InjectorRule
+	public function _mapClass(forType:Class<Dynamic>, instantiateClass:Class<Dynamic>,
+		?named:String):InjectorRule
 	{
 		var rule = getTypeRule(Type.getClassName(forType), named);
 		rule.setResult(new InjectClassResult(instantiateClass));
@@ -113,12 +115,7 @@ class Injector
 	public macro function mapSingleton(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
 		InjectorMacro.keep(forType);
-		return macro $ethis._mapSingleton($forType, $named);
-	}
-
-	public function _mapSingleton(forType:Class<Dynamic>, ?named:String) :InjectorRule
-	{
-		return _mapSingletonOf(forType, forType, named);
+		return macro $ethis._mapSingletonOf($forType, $forType, $named);
 	}
 
 	/**
@@ -133,20 +130,135 @@ class Injector
 
 		@returns A reference to the rule for this injection which can be used with `mapRule`
 	**/
-	public macro function mapSingletonOf(ethis:Expr, forType:Expr,
-		useSingletonOf:Expr, ?named:Expr):Expr
+	public macro function mapSingletonOf(ethis:Expr, forType:Expr, useSingletonOf:Expr,
+		?named:Expr):Expr
 	{
 		InjectorMacro.keep(useSingletonOf);
 		return macro $ethis._mapSingletonOf($forType, $useSingletonOf, $named);
 	}
 
-	public function _mapSingletonOf(forType:Class<Dynamic>,
-		useSingletonOf:Class<Dynamic>, ?named:String):InjectorRule
+	public function _mapSingletonOf(forType:Class<Dynamic>, useSingletonOf:Class<Dynamic>,
+		?named:String):InjectorRule
 	{
 		var rule = getTypeRule(Type.getClassName(forType), named);
 		rule.setResult(new InjectSingletonResult(useSingletonOf));
 		return rule;
 	}
+
+	/**
+		Remove a rule from the injector
+
+		@param theClass A class or interface
+		@param named An optional name (id)
+	**/
+	public macro function unmap(ethis:Expr, forType:Expr, ?named:Expr):Expr
+	{
+		var type = InjectorMacro.getType(forType);
+		return macro $ethis.unmapType($type, $named);
+	}
+
+	public function unmapType(type:String, ?named:String):Void
+	{
+		var rule = getRuleForRequest(type, named);
+		#if debug
+		if (rule == null)
+			throw 'Error while removing an rule: No rule defined for class "$type", named "$named"';
+		#end
+		rule.setResult(null);
+	}
+
+	//-------------------------------------------------------------------------- rules
+
+	/**
+		Does a rule exist to satsify such a request?
+
+		@param forType A class or interface
+		@param named An optional name (id)
+		@returns Whether such a rule exists
+	**/
+	public macro function hasRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
+	{
+		var type = InjectorMacro.getType(forType);
+		return macro $ethis.hasTypeRule($type, $named);
+	}
+
+	public function hasTypeRule(forType:String, ?named:String):Bool
+	{
+		var rule = getRuleForRequest(forType, named);
+		if (rule == null) return false;
+		return rule.hasResponse(this);
+	}
+
+	/**
+		Returns the mapped `InjectorRule` for the class and name provided.
+	**/
+	public macro function getRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
+	{
+		var type = InjectorMacro.getType(forType);
+		return macro $ethis.getTypeRule($type, $named);
+	}
+
+	public function getTypeRule(forType:String, ?named:String):InjectorRule
+	{
+		var requestName = getRequestName(forType, named);
+		if (rules.exists(requestName))
+			return rules.get(requestName);
+
+		var rule = new InjectorRule(forType, named);
+		rules.set(requestName, rule);
+		return rule;
+	}
+
+	/**
+		When asked for an instance of the class `forType` use rule `useRule` to determine the
+		correct injection.
+
+		This will use whatever injection is set by the given injection rule as created using one of
+		the other rule methods.
+
+		@param forType A class or interface
+		@param useRule The rule to use for the injection
+		@param named An optional name (id)
+
+		@returns A reference to the rule for this injection which can be used with `mapRule`
+	**/
+	public macro function mapRule(ethis:Expr, forType:Expr, useRule:Expr, ?named:Expr):Expr
+	{
+		var type = InjectorMacro.getType(forType);
+		return macro $ethis.mapTypeRule($type, $useRule, $named);
+	}
+
+	public function mapTypeRule(forType:String, useRule:InjectorRule, ?named:String):InjectorRule
+	{
+		var rule = getTypeRule(forType, named);
+		rule.setResult(new InjectOtherRuleResult(useRule));
+		return useRule;
+	}
+
+	/**
+		Searches for an injection rule in the ancestry of the injector. This method is called when
+		a dependency cannot be satisfied by this injector.
+	**/
+	public function getAncestorRule(forType:String, ?named:String):InjectorRule
+	{
+		var parent = parent;
+
+		while (parent != null)
+		{
+			var parentConfig = parent.getRuleForRequest(forType, named, false);
+
+			if (parentConfig != null && parentConfig.hasOwnResponse())
+			{
+				return parentConfig;
+			}
+
+			parent = parent.parent;
+		}
+
+		return null;
+	}
+
+	//-------------------------------------------------------------------------- injecting
 
 	/**
 		Perform an injection into an object, satisfying all it's dependencies.
@@ -210,130 +322,30 @@ class Injector
 	}
 
 	/**
-		Remove a rule from the injector
+		Returns the injectors response for the provided type and name.
 
-		@param theClass A class or interface
-		@param named An optional name (id)
+		This method will return responses mapped through any method: mapValue, mapClass
+		or mapSingleton.
+
+		If a matching rule is not found then null is returned.
 	**/
-	public macro function unmap(ethis:Expr, forType:Expr, ?named:Expr):Expr
+	public macro function getResponse(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
 		var type = InjectorMacro.getType(forType);
-		return macro $ethis.unmapType($type, $named);
-	}
-
-	public function unmapType(forType:String, ?named:String):Void
-	{
-		var rule = getRuleForRequest(forType, named);
-		#if debug
-		if (rule == null)
-		{
-			throw 'Error while removing an injector rule: No rule defined for class "$forType", ' +
-				'named "$named"';
-		}
-		#end
-		rule.setResult(null);
-	}
-
-	/**
-		Does a rule exist to satsify such a request?
-
-		@param forType A class or interface
-		@param named An optional name (id)
-		@returns Whether such a rule exists
-	**/
-	public macro function hasRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
-	{
-		var type = InjectorMacro.getType(forType);
-		return macro $ethis.hasTypeRule($type, $named);
-	}
-
-	public function hasTypeRule(forType:String, ?named:String):Bool
-	{
-		var rule = getRuleForRequest(forType, named);
-		if (rule == null) return false;
-		return rule.hasResponse(this);
-	}
-
-	/**
-		Returns the mapped `InjectorRule` for the class and name provided.
-	**/
-	public macro function getRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
-	{
-		var type = InjectorMacro.getType(forType);
-		return macro $ethis.getTypeRule($type, $named);
-	}
-
-	public function getTypeRule(forType:String, ?named:String):InjectorRule
-	{
-		var requestName = getRequestName(forType, named);
-		if (rules.exists(requestName))
-			return rules.get(requestName);
-
-		var rule = new InjectorRule(forType, named);
-		rules.set(requestName, rule);
-		return rule;
+		return macro $ethis.getTypeResponse($type, $named);
 	}
 
 	public function getTypeResponse(forType:String, ?named:String):Dynamic
 	{
 		var response = getTypeRule(forType, named).getResponse(this);
-		if (response != null) return response;
-
-		// if Array<Int> fails fall back to Array
-		var index = forType.indexOf("<");
-		if (index == -1) return null;
-		forType = forType.substr(0, index);
-
-		return getTypeRule(forType, named).getResponse(this);
-	}
-
-	/**
-		When asked for an instance of the class `forType` use rule `useRule` to determine the
-		correct injection.
-
-		This will use whatever injection is set by the given injection rule as created using one of
-		the other rule methods.
-
-		@param forType A class or interface
-		@param useRule The rule to use for the injection
-		@param named An optional name (id)
-
-		@returns A reference to the rule for this injection which can be used with `mapRule`
-	**/
-	public macro function mapRule(ethis:Expr, forType:Expr, useRule:Expr, ?named:Expr):Expr
-	{
-		var type = InjectorMacro.getType(forType);
-		return macro $ethis.mapTypeRule($type, $useRule, $named);
-	}
-
-	public function mapTypeRule(forType:String, useRule:InjectorRule, ?named:String):InjectorRule
-	{
-		var rule = getTypeRule(forType, named);
-		rule.setResult(new InjectOtherRuleResult(useRule));
-		return useRule;
-	}
-
-	/**
-		Searches for an injection rule in the ancestry of the injector. This method is called when
-		a dependency cannot be satisfied by this injector.
-	**/
-	public function getAncestorRule(forType:String, ?named:String):InjectorRule
-	{
-		var parent = parent;
-
-		while (parent != null)
+		if (response == null)
 		{
-			var parentConfig = parent.getRuleForRequest(forType, named, false);
-
-			if (parentConfig != null && parentConfig.hasOwnResponse())
-			{
-				return parentConfig;
-			}
-
-			parent = parent.parent;
+			// if Array<Int> fails fall back to Array
+			var index = forType.indexOf("<");
+			if (index > -1)
+				response = getTypeRule(forType.substr(0, index), named).getResponse(this);
 		}
-
-		return null;
+		return response;
 	}
 
 	/**
@@ -350,8 +362,8 @@ class Injector
 
 		if (rule == null || !rule.hasResponse(this))
 		{
-			throw 'Error while getting rule response: No rule defined for ' +
-				'class "$type" named "$named"';
+			throw 'Error while getting rule response: No rule defined for class "$type" ' +
+				'named "$named"';
 		}
 
 		return rule.getResponse(this);

@@ -63,12 +63,10 @@ class InjectorRule
 		#if debug
 		if (this.result != null && result != null)
 		{
-			var desc = result.toString();
-			trace('Warning: Injector contains ${this.toString()}.\n' +
-				'Attempting to overwrite this with mapping for [$desc].\n' +
-				'If you have overwritten this mapping intentionally you can ' +
-				'use `injector.unmap()` prior to your replacement mapping in ' +
-				'order to avoid seeing this message.');
+			trace('Warning: Injector contains ${this.toString()}.\nAttempting to overwrite this ' +
+				'with mapping for ${result.toString()}.\nIf you have overwritten this mapping ' +
+				'intentionally you can use `injector.unmap()` prior to your replacement mapping ' +
+				'in order to avoid seeing this message.');
 		}
 		#end
 		this.result = result;

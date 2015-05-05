@@ -56,7 +56,7 @@ class MethodInjectionPoint implements InjectionPoint
 			values.push(response);
 
 			#if debug
-			if (response == null && !opt)
+			if (!opt && response == null)
 			{
 				var targetName = Type.getClassName(Type.getClass(target));
 				throw 'Injector is missing a rule to handle injection into target "$targetName". ' +
@@ -64,7 +64,7 @@ class MethodInjectionPoint implements InjectionPoint
 			}
 			#end
 		}
-		
+
 		return values;
 	}
 }
