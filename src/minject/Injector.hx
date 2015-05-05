@@ -23,11 +23,10 @@ SOFTWARE.
 package minject;
 
 import haxe.rtti.Meta;
+import haxe.macro.Expr;
 
 import minject.point.*;
 import minject.result.*;
-
-import haxe.macro.Expr;
 
 /**
 	The dependency injector
@@ -49,29 +48,24 @@ class Injector
 	public function new() {}
 
 	/**
-		When asked for an instance of the type `forType` inject the
-		instance `useValue`.
+		When asked for an instance of the type `forType` inject the instance `useValue`.
 
-		This is used to register an existing value with the injector and
-		treat it like a singleton.
+		This is used to register an existing value with the injector and treat it like a singleton.
 
 		@param forType A class or interface
 		@param useValue An instance
 		@param named An optional name (id)
 
-		@returns A reference to the rule for this injection which can be used
-		with `mapRule`
+		@returns A reference to the rule for this injection which can be used with `mapRule`
 	**/
-	public macro function mapValue(ethis:Expr, forType:Expr, useValue:Expr,
-		?named:Expr):Expr
+	public macro function mapValue(ethis:Expr, forType:Expr, useValue:Expr, ?named:Expr):Expr
 	{
 		InjectorMacro.keep(forType);
 		var type = InjectorMacro.getType(forType);
 		return macro $ethis.mapTypeValue($type, $useValue, $named);
 	}
 
-	public function mapTypeValue(forType:String, useValue:Dynamic,
-		?named:String=''):InjectorRule
+	public function mapTypeValue(forType:String, useValue:Dynamic, ?named:String):InjectorRule
 	{
 		var rule = getTypeRule(forType, named);
 		rule.setResult(new InjectValueResult(useValue));
@@ -79,8 +73,8 @@ class Injector
 	}
 
 	/**
-		When asked for an instance of the class `forType` inject a new
-		instance of `instantiateClass`.
+		When asked for an instance of the class `forType` inject a new instance of
+		`instantiateClass`.
 
 		This will create a new instance for each injection.
 
@@ -88,8 +82,7 @@ class Injector
 		@param instantiateClass A class to instantiate
 		@param named An optional name (id)
 
-		@returns A reference to the rule for this injection which can be used
-		with `mapRule`
+		@returns A reference to the rule for this injection which can be used with `mapRule`
 	**/
 	public macro function mapClass(ethis:Expr, forType:Expr,
 		instantiateClass:Expr, ?named:Expr):Expr
@@ -99,7 +92,7 @@ class Injector
 	}
 
 	public function _mapClass(forType:Class<Dynamic>,
-		instantiateClass:Class<Dynamic>, ?named:String=''):InjectorRule
+		instantiateClass:Class<Dynamic>, ?named:String):InjectorRule
 	{
 		var rule = getTypeRule(Type.getClassName(forType), named);
 		rule.setResult(new InjectClassResult(instantiateClass));
@@ -107,44 +100,38 @@ class Injector
 	}
 
 	/**
-		When asked for an instance of the class `forType` inject an
-		instance of `forType`.
+		When asked for an instance of the class `forType` inject an instance of `forType`.
 
-		This will create an instance on the first injection, but will re-use
-		that instance for subsequent injections.
+		This will create an instance on the first injection, but will re-use that instance for
+		subsequent injections.
 
 		@param forType A class or interface
 		@param named An optional name (id)
 
-		@returns A reference to the rule for this injection which can be used
-		with `mapRule`
+		@returns A reference to the rule for this injection which can be used with `mapRule`
 	**/
-	public macro function mapSingleton(ethis:Expr, forType:Expr,
-		?named:Expr):Expr
+	public macro function mapSingleton(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
 		InjectorMacro.keep(forType);
 		return macro $ethis._mapSingleton($forType, $named);
 	}
 
-	public function _mapSingleton(forType:Class<Dynamic>,
-		?named:String='') :InjectorRule
+	public function _mapSingleton(forType:Class<Dynamic>, ?named:String) :InjectorRule
 	{
 		return _mapSingletonOf(forType, forType, named);
 	}
 
 	/**
-		When asked for an instance of the class `forType`
-		inject an instance of `useSingletonOf`.
+		When asked for an instance of the class `forType` inject an instance of `useSingletonOf`.
 
-		This will create an instance on the first injection, but will re-use
-		that instance for subsequent injections.
+		This will create an instance on the first injection, but will re-use that instance for
+		subsequent injections.
 
 		@param forType A class or interface
 		@param useSingletonOf A class to instantiate
 		@param named An optional name
 
-		@returns A reference to the rule for this injection which can be used
-		with `mapRule`
+		@returns A reference to the rule for this injection which can be used with `mapRule`
 	**/
 	public macro function mapSingletonOf(ethis:Expr, forType:Expr,
 		useSingletonOf:Expr, ?named:Expr):Expr
@@ -154,7 +141,7 @@ class Injector
 	}
 
 	public function _mapSingletonOf(forType:Class<Dynamic>,
-		useSingletonOf:Class<Dynamic>, ?named:String=''):InjectorRule
+		useSingletonOf:Class<Dynamic>, ?named:String):InjectorRule
 	{
 		var rule = getTypeRule(Type.getClassName(forType), named);
 		rule.setResult(new InjectSingletonResult(useSingletonOf));
@@ -162,10 +149,9 @@ class Injector
 	}
 
 	/**
-		Perform an injection into an object, satisfying all it's dependencies
+		Perform an injection into an object, satisfying all it's dependencies.
 
-		The `Injector` should throw an `Error` if it can't satisfy all
-		dependencies of the injectee.
+		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
 
 		@param target The object to inject into - the Injectee
 	**/
@@ -196,19 +182,16 @@ class Injector
 	}
 
 	/**
-		Create an object of the given class, supplying its dependencies as
-		constructor parameters if the used DI solution has support for
-		constructor injection
+		Create an object of the given class, supplying its dependencies as constructor parameters
+		if the used DI solution has support for constructor injection
 
-		Adapters for DI solutions that don't support constructor injection
-		should just create a new instance and perform setter and/or method
-		injection on that.
+		Adapters for DI solutions that don't support constructor injection should just create a new
+		instance and perform setter and/or method injection on that.
 
-		NOTE: This method will always create a new instance. If you need to
-		retrieve an instance consider using `getInstance`
+		NOTE: This method will always create a new instance. If you need to retrieve an instance
+		consider using `getInstance`
 
-		The `Injector` should throw an `Error` if it can't satisfy all
-		dependencies of the injectee.
+		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
 
 		@param theClass The class to instantiate
 		@returns The created instance
@@ -232,17 +215,22 @@ class Injector
 		@param theClass A class or interface
 		@param named An optional name (id)
 	**/
-	public function unmap(theClass:Class<Dynamic>, ?named:String=''):Void
+	public macro function unmap(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var type = Type.getClassName(theClass);
-		var rule = getRuleForRequest(type, named);
+		var type = InjectorMacro.getType(forType);
+		return macro $ethis.unmapType($type, $named);
+	}
 
+	public function unmapType(forType:String, ?named:String):Void
+	{
+		var rule = getRuleForRequest(forType, named);
+		#if debug
 		if (rule == null)
 		{
-			throw 'Error while removing an injector rule: No rule defined ' +
-				'for class "$type", named "$named"';
+			throw 'Error while removing an injector rule: No rule defined for class "$forType", ' +
+				'named "$named"';
 		}
-
+		#end
 		rule.setResult(null);
 	}
 
@@ -259,7 +247,7 @@ class Injector
 		return macro $ethis.hasTypeRule($type, $named);
 	}
 
-	public function hasTypeRule(forType:String, ?named:String=''):Bool
+	public function hasTypeRule(forType:String, ?named:String):Bool
 	{
 		var rule = getRuleForRequest(forType, named);
 		if (rule == null) return false;
@@ -275,7 +263,7 @@ class Injector
 		return macro $ethis.getTypeRule($type, $named);
 	}
 
-	public function getTypeRule(forType:String, ?named:String=''):InjectorRule
+	public function getTypeRule(forType:String, ?named:String):InjectorRule
 	{
 		var requestName = getRequestName(forType, named);
 		if (rules.exists(requestName))
@@ -286,19 +274,31 @@ class Injector
 		return rule;
 	}
 
-	/**
-		When asked for an instance of the class `forType`
-		use rule `useRule` to determine the correct injection.
+	public function getTypeResponse(forType:String, ?named:String):Dynamic
+	{
+		var response = getTypeRule(forType, named).getResponse(this);
+		if (response != null) return response;
 
-		This will use whatever injection is set by the given injection rule as
-		created using one of the other rule methods.
+		// if Array<Int> fails fall back to Array
+		var index = forType.indexOf("<");
+		if (index == -1) return null;
+		forType = forType.substr(0, index);
+
+		return getTypeRule(forType, named).getResponse(this);
+	}
+
+	/**
+		When asked for an instance of the class `forType` use rule `useRule` to determine the
+		correct injection.
+
+		This will use whatever injection is set by the given injection rule as created using one of
+		the other rule methods.
 
 		@param forType A class or interface
 		@param useRule The rule to use for the injection
 		@param named An optional name (id)
 
-		@returns A reference to the rule for this injection which can be used
-		with `mapRule`
+		@returns A reference to the rule for this injection which can be used with `mapRule`
 	**/
 	public macro function mapRule(ethis:Expr, forType:Expr, useRule:Expr, ?named:Expr):Expr
 	{
@@ -306,7 +306,7 @@ class Injector
 		return macro $ethis.mapTypeRule($type, $useRule, $named);
 	}
 
-	public function mapTypeRule(forType:String, useRule:InjectorRule, ?named:String=''):InjectorRule
+	public function mapTypeRule(forType:String, useRule:InjectorRule, ?named:String):InjectorRule
 	{
 		var rule = getTypeRule(forType, named);
 		rule.setResult(new InjectOtherRuleResult(useRule));
@@ -314,10 +314,10 @@ class Injector
 	}
 
 	/**
-		Searches for an injection rule in the ancestry of the injector. This
-		method is called when a dependency cannot be satisfied by this injector.
+		Searches for an injection rule in the ancestry of the injector. This method is called when
+		a dependency cannot be satisfied by this injector.
 	**/
-	public function getAncestorRule(forType:String, named:String=null):InjectorRule
+	public function getAncestorRule(forType:String, ?named:String):InjectorRule
 	{
 		var parent = parent;
 
@@ -343,7 +343,7 @@ class Injector
 		@param named An optional name (id)
 		@return An instance
 	**/
-	public function getInstance<T>(ofClass:Class<T>, ?named:String=''):T
+	public function getInstance<T>(ofClass:Class<T>, ?named:String):T
 	{
 		var type = Type.getClassName(ofClass);
 		var rule = getRuleForRequest(type, named);
@@ -369,7 +369,7 @@ class Injector
 		return injector;
 	}
 
-	//--------------------------------------------------------------------------
+	//-------------------------------------------------------------------------- private
 
 	function getInfo(forClass:Class<Dynamic>):InjectorInfo
 	{
@@ -384,14 +384,12 @@ class Injector
 	function createInfo(forClass:Class<Dynamic>):InjectorInfo
 	{
 		var info = new InjectorInfo(null, []);
-		addClassToInfo(forClass,info);
-
+		addClassToInfo(forClass, info, []);
 		if (info.ctor == null) info.ctor = new ConstructorInjectionPoint([]);
-
 		return info;
 	}
 
-	function addClassToInfo(forClass:Class<Dynamic>, info:InjectorInfo):Void
+	function addClassToInfo(forClass:Class<Dynamic>, info:InjectorInfo, injected:Array<String>):Void
 	{
 		var typeMeta = Meta.getType(forClass);
 
@@ -400,9 +398,6 @@ class Injector
 			throw 'Interfaces can\'t be used as instantiatable classes.';
 		#end
 
-		var superClass = Type.getSuperClass(forClass);
-		if (superClass != null) addClassToInfo(superClass,info);
-
 		var fields:Array<Array<String>> = cast typeMeta.rtti;
 
 		if (fields != null)
@@ -410,6 +405,10 @@ class Injector
 			for (field in fields)
 			{
 				var name = field[0];
+
+				if (injected.indexOf(name) > -1) continue;
+				injected.push(name);
+
 				if (name == 'new')
 				{
 					info.ctor = new ConstructorInjectionPoint(field.slice(1));
@@ -424,10 +423,12 @@ class Injector
 				}
 			}
 		}
+
+		var superClass = Type.getSuperClass(forClass);
+		if (superClass != null) addClassToInfo(superClass, info, injected);
 	}
 
-	function getRuleForRequest(type:String, named:String,
-		?traverseAncestors:Bool=true):InjectorRule
+	function getRuleForRequest(type:String, named:String, ?traverseAncestors:Bool=true):InjectorRule
 	{
 		var requestName = getRequestName(type, named);
 
@@ -444,6 +445,7 @@ class Injector
 
 	function getRequestName(forType:String, named:String):String
 	{
+		if (named == null) named = '';
 		return '$forType#$named';
 	}
 }

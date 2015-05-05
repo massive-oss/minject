@@ -187,7 +187,15 @@ class InjectorMacro
 						for (i in 0...args.length)
 						{
 							var arg = args[i];
-							rtti.push(arg.t.follow().toString());
+							var type = arg.t.follow().toString();
+
+							if (!arg.opt && type == 'Dynamic')
+							{
+								Context.error('Error in method definition of injectee. Required ' +
+									'parameters can\'t have type "Dynamic"', field.pos);
+							}
+
+							rtti.push(type);
 							rtti.push(names[i] == null ? '' : names[i].getValue());
 							rtti.push(arg.opt ? 'o' : '');
 						}

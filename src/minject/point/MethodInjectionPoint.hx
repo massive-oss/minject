@@ -33,13 +33,6 @@ class MethodInjectionPoint implements InjectionPoint
 	{
 		this.name = name;
 		this.args = args;
-
-		#if debug
-		for (i in 0...Math.floor(args.length / 3))
-			if (args[i] == "Dynamic")
-				throw 'Error in method definition of injectee. ' +
-					'Required parameters can\'t have non class type.';
-		#end
 	}
 
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
@@ -59,25 +52,19 @@ class MethodInjectionPoint implements InjectionPoint
 			var argName = args[index++];
 			var opt = args[index++] == 'o';
 
-			var response = injector.getTypeRule(type, argName).getResponse(injector);
-			if (response == null)
-			{
-				var index = type.indexOf("<");
-				type = (index>-1) ? type.substr(0, index) : type;
-				response = injector.getTypeRule(type, argName).getResponse(injector);
-			}
+			var response = injector.getTypeResponse(type, argName);
+			values.push(response);
 
 			#if debug
 			if (response == null && !opt)
 			{
 				var targetName = Type.getClassName(Type.getClass(target));
-				throw 'Injector is missing a rule to handle injection into ' +
-					'target "$targetName". Target dependency: "$type", ' +
-					'method: "$name", named: "$argName"';
+				throw 'Injector is missing a rule to handle injection into target "$targetName". ' +
+					'Target dependency: "$type", method: "$name", named: "$argName"';
 			}
 			#end
-			values.push(response);
 		}
+		
 		return values;
 	}
 }

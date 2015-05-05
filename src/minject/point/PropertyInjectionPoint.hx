@@ -39,21 +39,14 @@ class PropertyInjectionPoint implements InjectionPoint
 
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var response = injector.getTypeRule(type, injectionName).getResponse(injector);
-		if (response == null)
-		{
-			var index = type.indexOf("<");
-			type = (index>-1) ? type.substr(0, index) : type;
-			response = injector.getTypeRule(type, injectionName).getResponse(injector);
-		}
-
+		var response = injector.getTypeResponse(type, injectionName);
+		
 		#if debug
 		if (response == null)
 		{
 			var targetName = Type.getClassName(Type.getClass(target));
-			throw 'Injector is missing a rule to handle injection into ' +
-				'property "$name" of object "$targetName". Target ' +
-				'dependency: "$type", named "$injectionName"';
+			throw 'Injector is missing a rule to handle injection into property "$name" of ' +
+				'object "$targetName". Target dependency: "$type", named "$injectionName"';
 		}
 		#end
 

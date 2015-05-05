@@ -89,23 +89,6 @@ import minject.support.types.Interface1;
 	}
 
 	@Test
-	public function gathering_parameters_for_methods_with_untyped_parameters_throws_exception()
-	{
-		var passed = false;
-
-		try
-		{
-			var injectionPoint = new MethodInjectionPoint("test", ['Dynamic','','o']);
-		}
-		catch (e:Dynamic)
-		{
-			passed = true;
-		}
-
-		Assert.isTrue(passed);
-	}
-
-	@Test
 	public function injection_of_unmapped_parameter_into_method_throws_exception()
 	{
 		var injectee = new OneParameterMethodInjectee();
