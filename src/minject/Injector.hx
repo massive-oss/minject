@@ -38,6 +38,11 @@ class Injector
 	{
 		if (Std.is(value, String)) return value;
 
+		if (Std.is(value, Class))
+			return Type.getClassName(value);
+		if (Std.is(value, Enum))
+			return Type.getEnumName(value);
+
 		var name = switch (Type.typeof(value))
 		{
 			case TInt: 'Int';
@@ -47,12 +52,7 @@ class Injector
 			default: null;
 		}
 
-		if (name == null)
-			try name = Type.getClassName(value) catch (e:Dynamic) {}
-		if (name == null)
-			try name = Type.getEnumName(value) catch (e:Dynamic) {}
-		if (name != null)
-			return name;
+		if (name != null) return name;
 		throw 'Could not determine type name of $value';
 	}
 
