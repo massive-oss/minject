@@ -9,3 +9,4 @@ TestSuite.hx
 /lib
 .DS_Store
 teamcity-info.xml
+.haxelib
