@@ -50,7 +50,13 @@ class InjectorRule
 
 	public function hasResponse(injector:Injector):Bool
 	{
-		return result != null;
+		if (this.injector != null) injector = this.injector;
+		if (result != null) return true;
+
+		var parent = injector.getAncestorRule(type, injectionName);
+		if (parent != null && parent.result != null) return true;
+
+		return false;
 	}
 
 	public function hasOwnResponse():Bool

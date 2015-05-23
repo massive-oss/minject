@@ -129,35 +129,55 @@ import minject.support.types.Class1;
 		Assert.isType(robotBody.leftLeg.ankle.foot, LeftRobotFoot);
 	}
 
-    @Test
-    public function child_injector_has_mapping_when_exists_on_parent_injector():Void
-    {
-        var childInjector = injector.createChildInjector();
-        var class1 = new Class1();
-        injector.mapValue(Class1, class1);
+	@Test
+	public function child_injector_has_mapping_when_exists_on_parent_injector():Void
+	{
+		var childInjector = injector.createChildInjector();
+		var class1 = new Class1();
+		injector.mapValue(Class1, class1);
 
-        Assert.isTrue(childInjector.hasRule(Class1));
-    }
+		Assert.isTrue(childInjector.hasRule(Class1));
+	}
 
-    @Test
-    public function child_injector_does_not_have_mapping_when_does_not_exist_on_parent_injector():Void
-    {
-        var childInjector = injector.createChildInjector();
-        Assert.isFalse(childInjector.hasRule(Class1));
-    }
+	@Test
+	@:access(minject.Injector)
+	public function child_injector_get_response_does_not_break_mapping_when_when_exists_on_parent_injector():Void
+	{
+		var childInjector = injector.createChildInjector();
+		var class1 = new Class1();
+		injector.mapValue(Class1, class1);
 
-    @Test
-    public function grand_child_injector_supplies_injection_from_ancestor():Void
-    {
-        var injectee = new ClassInjectee();
-        var childInjector = injector.createChildInjector();
-        var grandChildInjector = childInjector.createChildInjector();
+		Assert.areEqual(1, Lambda.count(injector.rules));
+		Assert.areEqual(0, Lambda.count(childInjector.rules));
 
-        injector.mapSingleton(Class1);
-        grandChildInjector.injectInto(injectee);
+		var response1 = childInjector.getResponse(Class1);
+		var response2 = childInjector.getInstance(Class1);
+		Assert.areEqual( class1, response1 );
+		Assert.areEqual( class1, response2 );
 
-        Assert.isType(injectee.property, Class1);
-    }
+		Assert.areEqual(1, Lambda.count(injector.rules));
+		Assert.areEqual(0, Lambda.count(childInjector.rules));
+	}
+
+	@Test
+	public function child_injector_does_not_have_mapping_when_does_not_exist_on_parent_injector():Void
+	{
+		var childInjector = injector.createChildInjector();
+		Assert.isFalse(childInjector.hasRule(Class1));
+	}
+
+	@Test
+	public function grand_child_injector_supplies_injection_from_ancestor():Void
+	{
+		var injectee = new ClassInjectee();
+		var childInjector = injector.createChildInjector();
+		var grandChildInjector = childInjector.createChildInjector();
+
+		injector.mapSingleton(Class1);
+		grandChildInjector.injectInto(injectee);
+
+		Assert.isType(injectee.property, Class1);
+	}
 
 	@Test
 	public function can_create_child_injector_during_injection():Void
