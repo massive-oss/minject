@@ -359,13 +359,17 @@ class Injector
 
 	public function getTypeResponse(forType:String, ?named:String):Dynamic
 	{
-		var response = getTypeRule(forType, named).getResponse(this);
+		var rule = getRuleForRequest(forType, named, true);
+		var response = (rule!=null) ? rule.getResponse(this) : null;
+
 		if (response == null)
 		{
 			// if Array<Int> fails fall back to Array
 			var index = forType.indexOf("<");
-			if (index > -1)
-				response = getTypeRule(forType.substr(0, index), named).getResponse(this);
+			if (index > -1) {
+				rule = getRuleForRequest(forType.substr(0, index), named);
+				response = (rule!=null) ? rule.getResponse(this) : null;
+			}
 		}
 		return response;
 	}
