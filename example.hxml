@@ -1,15 +1,16 @@
 -main InjectionExample
 -lib minject
 -dce full
+-cp src/example
 
 --each
 
--js index.js
+-js bin/index.js
 
 --next
 
--swf index.swf
+-swf bin/index.swf
 
 --next
 
--neko neko.n
+-neko bin/neko.n

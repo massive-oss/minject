@@ -1,0 +1,17 @@
+{
+	"name": "minject",
+	"license": "MIT",
+	"tags": [
+		"cross",
+		"utility",
+		"massive"
+	],
+	"description": "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.",
+	"contributors": [
+		"massive"
+	],
+	"releasenote": "See https://github.com/massiveinteractive/minject/blob/master/CHANGES.md",
+	"version": "2.0.0",
+	"url": "https://github.com/massiveinteractive/minject",
+	"dependencies": {}
+}

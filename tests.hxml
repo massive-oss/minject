@@ -2,8 +2,8 @@
 -main TestMain
 -debug
 -lib munit
--cp src
--cp test
+-cp src/lib
+-cp src/test
 -dce full
 -swf-version 9
 --macro keep('TestSuite')
@@ -14,8 +14,8 @@
 -main TestMain
 -debug
 -lib munit
--cp src
--cp test
+-cp src/lib
+-cp src/test
 -dce full
 --macro keep('TestSuite')
 
@@ -25,8 +25,8 @@
 -main TestMain
 -debug
 -lib munit
--cp src
--cp test
+-cp src/lib
+-cp src/test
 -dce full
 --macro keep('TestSuite')
 
@@ -36,7 +36,7 @@
 -main TestMain
 -debug
 -lib munit
--cp src
--cp test
+-cp src/lib
+-cp src/test
 -dce full
 --macro keep('TestSuite')
