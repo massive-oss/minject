@@ -27,35 +27,28 @@ import minject.result.InjectionResult;
 class InjectorRule
 {
 	public var type:String;
-	public var injectionName:String;
+	public var name:String;
 	public var injector:Injector;
 	public var result:InjectionResult;
 
-	public function new(type:String, injectionName:String)
+	public function new(type:String, name:String)
 	{
 		this.type = type;
-		this.injectionName = injectionName;
+		this.name = name;
 	}
 
 	public function getResponse(injector:Injector):Dynamic
 	{
 		if (this.injector != null) injector = this.injector;
-		if (result != null) return result.getResponse(injector);
 
-		var parent = injector.getAncestorRule(type, injectionName);
-		if (parent == null) return null;
+		if (result != null)
+			return result.getResponse(injector);
 
-		return parent.getResponse(injector);
-	}
+		var parent = injector.findRuleForTypeId(type, name);
+		if (parent != null)
+			return parent.getResponse(injector);
 
-	public function hasResponse(injector:Injector):Bool
-	{
-		return result != null;
-	}
-
-	public function hasOwnResponse():Bool
-	{
-		return result != null;
+		return null;
 	}
 
 	public function setResult(result:InjectionResult):Void
@@ -75,8 +68,7 @@ class InjectorRule
 	#if debug
 	public function toString():String
 	{
-		var named = injectionName != null && injectionName != '' ?
-			' named "$injectionName" and' : '';
+		var named = name != null && name != '' ? ' named "$name" and' : '';
 		return 'rule: [$type]$named mapped to [$result]';
 	}
 	#end

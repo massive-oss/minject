@@ -140,6 +140,26 @@ import minject.support.types.Class1;
 	}
 
 	@Test
+	@:access(minject.Injector)
+	public function child_injector_get_response_does_not_break_mapping_when_when_exists_on_parent_injector():Void
+	{
+		var childInjector = injector.createChildInjector();
+		var class1 = new Class1();
+		injector.mapValue(Class1, class1);
+
+		Assert.areEqual(1, Lambda.count(injector.rules));
+		Assert.areEqual(0, Lambda.count(childInjector.rules));
+
+		var response1 = childInjector.getResponse(Class1);
+		var response2 = childInjector.getInstance(Class1);
+		Assert.areEqual( class1, response1 );
+		Assert.areEqual( class1, response2 );
+
+		Assert.areEqual(1, Lambda.count(injector.rules));
+		Assert.areEqual(0, Lambda.count(childInjector.rules));
+	}
+
+	@Test
 	public function child_injector_does_not_have_mapping_when_does_not_exist_on_parent_injector():Void
 	{
 		var childInjector = injector.createChildInjector();

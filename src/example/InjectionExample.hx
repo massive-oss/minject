@@ -11,11 +11,11 @@ class InjectionExample
 		injector.mapClass(TypeB, TypeB, "foo");
 		injector.mapValue(Int, 20);
 		injector.mapValue(ValueType, TObject);
-		injector.mapValueToPath('Void -> String', function () return 'Hello!');
-		injector.mapValueToPath('Array<Int>', [0,1,2]);
-		injector.mapValueToPath('Iterable<Int>', [0,1,2]);
-		injector.mapValueToPath('String -> String -> Bool', function(a, b) return a == b);
-		injector.mapValueToPath('haxe.EnumFlags<ValueType>', new haxe.EnumFlags<ValueType>());
+		injector.mapValueToTypeId('Void -> String', function () return 'Hello!');
+		injector.mapValueToTypeId('Array<Int>', [0,1,2]);
+		injector.mapValueToTypeId('Iterable<Int>', [0,1,2]);
+		injector.mapValueToTypeId('String -> String -> Bool', function(a, b) return a == b);
+		injector.mapValueToTypeId('haxe.EnumFlags<ValueType>', new haxe.EnumFlags<ValueType>());
 
 		var a = injector.getInstance(TypeA);
 		a.id = 123;
@@ -41,7 +41,7 @@ class InjectionExample
 		trace('foo.enumValue ${foo.enumValue}');
 		trace('foo.flags ${foo.flags}');
 
-		trace(minject.Injector.getExprTypeName(function () return ''));
+		trace(minject.Injector.getExprTypeId(function () return ''));
 	}
 }
 

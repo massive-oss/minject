@@ -34,12 +34,12 @@ import minject.result.*;
 #if !macro @:build(minject.InjectorMacro.addMetadata()) #end
 class Injector
 {
-	public static macro function getExprTypeName(expr:Expr):Expr
+	public static macro function getExprTypeId(expr:Expr):Expr
 	{
-		return InjectorMacro.getExprTypeName(expr);
+		return InjectorMacro.getExprTypeId(expr);
 	}
 
-	public static function getValueTypeName(value:Dynamic)
+	public static function getValueTypeId(value:Dynamic)
 	{
 		if (Std.is(value, String))
 			return 'String';
@@ -71,7 +71,10 @@ class Injector
 	// map of injector infos by className
 	var infos = new Map<String, InjectorInfo>();
 
-	public function new() {}
+	public function new(?parent:Injector)
+	{
+		this.parent = parent;
+	}
 
 	//-------------------------------------------------------------------------- mapping
 
@@ -89,13 +92,13 @@ class Injector
 	public macro function mapValue(ethis:Expr, forType:Expr, useValue:Expr, ?named:Expr):Expr
 	{
 		InjectorMacro.keep(forType);
-		var forPath = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.mapValueToPath($forPath, $useValue, $named);
+		var forTypeId = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.mapValueToTypeId($forTypeId, $useValue, $named);
 	}
 
-	public function mapValueToPath(forPath:String, useValue:Dynamic, ?named:String):InjectorRule
+	public function mapValueToTypeId(forTypeId:String, useValue:Dynamic, ?named:String):InjectorRule
 	{
-		var rule = getRuleForPath(forPath, named);
+		var rule = getRuleForTypeId(forTypeId, named);
 		rule.setResult(new InjectValueResult(useValue));
 		return rule;
 	}
@@ -116,14 +119,14 @@ class Injector
 		?named:Expr):Expr
 	{
 		InjectorMacro.keep(instantiateClass);
-		var forPath = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.mapClassToPath($forPath, $instantiateClass, $named);
+		var forTypeId = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.mapClassToTypeId($forTypeId, $instantiateClass, $named);
 	}
 
-	public function mapClassToPath(forPath:String, instantiateClass:Class<Dynamic>,
+	public function mapClassToTypeId(forTypeId:String, instantiateClass:Class<Dynamic>,
 		?named:String):InjectorRule
 	{
-		var rule = getRuleForPath(forPath, named);
+		var rule = getRuleForTypeId(forTypeId, named);
 		rule.setResult(new InjectClassResult(instantiateClass));
 		return rule;
 	}
@@ -142,8 +145,8 @@ class Injector
 	public macro function mapSingleton(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
 		InjectorMacro.keep(forType);
-		var forPath = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.mapSingletonOfToPath($forPath, $forType, $named);
+		var forTypeId = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.mapSingletonOfToTypeId($forTypeId, $forType, $named);
 	}
 
 	/**
@@ -162,38 +165,16 @@ class Injector
 		?named:Expr):Expr
 	{
 		InjectorMacro.keep(useSingletonOf);
-		var forPath = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.mapSingletonOfToPath($forPath, $useSingletonOf, $named);
+		var forTypeId = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.mapSingletonOfToTypeId($forTypeId, $useSingletonOf, $named);
 	}
 
-	public function mapSingletonOfToPath(forPath:String, useSingletonOf:Class<Dynamic>,
+	public function mapSingletonOfToTypeId(forTypeId:String, useSingletonOf:Class<Dynamic>,
 		?named:String):InjectorRule
 	{
-		var rule = getRuleForPath(forPath, named);
+		var rule = getRuleForTypeId(forTypeId, named);
 		rule.setResult(new InjectSingletonResult(useSingletonOf));
 		return rule;
-	}
-
-	/**
-		Remove a rule from the injector
-
-		@param theClass A class or interface
-		@param named An optional name (id)
-	**/
-	public macro function unmap(ethis:Expr, forType:Expr, ?named:Expr):Expr
-	{
-		var type = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.unmapPath($type, $named);
-	}
-
-	public function unmapPath(path:String, ?named:String):Void
-	{
-		var rule = getRuleForRequest(path, named);
-		#if debug
-		if (rule == null)
-			throw 'Error while removing an rule: No rule defined for type "$path", named "$named"';
-		#end
-		rule.setResult(null);
 	}
 
 	//-------------------------------------------------------------------------- rules
@@ -207,35 +188,44 @@ class Injector
 	**/
 	public macro function hasRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var type = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.hasRuleForPath($type, $named);
+		var type = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.hasRuleForTypeId($type, $named);
 	}
 
-	public function hasRuleForPath(forPath:String, ?named:String):Bool
+	public function hasRuleForTypeId(forTypeId:String, ?named:String):Bool
 	{
-		var rule = getRuleForRequest(forPath, named);
-		if (rule == null) return false;
-		return rule.hasResponse(this);
+		return findRuleForTypeId(forTypeId, named) != null;
 	}
 
 	/**
-		Returns the mapped `InjectorRule` for the class and name provided.
+		Returns the mapped `InjectorRule` for the type and name provided.
 	**/
 	public macro function getRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var forPath = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.getRuleForPath($forPath, $named);
+		var forTypeId = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.getRuleForTypeId($forTypeId, $named);
 	}
 
-	public function getRuleForPath(forPath:String, ?named:String):InjectorRule
+	public function getRuleForTypeId(forTypeId:String, ?named:String):InjectorRule
 	{
-		var requestName = getRequestName(forPath, named);
-		if (rules.exists(requestName))
-			return rules.get(requestName);
-
-		var rule = new InjectorRule(forPath, named);
-		rules.set(requestName, rule);
+		var key = getRuleKey(forTypeId, named);
+		if (rules.exists(key))
+			return rules.get(key);
+		var rule = new InjectorRule(forTypeId, named);
+		rules.set(key, rule);
 		return rule;
+	}
+
+	public function findRuleForTypeId(type:String, named:String):InjectorRule
+	{
+		var rule = rules.get(getRuleKey(type, named));
+		if (rule != null && rule.result != null)
+			return rule;
+
+		if (parent != null)
+			return parent.findRuleForTypeId(type, named);
+
+		return null;
 	}
 
 	/**
@@ -253,36 +243,63 @@ class Injector
 	**/
 	public macro function mapRule(ethis:Expr, forType:Expr, useRule:Expr, ?named:Expr):Expr
 	{
-		var forPath = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.mapRuleForPath($forPath, $useRule, $named);
+		var forTypeId = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.mapRuleForTypeId($forTypeId, $useRule, $named);
 	}
 
-	public function mapRuleForPath(forPath:String, useRule:InjectorRule, ?named:String):InjectorRule
+	public function mapRuleForTypeId(forTypeId:String, useRule:InjectorRule, ?named:String):InjectorRule
 	{
-		var rule = getRuleForPath(forPath, named);
+		var rule = getRuleForTypeId(forTypeId, named);
 		rule.setResult(new InjectOtherRuleResult(useRule));
 		return useRule;
 	}
 
 	/**
-		Searches for an injection rule in the ancestry of the injector. This method is called when
-		a dependency cannot be satisfied by this injector.
+		Remove a rule from the injector
+
+		@param theClass A class or interface
+		@param named An optional name (id)
 	**/
-	public function getAncestorRule(forPath:String, ?named:String):InjectorRule
+	public macro function unmap(ethis:Expr, forType:Expr, ?named:Expr):Expr
 	{
-		var parent = parent;
+		var type = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.unmapTypeId($type, $named);
+	}
 
-		while (parent != null)
-		{
-			var parentConfig = parent.getRuleForRequest(forPath, named, false);
+	public function unmapTypeId(path:String, ?named:String):Void
+	{
+		#if debug
+		if (!rules.exists(getRuleKey(path, named)))
+			throw 'Error while removing an rule: No rule defined for type "$path", named "$named"';
+		#end
+		rules.remove(getRuleKey(path, named));
+	}
 
-			if (parentConfig != null && parentConfig.hasOwnResponse())
-			{
-				return parentConfig;
-			}
+	//-------------------------------------------------------------------------- response
 
-			parent = parent.parent;
-		}
+	/**
+		Returns the injectors response for the provided type and name.
+
+		This method will return responses mapped through any method: mapValue, mapClass
+		or mapSingleton.
+
+		If a matching rule is not found then null is returned.
+	**/
+	public macro function getResponse(ethis:Expr, forType:Expr, ?named:Expr):Expr
+	{
+		var forTypeId = InjectorMacro.getExprTypeId(forType);
+		return macro $ethis.getResponseForTypeId($forTypeId, $named);
+	}
+
+	public function getResponseForTypeId(forTypeId:String, ?named:String):Dynamic
+	{
+		var rule = findRuleForTypeId(forTypeId, named);
+		if (rule != null) return rule.getResponse(this);
+
+		// if Array<Int> fails fall back to Array
+		var index = forTypeId.indexOf("<");
+		if (index > -1) rule = findRuleForTypeId(forTypeId.substr(0, index), named);
+		if (rule != null) return rule.getResponse(this);
 
 		return null;
 	}
@@ -303,8 +320,8 @@ class Injector
 		// no injections for class
 		if (info == null) return;
 
-		for (injectionPoint in info.injectionPoints)
-			injectionPoint.applyInjection(target, this);
+		for (field in info.fields)
+			field.applyInjection(target, this);
 	}
 
 	/**
@@ -351,33 +368,6 @@ class Injector
 	}
 
 	/**
-		Returns the injectors response for the provided type and name.
-
-		This method will return responses mapped through any method: mapValue, mapClass
-		or mapSingleton.
-
-		If a matching rule is not found then null is returned.
-	**/
-	public macro function getResponse(ethis:Expr, forType:Expr, ?named:Expr):Expr
-	{
-		var forPath = InjectorMacro.getExprTypeName(forType);
-		return macro $ethis.getResponseForPath($forPath, $named);
-	}
-
-	public function getResponseForPath(forPath:String, ?named:String):Dynamic
-	{
-		var response = getRuleForPath(forPath, named).getResponse(this);
-		if (response == null)
-		{
-			// if Array<Int> fails fall back to Array
-			var index = forPath.indexOf("<");
-			if (index > -1)
-				response = getRuleForPath(forPath.substr(0, index), named).getResponse(this);
-		}
-		return response;
-	}
-
-	/**
 		Create or retrieve an instance of the given class
 
 		@param ofClass The class to retrieve.
@@ -387,9 +377,9 @@ class Injector
 	public function getInstance<T>(ofClass:Class<T>, ?named:String):T
 	{
 		var type = Type.getClassName(ofClass);
-		var rule = getRuleForRequest(type, named);
+		var rule = findRuleForTypeId(type, named);
 
-		if (rule == null || !rule.hasResponse(this))
+		if (rule == null)
 		{
 			throw 'Error while getting rule response: No rule defined for class "$type" ' +
 				'named "$named"';
@@ -405,9 +395,7 @@ class Injector
 	**/
 	public function createChildInjector():Injector
 	{
-		var injector = new Injector();
-		injector.parent = this;
-		return injector;
+		return new Injector(this);
 	}
 
 	//-------------------------------------------------------------------------- private
@@ -456,11 +444,11 @@ class Injector
 				}
 				else if (field.length == 3)
 				{
-					info.injectionPoints.push(new PropertyInjectionPoint(name, field[1], field[2]));
+					info.fields.push(new PropertyInjectionPoint(name, field[1], field[2]));
 				}
 				else
 				{
-					info.injectionPoints.push(new MethodInjectionPoint(name, field.slice(1)));
+					info.fields.push(new MethodInjectionPoint(name, field.slice(1)));
 				}
 			}
 		}
@@ -469,24 +457,9 @@ class Injector
 		if (superClass != null) addClassToInfo(superClass, info, injected);
 	}
 
-	function getRuleForRequest(type:String, named:String, ?traverseAncestors:Bool=true):InjectorRule
+	function getRuleKey(type:String, name:String):String
 	{
-		var requestName = getRequestName(type, named);
-
-		if (!rules.exists(requestName))
-		{
-			if (traverseAncestors && parent != null
-				&& parent.hasRuleForPath(type, named))
-					return getAncestorRule(type, named);
-			return null;
-		}
-
-		return rules.get(requestName);
-	}
-
-	function getRequestName(forType:String, named:String):String
-	{
-		if (named == null) named = '';
-		return '$forType#$named';
+		if (name == null) name = '';
+		return '$type#$name';
 	}
 }

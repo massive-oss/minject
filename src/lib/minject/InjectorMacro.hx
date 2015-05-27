@@ -73,10 +73,10 @@ class InjectorMacro
 		Returns a string representing the type for the supplied value
 
 		- if expr is a type (String, foo.Bar) result is full type path
-		- anything else is passed to `Injector.getValueTypeName` which will attempt to determine a
+		- anything else is passed to `Injector.getValueTypeId` which will attempt to determine a
 		  runtime type name.
 	**/
-	public static function getExprTypeName(expr:Expr):Expr
+	public static function getExprTypeId(expr:Expr):Expr
 	{
 		switch (Context.typeof(expr))
 		{
@@ -84,7 +84,7 @@ class InjectorMacro
 				var expr = expr.toString();
 				try
 				{
-					var type = getTypeName(Context.getType(expr));
+					var type = getTypeId(Context.getType(expr));
 					var index = type.indexOf("<");
 					var typeWithoutParams = (index>-1) ? type.substr(0, index) : type;
 					return macro $v{typeWithoutParams};
@@ -95,10 +95,10 @@ class InjectorMacro
 				return macro $v{type};
 			default:
 		}
-		return macro minject.Injector.getValueTypeName($expr);
+		return macro minject.Injector.getValueTypeId($expr);
 	}
 
-	static function getTypeName(type:Type):String
+	static function getTypeId(type:Type):String
 	{
 		return followType(type).toString();
 	}
@@ -209,7 +209,7 @@ class InjectorMacro
 		{
 			case FVar(_, _):
 				keep.set('set_' + field.name, true);
-				rtti.push(getTypeName(field.type));
+				rtti.push(getTypeId(field.type));
 				if (names.length > 0) rtti.push(names[0].getValue());
 				else rtti.push('');
 			case FMethod(_):
@@ -219,7 +219,7 @@ class InjectorMacro
 						for (i in 0...args.length)
 						{
 							var arg = args[i];
-							var type = getTypeName(arg.t);
+							var type = getTypeId(arg.t);
 
 							if (!arg.opt && type == 'Dynamic')
 							{

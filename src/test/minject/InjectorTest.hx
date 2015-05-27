@@ -242,8 +242,8 @@ import minject.support.injectees.RecursiveInjectee;
 	public function bind_type_params():Void
 	{
 		// These 2 rules should match on the full type, so do not need a name.
-		injector.mapValueToPath("Array<String>", ["Jason","David"]);
-		injector.mapValueToPath("Array<Int>", [0,1,2]);
+		injector.mapValueToTypeId("Array<String>", ["Jason","David"]);
+		injector.mapValueToTypeId("Array<Int>", [0,1,2]);
 		// These 2 rules should match an Array with any type parameter - hence the need for names.
 		injector.mapValue(Array, ["London","Sydney","Perth"], "cities");
 		injector.mapValue(Array, [8416535,4840600,2021200], "populations");
@@ -504,7 +504,7 @@ import minject.support.injectees.RecursiveInjectee;
 	{
 		var array = ["value1", "value2", "value3"];
 
-		injector.mapValueToPath('Array<String>', array, NamedArrayInjectee.NAME);
+		injector.mapValueToTypeId('Array<String>', array, NamedArrayInjectee.NAME);
 		var injectee = injector.instantiate(NamedArrayInjectee);
 
 		Assert.isNotNull(injectee.array);

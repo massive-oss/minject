@@ -5,11 +5,11 @@ import minject.point.InjectionPoint;
 class InjectorInfo
 {
 	public var ctor:InjectionPoint;
-	public var injectionPoints:Array<InjectionPoint>;
+	public var fields:Array<InjectionPoint>;
 
-	public function new(ctor:InjectionPoint, injectionPoints:Array<InjectionPoint>)
+	public function new(ctor:InjectionPoint, fields:Array<InjectionPoint>)
 	{
 		this.ctor = ctor;
-		this.injectionPoints = injectionPoints;
+		this.fields = fields;
 	}
 }
