@@ -31,6 +31,8 @@ import massive.munit.TestRunner;
 	Auto generated Test Application.
 
 	Refer to munit command line tool for more information (haxelib run munit)
+
+	#if MCOVER <- hahah
 **/
 class TestMain
 {

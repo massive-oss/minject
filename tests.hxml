@@ -2,6 +2,7 @@
 -main TestMain
 -debug
 -lib munit
+-lib mcover
 -cp src/lib
 -cp src/test
 -dce full
@@ -14,6 +15,7 @@
 -main TestMain
 -debug
 -lib munit
+-lib mcover
 -cp src/lib
 -cp src/test
 -dce full
@@ -25,6 +27,7 @@
 -main TestMain
 -debug
 -lib munit
+-lib mcover
 -cp src/lib
 -cp src/test
 -dce full
@@ -36,6 +39,7 @@
 -main TestMain
 -debug
 -lib munit
+-lib mcover
 -cp src/lib
 -cp src/test
 -dce full

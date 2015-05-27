@@ -129,35 +129,35 @@ import minject.support.types.Class1;
 		Assert.isType(robotBody.leftLeg.ankle.foot, LeftRobotFoot);
 	}
 
-    @Test
-    public function child_injector_has_mapping_when_exists_on_parent_injector():Void
-    {
-        var childInjector = injector.createChildInjector();
-        var class1 = new Class1();
-        injector.mapValue(Class1, class1);
+	@Test
+	public function child_injector_has_mapping_when_exists_on_parent_injector():Void
+	{
+		var childInjector = injector.createChildInjector();
+		var class1 = new Class1();
+		injector.mapValue(Class1, class1);
 
-        Assert.isTrue(childInjector.hasRule(Class1));
-    }
+		Assert.isTrue(childInjector.hasRule(Class1));
+	}
 
-    @Test
-    public function child_injector_does_not_have_mapping_when_does_not_exist_on_parent_injector():Void
-    {
-        var childInjector = injector.createChildInjector();
-        Assert.isFalse(childInjector.hasRule(Class1));
-    }
+	@Test
+	public function child_injector_does_not_have_mapping_when_does_not_exist_on_parent_injector():Void
+	{
+		var childInjector = injector.createChildInjector();
+		Assert.isFalse(childInjector.hasRule(Class1));
+	}
 
-    @Test
-    public function grand_child_injector_supplies_injection_from_ancestor():Void
-    {
-        var injectee = new ClassInjectee();
-        var childInjector = injector.createChildInjector();
-        var grandChildInjector = childInjector.createChildInjector();
+	@Test
+	public function grand_child_injector_supplies_injection_from_ancestor():Void
+	{
+		var injectee = new ClassInjectee();
+		var childInjector = injector.createChildInjector();
+		var grandChildInjector = childInjector.createChildInjector();
 
-        injector.mapSingleton(Class1);
-        grandChildInjector.injectInto(injectee);
+		injector.mapSingleton(Class1);
+		grandChildInjector.injectInto(injectee);
 
-        Assert.isType(injectee.property, Class1);
-    }
+		Assert.isType(injectee.property, Class1);
+	}
 
 	@Test
 	public function can_create_child_injector_during_injection():Void

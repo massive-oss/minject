@@ -70,12 +70,13 @@ class InjectorMacro
 	}
 
 	/**
-		Returns a string expression for the supplied value
+		Returns a string representing the type for the supplied value
 
 		- if expr is a type (String, foo.Bar) result is full type path
-		- anything else is returned as is, ie: 'Void -> Void' or a ref to such
+		- anything else is passed to `Injector.getValueTypeName` which will attempt to determine a
+		  runtime type name.
 	**/
-	public static function getTypeName(expr:Expr):Expr
+	public static function getExprTypeName(expr:Expr):Expr
 	{
 		switch (Context.typeof(expr))
 		{
@@ -83,15 +84,43 @@ class InjectorMacro
 				var expr = expr.toString();
 				try
 				{
-					var type = Context.getType(expr).follow().toString();
+					var type = getTypeName(Context.getType(expr));
 					var index = type.indexOf("<");
 					var typeWithoutParams = (index>-1) ? type.substr(0, index) : type;
 					return macro $v{typeWithoutParams};
 				}
 				catch (e:Dynamic) {}
+			case t = TFun(_,_):
+				var type = t.toString();
+				return macro $v{type};
 			default:
 		}
-		return macro minject.Injector.getTypeName($expr);
+		return macro minject.Injector.getValueTypeName($expr);
+	}
+
+	static function getTypeName(type:Type):String
+	{
+		return followType(type).toString();
+	}
+
+	/**
+		Follow TType references, but not if they point to TAnonymous
+	**/
+	static function followType(type:Type):Type
+	{
+		switch (type)
+		{
+			case TType(t, params):
+				if (Std.string(t) == 'Null')
+					return followType(params[0]);
+				return switch (t.get().type)
+				{
+					case TAnonymous(_): type;
+					case ref: followType(ref);
+				}
+			default:
+				return type;
+		}
 	}
 
 	/**
@@ -180,7 +209,7 @@ class InjectorMacro
 		{
 			case FVar(_, _):
 				keep.set('set_' + field.name, true);
-				rtti.push(field.type.follow().toString());
+				rtti.push(getTypeName(field.type));
 				if (names.length > 0) rtti.push(names[0].getValue());
 				else rtti.push('');
 			case FMethod(_):
@@ -190,7 +219,7 @@ class InjectorMacro
 						for (i in 0...args.length)
 						{
 							var arg = args[i];
-							var type = arg.t.follow().toString();
+							var type = getTypeName(arg.t);
 
 							if (!arg.opt && type == 'Dynamic')
 							{

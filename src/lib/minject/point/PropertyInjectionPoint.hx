@@ -39,7 +39,7 @@ class PropertyInjectionPoint implements InjectionPoint
 
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
-		var response = injector.getTypeResponse(type, injectionName);
+		var response = injector.getResponseForPath(type, injectionName);
 
 		#if debug
 		if (response == null)

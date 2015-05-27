@@ -1,38 +1,21 @@
 import minject.Injector;
+import Type;
 
 class InjectionExample
 {
 	public static function main()
 	{
-		new InjectionExample();
-	}
+		var injector = new Injector();
 
-	public var injector:Injector;
-
-	public function new()
-	{
-		injector = new Injector();
-
-		initializeContext();
-
-		var foo = new Foo();
-		injector.injectInto(foo);
-
-		trace(foo);
-		trace(foo.cb());
-	}
-
-	/**
-		Registers three class types using three approaches
-			- singleton
-			- class (with name)
-			- value (with name);
-	**/
-	function initializeContext()
-	{
 		injector.mapSingleton(TypeA);
 		injector.mapClass(TypeB, TypeB, "foo");
-		injector.mapTypeValue('Void -> String', function () return 'Hello!');
+		injector.mapValue(Int, 20);
+		injector.mapValue(ValueType, TObject);
+		injector.mapValueToPath('Void -> String', function () return 'Hello!');
+		injector.mapValueToPath('Array<Int>', [0,1,2]);
+		injector.mapValueToPath('Iterable<Int>', [0,1,2]);
+		injector.mapValueToPath('String -> String -> Bool', function(a, b) return a == b);
+		injector.mapValueToPath('haxe.EnumFlags<ValueType>', new haxe.EnumFlags<ValueType>());
 
 		var a = injector.getInstance(TypeA);
 		a.id = 123;
@@ -41,36 +24,41 @@ class InjectionExample
 		c.id = 666;
 
 		injector.mapValue(TypeB, c, "bar");
+
+		var foo = new Foo();
+		injector.injectInto(foo);
+
+		trace('foo.a ${foo.a}');
+		trace('foo.b ${foo.b}');
+		trace('foo.c ${foo.c}');
+
+		trace('foo.cb() ${foo.cb()}');
+		trace('foo.fn() ${foo.fn("a", "b")}');
+
+		trace('foo.integer ${foo.integer}');
+		trace('foo.array ${foo.array}');
+		trace('foo.iter ${foo.iter}');
+		trace('foo.enumValue ${foo.enumValue}');
+		trace('foo.flags ${foo.flags}');
+
+		trace(minject.Injector.getExprTypeName(function () return ''));
 	}
 }
 
 class Foo
 {
-	@inject
-	public var a:TypeA;
-
-	@inject("foo")
-	public var b:TypeB;
-
-	@inject("bar")
-	public var c:TypeB;
-
-	@inject
-	public var cb:Void -> String;
-
+	@inject public var a:TypeA;
+	@inject("foo") public var b:TypeB;
+	@inject("bar") public var c:TypeB;
+	@inject public var cb:Void -> String;
+	@inject public var fn:String -> String -> Bool;
+	@inject public var integer:Int;
 	@inject public var array:Array<Int>;
-	@inject public var int:Int;
     @inject public var iter:Iterable<Int>;
-    @inject public var enumValue:Type.ValueType;
-    @inject public var fn:String->String->Bool;
+    @inject public var enumValue:ValueType;
     @inject public var flags:haxe.EnumFlags<Type.ValueType>;
 
 	public function new(){}
-
-	public function toString():String
-	{
-		return 'Foo\n	a: $a\n	b: $b\n	c: $c';
-	}
 }
 
 class TypeA

@@ -6,6 +6,7 @@
 		"utility",
 		"massive"
 	],
+	"classPath": "src/lib",
 	"description": "A Haxe port of the ActionScript 3 SwiftSuspenders IOC library with efficient macro enhanced type reflection. Supports AVM1, AVM2, JavaScript, Neko and C++.",
 	"contributors": [
 		"massive"

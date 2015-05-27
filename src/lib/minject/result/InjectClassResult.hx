@@ -36,7 +36,7 @@ class InjectClassResult extends InjectionResult
 
 	public override function getResponse(injector:Injector):Dynamic
 	{
-		return injector._instantiate(type);
+		return injector.instantiateClass(type);
 	}
 
 	#if debug

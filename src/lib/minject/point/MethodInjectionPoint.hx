@@ -52,7 +52,7 @@ class MethodInjectionPoint implements InjectionPoint
 			var argName = args[index++];
 			var opt = args[index++] == 'o';
 
-			var response = injector.getTypeResponse(type, argName);
+			var response = injector.getResponseForPath(type, argName);
 			values.push(response);
 
 			#if debug

@@ -48,7 +48,7 @@ class InjectSingletonResult extends InjectionResult
 
 	function createResponse(injector:Injector):Dynamic
 	{
-		return injector._construct(type);
+		return injector.constructClass(type);
 	}
 
 	#if debug

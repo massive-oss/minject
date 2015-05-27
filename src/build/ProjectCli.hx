@@ -28,9 +28,11 @@ class ProjectCli extends mdk.cli.CliModule
 
 	@task function buildExample()
 	{
+		run('mdk', ['build', 'example']);
+
 		var path = 'bin/example';
-		SysApi.createDirectory(path);
 		SysApi.copy('src/example', '$path/src');
+		SysApi.copy('res/example/build.hxml', '$path/build.hxml');
 		SysApi.zip(path, '$path.zip', '$path/');
 	}
 }

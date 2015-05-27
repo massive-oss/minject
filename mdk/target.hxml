@@ -12,13 +12,13 @@
 
 --each
 
--js example/html.js
+-js example/bin/html.js
 -D html
 
 --next
 
--swf example/flash.swf
+-swf example/bin/flash.swf
 
 --next
 
--neko example/neko.n
+-neko example/bin/neko.n
