@@ -58,6 +58,11 @@ class InjectorMacro
 	**/
 	public static function getExprType(expr:Expr):Expr
 	{
+		switch (expr.expr)
+		{
+			case EConst(CString(_)): return expr;
+			default:
+		}
 		switch (Context.typeof(expr))
 		{
 			case TType(_, _):
@@ -70,12 +75,9 @@ class InjectorMacro
 					return macro $v{typeWithoutParams};
 				}
 				catch (e:Dynamic) {}
-			case t = TFun(_,_):
-				var type = t.toString();
-				return macro $v{type};
 			default:
 		}
-		return macro minject.Injector.getValueType($expr);
+		return expr;//macro minject.Injector.getValueType($expr);
 	}
 
 	static function getType(type:Type):String

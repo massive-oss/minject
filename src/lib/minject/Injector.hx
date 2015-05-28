@@ -14,11 +14,6 @@ import minject.provider.*;
 #if !macro @:build(minject.InjectorMacro.addMetadata()) #end
 class Injector
 {
-	public static macro function getExprType(expr:Expr):Expr
-	{
-		return InjectorMacro.getExprType(expr);
-	}
-
 	public static function getValueType(value:Dynamic):String
 	{
 		if (Std.is(value, String))
@@ -35,7 +30,6 @@ class Injector
 			case TEnum(e): Type.getEnumName(e);
 			default: null;
 		}
-
 		if (name != null) return name;
 		throw 'Could not determine type name of $value';
 	}
@@ -82,7 +76,7 @@ class Injector
 		// ensure type does not get eleminated by dce
 		InjectorMacro.keep(type);
 
-		// get string representing type
+		// get type identifier
 		var type = InjectorMacro.getExprType(type);
 
 		// forward to runtime method
@@ -105,7 +99,17 @@ class Injector
 	**/
 	public function mapType(type:String, ?name:String):InjectorMapping<Dynamic>
 	{
-		return getMappingForType(type, name);
+		var key = getMappingKey(type, name);
+		if (mappings.exists(key))
+			return mappings.get(key);
+		var mapping = new InjectorMapping(type, name);
+		mappings.set(key, mapping);
+		return mapping;
+	}
+
+	public function mapTypeOf(value:Dynamic, ?name:String):InjectorMapping<Dynamic>
+	{
+		return mapType(getValueType(value), name);
 	}
 
 	/**
@@ -160,15 +164,6 @@ class Injector
 	public function hasMappingForType(type:String, ?name:String):Bool
 	{
 		return findMappingForType(type, name) != null;
-	}
-
-	/**
-		Returns the mapped `InjectorMapping` for the type and name provided.
-	**/
-	public macro function getMapping(ethis:Expr, type:Expr, ?name:Expr):Expr
-	{
-		var type = InjectorMacro.getExprType(type);
-		return macro $ethis.getMappingForType($type, $name);
 	}
 
 	/**
@@ -381,16 +376,6 @@ class Injector
 
 		var superClass = Type.getSuperClass(forClass);
 		if (superClass != null) addClassToInfo(superClass, info, injected);
-	}
-
-	function getMappingForType(type:String, ?name:String):InjectorMapping<Dynamic>
-	{
-		var key = getMappingKey(type, name);
-		if (mappings.exists(key))
-			return mappings.get(key);
-		var mapping = new InjectorMapping(type, name);
-		mappings.set(key, mapping);
-		return mapping;
 	}
 
 	function getMappingKey(type:String, name:String):String

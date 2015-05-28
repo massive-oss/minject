@@ -13,11 +13,11 @@ class InjectionExample
 		injector.map(TypeB, "foo").toClass(TypeB);
 		injector.map(Int).toValue(20);
 		injector.map(ValueType).toValue(TObject);
-		injector.mapType('Void -> String').toValue(function () return 'Hello!');
-		injector.mapType('Array<Int>').toValue([0,1,2]);
-		injector.mapType('Iterable<Int>').toValue([0,1,2]);
-		injector.mapType('String -> String -> Bool').toValue(function(a, b) return a == b);
-		injector.mapType('haxe.EnumFlags<ValueType>').toValue(new haxe.EnumFlags<ValueType>());
+		injector.map('Void -> String').toValue(function () return 'Hello!');
+		injector.map('Array<Int>').toValue([0,1,2]);
+		injector.map('Iterable<Int>').toValue([0,1,2]);
+		injector.map('String -> String -> Bool').toValue(function(a, b) return a == b);
+		injector.map('haxe.EnumFlags<ValueType>').toValue(new haxe.EnumFlags<ValueType>());
 
 		var a = injector.getInstance(TypeA);
 		a.id = 123;

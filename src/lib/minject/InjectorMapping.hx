@@ -20,7 +20,7 @@ class InjectorMapping<T>
 		this.name = name;
 	}
 
-	public function getValue(injector:Injector):Dynamic
+	public function getValue(injector:Injector):T
 	{
 		if (this.injector != null)
 			injector = this.injector;
@@ -35,7 +35,7 @@ class InjectorMapping<T>
 		return null;
 	}
 
-	public function toValue(value:Dynamic):InjectorMapping<T>
+	public function toValue(value:T):InjectorMapping<T>
 	{
 		return toProvider(new ValueProvider(value));
 	}

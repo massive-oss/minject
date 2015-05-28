@@ -192,8 +192,8 @@ import minject.support.types.*;
 	public function bind_type_params():Void
 	{
 		// These 2 mappings should match on the full type, so do not need a name.
-		injector.mapType('Array<String>').toValue(['Jason', 'David']);
-		injector.mapType('Array<Int>').toValue([0,1,2]);
+		injector.map('Array<String>').toValue(['Jason', 'David']);
+		injector.map('Array<Int>').toValue([0,1,2]);
 		// These 2 mappings should match an Array with any type parameter - hence the need for names.
 		injector.map(Array, 'cities').toValue(['London', 'Sydney', 'Perth']);
 		injector.map(Array, 'populations').toValue([8416535,4840600,2021200]);
@@ -454,7 +454,7 @@ import minject.support.types.*;
 	{
 		var array = ['value1', 'value2', 'value3'];
 
-		injector.mapType('Array<String>', NamedArrayInjectee.NAME).toValue(array);
+		injector.map('Array<String>', NamedArrayInjectee.NAME).toValue(array);
 		var injectee = injector.instantiate(NamedArrayInjectee);
 
 		Assert.isNotNull(injectee.array);
@@ -693,7 +693,7 @@ import minject.support.types.*;
 	public function should_map_type_by_class_reference()
 	{
 		var reference = Class1;
-		injector.map(reference).toValue(new Class1());
+		injector.mapTypeOf(reference).toValue(new Class1());
 		Assert.isTrue(injector.hasMapping(Class1));
 	}
 
@@ -701,7 +701,7 @@ import minject.support.types.*;
 	public function should_map_type_by_instance_reference()
 	{
 		var reference = new Class1();
-		injector.map(reference).toValue(new Class1());
+		injector.mapTypeOf(reference).toValue(new Class1());
 		Assert.isTrue(injector.hasMapping(Class1));
 	}
 
@@ -709,7 +709,7 @@ import minject.support.types.*;
 	public function should_map_type_by_enum_reference()
 	{
 		var reference = ValueType;
-		injector.map(reference).toValue(TObject);
+		injector.mapTypeOf(reference).toValue(TObject);
 		Assert.isTrue(injector.hasMapping(ValueType));
 	}
 
@@ -717,7 +717,7 @@ import minject.support.types.*;
 	public function should_map_type_by_enum_value_reference()
 	{
 		var reference = ValueType.TObject;
-		injector.map(reference).toValue(TObject);
+		injector.mapTypeOf(reference).toValue(TObject);
 		Assert.isTrue(injector.hasMapping(ValueType));
 	}
 }
