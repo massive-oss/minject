@@ -1,3 +1,5 @@
+// See the file "LICENSE" for the full license governing this code
+
 import sys.io.File;
 import haxe.Json;
 
@@ -21,6 +23,7 @@ class ProjectCli extends mdk.cli.CliModule
 
 		var path = 'bin/haxelib';
 		SysApi.createDirectory(path);
+		SysApi.copy('LICENSE', '$path/LICENSE');
 		SysApi.copy('src/lib', '$path/src/lib');
 		SysApi.copy(jsonPath, '$path/$jsonPath');
 		SysApi.zip(path, '$path.zip', '$path/');

@@ -1,24 +1,4 @@
-/*
-Copyright (c) 2012-2015 Massive Interactive
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// See the file "LICENSE" for the full license governing this code
 
 package minject;
 
@@ -26,7 +6,7 @@ import haxe.rtti.Meta;
 import haxe.macro.Expr;
 
 import minject.point.*;
-import minject.result.*;
+import minject.provider.*;
 
 /**
 	The dependency injector
@@ -34,12 +14,12 @@ import minject.result.*;
 #if !macro @:build(minject.InjectorMacro.addMetadata()) #end
 class Injector
 {
-	public static macro function getExprTypeId(expr:Expr):Expr
+	public static macro function getExprType(expr:Expr):Expr
 	{
-		return InjectorMacro.getExprTypeId(expr);
+		return InjectorMacro.getExprType(expr);
 	}
 
-	public static function getValueTypeId(value:Dynamic)
+	public static function getValueType(value:Dynamic):String
 	{
 		if (Std.is(value, String))
 			return 'String';
@@ -65,10 +45,10 @@ class Injector
 	**/
 	public var parent(default, null):Injector;
 
-	// map of injector rules by className#name
-	var rules = new Map<String, InjectorRule>();
+	// map of injector mappings by type#name
+	var mappings = new Map<String, InjectorMapping<Dynamic>>();
 
-	// map of injector infos by className
+	// map of injector infos by type
 	var infos = new Map<String, InjectorInfo>();
 
 	public function new(?parent:Injector)
@@ -79,227 +59,171 @@ class Injector
 	//-------------------------------------------------------------------------- mapping
 
 	/**
-		When asked for an instance of the type `forType` inject the instance `useValue`.
+		Returns an `InjectorMapping` for `type` with optional `name`
 
-		This is used to register an existing value with the injector and treat it like a singleton.
+		This macro method determines the string identifier for the type, and adds `@:keep` metadata
+		to ensure the type is not eliminated by dead code elimination.
 
-		@param forType A class or interface
-		@param useValue An instance
-		@param named An optional name (id)
+		The method returns an `InjectorMapping` with no provider set. A provider should be set by
+		a chained call to the mappings provider methods.
 
-		@returns A reference to the rule for this injection which can be used with `mapRule`
+		```haxe
+		var injector = new Injector();
+		injector.map(Int).toValue(10);
+		injector.map(MyInterface).toClass(MyImplementor);
+		injector.map(MySingleton).asSingleton();
+
+		@param type The type to map
+		@param name The optional name for the mapping
+		```
 	**/
-	public macro function mapValue(ethis:Expr, forType:Expr, useValue:Expr, ?named:Expr):Expr
+	public macro function map(ethis:Expr, type:Expr, ?name:Expr):Expr
 	{
-		InjectorMacro.keep(forType);
-		var forTypeId = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.mapValueToTypeId($forTypeId, $useValue, $named);
-	}
+		// ensure type does not get eleminated by dce
+		InjectorMacro.keep(type);
 
-	public function mapValueToTypeId(forTypeId:String, useValue:Dynamic, ?named:String):InjectorRule
-	{
-		var rule = getRuleForTypeId(forTypeId, named);
-		rule.setResult(new InjectValueResult(useValue));
-		return rule;
+		// get string representing type
+		var type = InjectorMacro.getExprType(type);
+
+		// forward to runtime method
+		return macro $ethis.mapType($type, $name);
 	}
 
 	/**
-		When asked for an instance of the class `forType` inject a new instance of
-		`instantiateClass`.
+		Returns an `InjectorMapping` for the type identifier `type` with optional `name`
 
-		This will create a new instance for each injection.
+		This method is called by `map`, but can also be used to explicitly map a type identifier
+		where it is not possible to provide it, such as for types with type parameters.
 
-		@param forType A class or interface
-		@param instantiateClass A class to instantiate
-		@param named An optional name (id)
+		```haxe
+		var injector = new Injector();
+		injector.mapType('Array<Int>', [0, 1, 2]);
+		```
 
-		@returns A reference to the rule for this injection which can be used with `mapRule`
+		@param type The type identifier to map
+		@param name The optional name for the mapping
 	**/
-	public macro function mapClass(ethis:Expr, forType:Expr, instantiateClass:Expr,
-		?named:Expr):Expr
+	public function mapType(type:String, ?name:String):InjectorMapping<Dynamic>
 	{
-		InjectorMacro.keep(instantiateClass);
-		var forTypeId = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.mapClassToTypeId($forTypeId, $instantiateClass, $named);
-	}
-
-	public function mapClassToTypeId(forTypeId:String, instantiateClass:Class<Dynamic>,
-		?named:String):InjectorRule
-	{
-		var rule = getRuleForTypeId(forTypeId, named);
-		rule.setResult(new InjectClassResult(instantiateClass));
-		return rule;
+		return getMappingForType(type, name);
 	}
 
 	/**
-		When asked for an instance of the class `forType` inject an instance of `forType`.
+		Remove a mapping from the injector
 
-		This will create an instance on the first injection, but will re-use that instance for
-		subsequent injections.
-
-		@param forType A class or interface
-		@param named An optional name (id)
-
-		@returns A reference to the rule for this injection which can be used with `mapRule`
+		@param type The type to unmap
+		@param name The optional name provided when the mapping was created
 	**/
-	public macro function mapSingleton(ethis:Expr, forType:Expr, ?named:Expr):Expr
+	public macro function unmap(ethis:Expr, type:Expr, ?name:Expr):Expr
 	{
-		InjectorMacro.keep(forType);
-		var forTypeId = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.mapSingletonOfToTypeId($forTypeId, $forType, $named);
+		var type = InjectorMacro.getExprType(type);
+		return macro $ethis.unmapType($type, $name);
 	}
 
 	/**
-		When asked for an instance of the class `forType` inject an instance of `useSingletonOf`.
+		Remove a mapping from the injector
 
-		This will create an instance on the first injection, but will re-use that instance for
-		subsequent injections.
-
-		@param forType A class or interface
-		@param useSingletonOf A class to instantiate
-		@param named An optional name
-
-		@returns A reference to the rule for this injection which can be used with `mapRule`
+		@param type The type identifier to unmap
+		@param name The optional name provided when the mapping was created
 	**/
-	public macro function mapSingletonOf(ethis:Expr, forType:Expr, useSingletonOf:Expr,
-		?named:Expr):Expr
-	{
-		InjectorMacro.keep(useSingletonOf);
-		var forTypeId = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.mapSingletonOfToTypeId($forTypeId, $useSingletonOf, $named);
-	}
-
-	public function mapSingletonOfToTypeId(forTypeId:String, useSingletonOf:Class<Dynamic>,
-		?named:String):InjectorRule
-	{
-		var rule = getRuleForTypeId(forTypeId, named);
-		rule.setResult(new InjectSingletonResult(useSingletonOf));
-		return rule;
-	}
-
-	//-------------------------------------------------------------------------- rules
-
-	/**
-		Does a rule exist to satsify such a request?
-
-		@param forType A class or interface
-		@param named An optional name (id)
-		@returns Whether such a rule exists
-	**/
-	public macro function hasRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
-	{
-		var type = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.hasRuleForTypeId($type, $named);
-	}
-
-	public function hasRuleForTypeId(forTypeId:String, ?named:String):Bool
-	{
-		return findRuleForTypeId(forTypeId, named) != null;
-	}
-
-	/**
-		Returns the mapped `InjectorRule` for the type and name provided.
-	**/
-	public macro function getRule(ethis:Expr, forType:Expr, ?named:Expr):Expr
-	{
-		var forTypeId = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.getRuleForTypeId($forTypeId, $named);
-	}
-
-	public function getRuleForTypeId(forTypeId:String, ?named:String):InjectorRule
-	{
-		var key = getRuleKey(forTypeId, named);
-		if (rules.exists(key))
-			return rules.get(key);
-		var rule = new InjectorRule(forTypeId, named);
-		rules.set(key, rule);
-		return rule;
-	}
-
-	public function findRuleForTypeId(type:String, named:String):InjectorRule
-	{
-		var rule = rules.get(getRuleKey(type, named));
-		if (rule != null && rule.result != null)
-			return rule;
-
-		if (parent != null)
-			return parent.findRuleForTypeId(type, named);
-
-		return null;
-	}
-
-	/**
-		When asked for an instance of the class `forType` use rule `useRule` to determine the
-		correct injection.
-
-		This will use whatever injection is set by the given injection rule as created using one of
-		the other rule methods.
-
-		@param forType A class or interface
-		@param useRule The rule to use for the injection
-		@param named An optional name (id)
-
-		@returns A reference to the rule for this injection which can be used with `mapRule`
-	**/
-	public macro function mapRule(ethis:Expr, forType:Expr, useRule:Expr, ?named:Expr):Expr
-	{
-		var forTypeId = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.mapRuleForTypeId($forTypeId, $useRule, $named);
-	}
-
-	public function mapRuleForTypeId(forTypeId:String, useRule:InjectorRule, ?named:String):InjectorRule
-	{
-		var rule = getRuleForTypeId(forTypeId, named);
-		rule.setResult(new InjectOtherRuleResult(useRule));
-		return useRule;
-	}
-
-	/**
-		Remove a rule from the injector
-
-		@param theClass A class or interface
-		@param named An optional name (id)
-	**/
-	public macro function unmap(ethis:Expr, forType:Expr, ?named:Expr):Expr
-	{
-		var type = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.unmapTypeId($type, $named);
-	}
-
-	public function unmapTypeId(path:String, ?named:String):Void
+	public function unmapType(type:String, ?name:String):Void
 	{
 		#if debug
-		if (!rules.exists(getRuleKey(path, named)))
-			throw 'Error while removing an rule: No rule defined for type "$path", named "$named"';
+		if (!mappings.exists(getMappingKey(type, name)))
+			throw 'Error while removing an mapping: No mapping defined for type "$type", name "$name"';
 		#end
-		rules.remove(getRuleKey(path, named));
+		mappings.remove(getMappingKey(type, name));
+	}
+
+	//-------------------------------------------------------------------------- mappings
+
+	/**
+		Does a mapping exist to satsify such a request?
+
+		@param type The mapping type
+		@param name The optional name provided when the mapping was created
+		@returns Whether such a mapping exists
+	**/
+	public macro function hasMapping(ethis:Expr, type:Expr, ?name:Expr):Expr
+	{
+		var type = InjectorMacro.getExprType(type);
+		return macro $ethis.hasMappingForType($type, $name);
+	}
+
+	/**
+		Determines if this injector has a mapping for the provided `type` and `name`
+
+		@param type The mapping type identifier
+		@param name The optional name provided when the mapping was created
+		@returns Whether such a mapping exists
+	**/
+	public function hasMappingForType(type:String, ?name:String):Bool
+	{
+		return findMappingForType(type, name) != null;
+	}
+
+	/**
+		Returns the mapped `InjectorMapping` for the type and name provided.
+	**/
+	public macro function getMapping(ethis:Expr, type:Expr, ?name:Expr):Expr
+	{
+		var type = InjectorMacro.getExprType(type);
+		return macro $ethis.getMappingForType($type, $name);
+	}
+
+	/**
+		Determines if this injector or any of it's ancestors has a mapping with a provider for the
+		provided `type` and `name`
+
+		@param type The mapping type identifier
+		@param name The optional name provided when the mapping was created
+		@returns The mapping, if it exists, or `null`
+	**/
+	public function findMappingForType(type:String, name:String):InjectorMapping<Dynamic>
+	{
+		var mapping = mappings.get(getMappingKey(type, name));
+		if (mapping != null && mapping.provider != null)
+			return mapping;
+		if (parent != null)
+			return parent.findMappingForType(type, name);
+		return null;
 	}
 
 	//-------------------------------------------------------------------------- response
 
 	/**
-		Returns the injectors response for the provided type and name.
+		Returns the injectors response for the provided `type` and `name`
 
-		This method will return responses mapped through any method: mapValue, mapClass
-		or mapSingleton.
+		If a matching mapping is not found then `null` is returned.
 
-		If a matching rule is not found then null is returned.
+		@param type The mapping type
+		@param name The optional name provided when the mapping was created
+		@returns The injector response, if a mapping exists, or `null`
 	**/
-	public macro function getResponse(ethis:Expr, forType:Expr, ?named:Expr):Expr
+	public macro function getValue(ethis:Expr, type:Expr, ?name:Expr):Expr
 	{
-		var forTypeId = InjectorMacro.getExprTypeId(forType);
-		return macro $ethis.getResponseForTypeId($forTypeId, $named);
+		var type = InjectorMacro.getExprType(type);
+		return macro $ethis.getValueForType($type, $name);
 	}
 
-	public function getResponseForTypeId(forTypeId:String, ?named:String):Dynamic
+	/**
+		Returns the injectors response for the provided `type` and `name`
+
+		If a matching mapping is not found then `null` is returned.
+
+		@param type The mapping type identifier
+		@param name The optional name provided when the mapping was created
+		@returns The injector response, if a mapping exists, or `null`
+	**/
+	public function getValueForType(type:String, ?name:String):Dynamic
 	{
-		var rule = findRuleForTypeId(forTypeId, named);
-		if (rule != null) return rule.getResponse(this);
+		var mapping = findMappingForType(type, name);
+		if (mapping != null) return mapping.getValue(this);
 
 		// if Array<Int> fails fall back to Array
-		var index = forTypeId.indexOf("<");
-		if (index > -1) rule = findRuleForTypeId(forTypeId.substr(0, index), named);
-		if (rule != null) return rule.getResponse(this);
+		var index = type.indexOf('<');
+		if (index > -1) mapping = findMappingForType(type.substr(0, index), name);
+		if (mapping != null) return mapping.getValue(this);
 
 		return null;
 	}
@@ -307,9 +231,7 @@ class Injector
 	//-------------------------------------------------------------------------- injecting
 
 	/**
-		Perform an injection into an object, satisfying all it's dependencies.
-
-		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
+		Perform an injection into `target`, satisfying all it's dependencies.
 
 		@param target The object to inject into - the Injectee
 	**/
@@ -325,18 +247,20 @@ class Injector
 	}
 
 	/**
-		Constructs an instance of theClass without satifying its dependencies.
+		Constructs an instance of `type` without satifying its dependencies.
 	**/
-	public macro function construct(ethis:Expr, theClass:Expr):Expr
+	public macro function construct(ethis:Expr, type:Expr):Expr
 	{
-		InjectorMacro.keep(theClass);
-		return macro ethis.constructClass(theClass);
+		InjectorMacro.keep(type);
+		return macro ethis._construct(type);
 	}
 
-	public function constructClass<T>(theClass:Class<T>):T
+	@:dox(hide)
+	@:noCompletion
+	public function _construct<T>(type:Class<T>):T
 	{
-		var info = getInfo(theClass);
-		return info.ctor.applyInjection(theClass, this);
+		var info = getInfo(type);
+		return info.ctor.createInstance(type, this);
 	}
 
 	/**
@@ -351,18 +275,20 @@ class Injector
 
 		The `Injector` should throw an `Error` if it can't satisfy all dependencies of the injectee.
 
-		@param theClass The class to instantiate
+		@param type The class to instantiate
 		@returns The created instance
 	**/
-	public macro function instantiate(ethis:Expr, theClass:Expr):Expr
+	public macro function instantiate(ethis:Expr, type:Expr):Expr
 	{
-		InjectorMacro.keep(theClass);
-		return macro $ethis.instantiateClass($theClass);
+		InjectorMacro.keep(type);
+		return macro $ethis._instantiate($type);
 	}
 
-	public function instantiateClass<T>(theClass:Class<T>):T
+	@:dox(hide)
+	@:noCompletion
+	public function _instantiate<T>(type:Class<T>):T
 	{
-		var instance = constructClass(theClass);
+		var instance = _construct(type);
 		injectInto(instance);
 		return instance;
 	}
@@ -370,26 +296,26 @@ class Injector
 	/**
 		Create or retrieve an instance of the given class
 
-		@param ofClass The class to retrieve.
-		@param named An optional name (id)
+		@param type The class to retrieve.
+		@param name An optional name
 		@return An instance
 	**/
-	public function getInstance<T>(ofClass:Class<T>, ?named:String):T
+	public function getInstance<T>(type:Class<T>, ?name:String):T
 	{
-		var type = Type.getClassName(ofClass);
-		var rule = findRuleForTypeId(type, named);
+		var type = Type.getClassName(type);
+		var mapping = findMappingForType(type, name);
 
-		if (rule == null)
+		if (mapping == null)
 		{
-			throw 'Error while getting rule response: No rule defined for class "$type" ' +
-				'named "$named"';
+			throw 'Error while getting mapping response: No mapping defined for class "$type" ' +
+				'name "$name"';
 		}
 
-		return rule.getResponse(this);
+		return mapping.getValue(this);
 	}
 
 	/**
-		Create an injector that inherits rules from its parent
+		Create an injector that inherits mappings from its parent
 
 		@returns The injector
 	**/
@@ -420,14 +346,14 @@ class Injector
 
 	function addClassToInfo(forClass:Class<Dynamic>, info:InjectorInfo, injected:Array<String>):Void
 	{
-		var typeMeta = Meta.getType(forClass);
+		var meta = Meta.getType(forClass);
 
 		#if debug
-		if (typeMeta != null && Reflect.hasField(typeMeta, 'interface'))
+		if (meta != null && Reflect.hasField(meta, 'interface'))
 			throw 'Interfaces can\'t be used as instantiatable classes.';
 		#end
 
-		var fields:Array<Array<String>> = cast typeMeta.rtti;
+		var fields:Array<Array<String>> = cast meta.rtti;
 
 		if (fields != null)
 		{
@@ -457,7 +383,17 @@ class Injector
 		if (superClass != null) addClassToInfo(superClass, info, injected);
 	}
 
-	function getRuleKey(type:String, name:String):String
+	function getMappingForType(type:String, ?name:String):InjectorMapping<Dynamic>
+	{
+		var key = getMappingKey(type, name);
+		if (mappings.exists(key))
+			return mappings.get(key);
+		var mapping = new InjectorMapping(type, name);
+		mappings.set(key, mapping);
+		return mapping;
+	}
+
+	function getMappingKey(type:String, name:String):String
 	{
 		if (name == null) name = '';
 		return '$type#$name';

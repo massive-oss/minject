@@ -1,64 +1,14 @@
-/*
-Copyright (c) 2012-2015 Massive Interactive
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// See the file "LICENSE" for the full license governing this code
 
 package minject;
 
 import Type;
 
 import massive.munit.Assert;
-import minject.Injector;
-import minject.support.injectees.ClassInjectee;
-import minject.support.injectees.InheritanceInjectee;
+import minject.support.injectees.*;
 import minject.support.injectees.TypedefInjectee;
-import minject.support.injectees.TypeParamInjectee;
-import minject.support.injectees.InterfaceInjectee;
-import minject.support.injectees.NamedClassInjectee;
-import minject.support.injectees.NamedInterfaceInjectee;
-import minject.support.injectees.StringInjectee;
-import minject.support.injectees.RecursiveInterfaceInjectee;
-import minject.support.injectees.MultipleSingletonsOfSameClassInjectee;
-import minject.support.injectees.ComplexClassInjectee;
-import minject.support.injectees.TwoNamedInterfaceFieldsInjectee;
-import minject.support.injectees.OneParameterMethodInjectee;
-import minject.support.injectees.OneNamedParameterMethodInjectee;
-import minject.support.injectees.TwoParametersMethodInjectee;
-import minject.support.injectees.TwoNamedParametersMethodInjectee;
-import minject.support.injectees.MixedParametersMethodInjectee;
-import minject.support.injectees.OneParameterConstructorInjectee;
-import minject.support.injectees.TwoParametersConstructorInjectee;
-import minject.support.injectees.OneNamedParameterConstructorInjectee;
-import minject.support.injectees.TwoNamedParametersConstructorInjectee;
-import minject.support.injectees.MixedParametersConstructorInjectee;
-import minject.support.injectees.NamedArrayInjectee;
-import minject.support.injectees.MultipleNamedSingletonsOfSameClassInjectee;
-import minject.support.injectees.XMLInjectee;
-import minject.support.injectees.OrderedPostConstructInjectee;
-import minject.support.types.Class1;
-import minject.support.types.Class2;
-import minject.support.types.Interface1;
-import minject.support.types.Interface2;
-import minject.support.types.ComplexClass;
-import minject.support.injectees.SetterInjectee;
 import minject.support.injectees.RecursiveInjectee;
+import minject.support.types.*;
 
 @:keep class InjectorTest
  {
@@ -84,7 +34,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee = new ClassInjectee();
 		var value = new Class1();
 
-		injector.mapValue(Class1, value);
+		injector.map(Class1).toValue(value);
 		injector.unmap(Class1);
 
 		try
@@ -102,7 +52,7 @@ import minject.support.injectees.RecursiveInjectee;
 	public function injector_injects_bound_value_into_all_injectees():Void
 	{
 		var value = new Class1();
-		injector.mapValue(Class1, value);
+		injector.map(Class1).toValue(value);
 
 		var injectee1 = new ClassInjectee();
 		injector.injectInto(injectee1);
@@ -120,7 +70,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee = new InterfaceInjectee();
 		var value = new Class1();
 
-		injector.mapValue(Interface1, value);
+		injector.map(Interface1).toValue(value);
 		injector.injectInto(injectee);
 		Assert.areEqual(value, injectee.property);
 	}
@@ -131,7 +81,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee = new NamedClassInjectee();
 		var value = new Class1();
 
-		injector.mapValue(Class1, value, NamedClassInjectee.NAME);
+		injector.map(Class1, NamedClassInjectee.NAME).toValue(value);
 		injector.injectInto(injectee);
 		Assert.areEqual(value, injectee.property);
 	}
@@ -142,7 +92,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee = new NamedInterfaceInjectee();
 		var value = new Class1();
 
-		injector.mapValue(Interface1, value, NamedClassInjectee.NAME);
+		injector.map(Interface1, NamedClassInjectee.NAME).toValue(value);
 		injector.injectInto(injectee);
 		Assert.areEqual(value, injectee.property);
 	}
@@ -151,9 +101,9 @@ import minject.support.injectees.RecursiveInjectee;
 	public function bind_falsy_value():Void
 	{
 		var injectee = new StringInjectee();
-		var value = "test";
+		var value = 'test';
 
-		injector.mapValue(String, value);
+		injector.map(String).toValue(value);
 		injector.injectInto(injectee);
 
 		Assert.areEqual(value, injectee.property);
@@ -165,7 +115,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee = new RecursiveInterfaceInjectee();
 		var value = new InterfaceInjectee();
 
-		injector.mapValue(InterfaceInjectee, value);
+		injector.map(InterfaceInjectee).toValue(value);
 		injector.injectInto(injectee);
 
 		Assert.isNull(value.property);
@@ -176,8 +126,8 @@ import minject.support.injectees.RecursiveInjectee;
 	{
 		var injectee = new MultipleSingletonsOfSameClassInjectee();
 
-		injector.mapSingletonOf(Interface1, Class1);
-		injector.mapSingletonOf(Interface2, Class1);
+		injector.map(Interface1).toSingleton(Class1);
+		injector.map(Interface2).toSingleton(Class1);
 
 		injector.injectInto(injectee);
 		Assert.isNotNull(injectee.property1);
@@ -191,7 +141,7 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function bind_class():Void
 	{
-		injector.mapClass(Class1, Class1);
+		injector.map(Class1).toClass(Class1);
 
 		var injectee1 = new ClassInjectee();
 		injector.injectInto(injectee1);
@@ -206,8 +156,8 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function bind_inherited_class():Void
 	{
-		injector.mapClass(Class1, Class1);
-		injector.mapClass(Class2, Class2);
+		injector.map(Class1).toClass(Class1);
+		injector.map(Class2).toClass(Class2);
 
 		var injectee1 = new InheritanceInjectee();
 		injector.injectInto(injectee1);
@@ -226,11 +176,11 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function bind_typedef():Void
 	{
-		injector.mapClass(Typedef1, Typedef1);
-		injector.mapClass(TypedefInjectee, TypedefInjectee);
+		injector.map(Typedef1).toClass(Typedef1);
+		injector.map(TypedefInjectee).toClass(TypedefInjectee);
 
-		Assert.isTrue(injector.hasRule(Typedef1));
-		Assert.isTrue(injector.hasRule(Class1));
+		Assert.isTrue(injector.hasMapping(Typedef1));
+		Assert.isTrue(injector.hasMapping(Class1));
 
 		var injectee1 = new TypedefInjectee();
 		injector.injectInto(injectee1);
@@ -241,19 +191,19 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function bind_type_params():Void
 	{
-		// These 2 rules should match on the full type, so do not need a name.
-		injector.mapValueToTypeId("Array<String>", ["Jason","David"]);
-		injector.mapValueToTypeId("Array<Int>", [0,1,2]);
-		// These 2 rules should match an Array with any type parameter - hence the need for names.
-		injector.mapValue(Array, ["London","Sydney","Perth"], "cities");
-		injector.mapValue(Array, [8416535,4840600,2021200], "populations");
+		// These 2 mappings should match on the full type, so do not need a name.
+		injector.mapType('Array<String>').toValue(['Jason', 'David']);
+		injector.mapType('Array<Int>').toValue([0,1,2]);
+		// These 2 mappings should match an Array with any type parameter - hence the need for names.
+		injector.map(Array, 'cities').toValue(['London', 'Sydney', 'Perth']);
+		injector.map(Array, 'populations').toValue([8416535,4840600,2021200]);
 
 		var injectee = new TypeParamInjectee();
 		injector.injectInto(injectee);
 
-		Assert.areEqual("Jason", injectee.names[0]);
+		Assert.areEqual('Jason', injectee.names[0]);
 		Assert.areEqual(0, injectee.numbers[0]);
-		Assert.areEqual("London", injectee.cities[0]);
+		Assert.areEqual('London', injectee.cities[0]);
 		Assert.areEqual(8416535, injectee.populations[0]);
 	}
 
@@ -263,8 +213,8 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee = new ComplexClassInjectee();
 		var value = new Class1();
 
-		injector.mapValue(Class1, value);
-		injector.mapClass(ComplexClass, ComplexClass);
+		injector.map(Class1).toValue(value);
+		injector.map(ComplexClass).toClass(ComplexClass);
 		injector.injectInto(injectee);
 
 		Assert.isNotNull(injectee.property);
@@ -275,7 +225,7 @@ import minject.support.injectees.RecursiveInjectee;
 	public function bind_class_by_interface():Void
 	{
 		var injectee = new InterfaceInjectee();
-		injector.mapClass(Interface1, Class1);
+		injector.map(Interface1).toClass(Class1);
 		injector.injectInto(injectee);
 		Assert.isNotNull(injectee.property);
 	}
@@ -283,8 +233,8 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function bind_named_class():Void
 	{
-		var injectee:NamedClassInjectee = new NamedClassInjectee();
-		injector.mapClass(Class1, Class1, NamedClassInjectee.NAME);
+		var injectee = new NamedClassInjectee();
+		injector.map(Class1, NamedClassInjectee.NAME).toClass(Class1);
 		injector.injectInto(injectee);
 		Assert.isNotNull(injectee.property);
 	}
@@ -293,7 +243,7 @@ import minject.support.injectees.RecursiveInjectee;
 	public function bind_named_class_by_interface():Void
 	{
 		var injectee = new NamedInterfaceInjectee();
-		injector.mapClass(Interface1, Class1, NamedClassInjectee.NAME);
+		injector.map(Interface1, NamedClassInjectee.NAME).toClass(Class1);
 		injector.injectInto(injectee);
 		Assert.isNotNull(injectee.property);
 	}
@@ -301,10 +251,10 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function bind_singleton():Void
 	{
-		var injectee1:ClassInjectee = new ClassInjectee();
-		var injectee2:ClassInjectee = new ClassInjectee();
+		var injectee1 = new ClassInjectee();
+		var injectee2 = new ClassInjectee();
 
-		injector.mapSingleton(Class1);
+		injector.map(Class1).asSingleton();
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.property);
@@ -319,7 +269,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee1 = new InterfaceInjectee();
 		var injectee2 = new InterfaceInjectee();
 
-		injector.mapSingletonOf(Interface1, Class1);
+		injector.map(Interface1).toSingleton(Class1);
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.property);
@@ -333,8 +283,8 @@ import minject.support.injectees.RecursiveInjectee;
 	{
 		var injectee = new TwoNamedInterfaceFieldsInjectee();
 
-		injector.mapSingletonOf(Interface1, Class1, TwoNamedInterfaceFieldsInjectee.NAME1);
-		injector.mapSingletonOf(Interface1, Class2, TwoNamedInterfaceFieldsInjectee.NAME2);
+		injector.map(Interface1, TwoNamedInterfaceFieldsInjectee.NAME1).toSingleton(Class1);
+		injector.map(Interface1, TwoNamedInterfaceFieldsInjectee.NAME2).toSingleton(Class2);
 
 		injector.injectInto(injectee);
 
@@ -346,10 +296,10 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function perform_setter_injection():Void
 	{
-		var injectee1:SetterInjectee = new SetterInjectee();
-		var injectee2:SetterInjectee = new SetterInjectee();
+		var injectee1 = new SetterInjectee();
+		var injectee2 = new SetterInjectee();
 
-		injector.mapClass(Class1, Class1);
+		injector.map(Class1).toClass(Class1);
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.property);
@@ -364,7 +314,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee1 = new OneParameterMethodInjectee();
 		var injectee2 = new OneParameterMethodInjectee();
 
-		injector.mapClass(Class1, Class1);
+		injector.map(Class1).toClass(Class1);
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency());
@@ -379,7 +329,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee1 = new OneNamedParameterMethodInjectee();
 		var injectee2 = new OneNamedParameterMethodInjectee();
 
-		injector.mapClass(Class1, Class1, OneNamedParameterMethodInjectee.NAME);
+		injector.map(Class1, OneNamedParameterMethodInjectee.NAME).toClass(Class1);
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency());
@@ -394,8 +344,8 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee1 = new TwoParametersMethodInjectee();
 		var injectee2 = new TwoParametersMethodInjectee();
 
-		injector.mapClass(Class1, Class1);
-		injector.mapClass(Interface1, Class1);
+		injector.map(Class1).toClass(Class1);
+		injector.map(Interface1).toClass(Class1);
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency1());
@@ -412,8 +362,8 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee1 = new TwoNamedParametersMethodInjectee();
 		var injectee2 = new TwoNamedParametersMethodInjectee();
 
-		injector.mapClass(Class1, Class1, TwoNamedParametersMethodInjectee.NAME1);
-		injector.mapClass(Interface1, Class1, TwoNamedParametersMethodInjectee.NAME2);
+		injector.map(Class1, TwoNamedParametersMethodInjectee.NAME1).toClass(Class1);
+		injector.map(Interface1, TwoNamedParametersMethodInjectee.NAME2).toClass(Class1);
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency1());
@@ -430,9 +380,9 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee1 = new MixedParametersMethodInjectee();
 		var injectee2 = new MixedParametersMethodInjectee();
 
-		injector.mapClass(Class1, Class1, MixedParametersMethodInjectee.NAME1);
-		injector.mapClass(Class1, Class1);
-		injector.mapClass(Interface1, Class1, MixedParametersMethodInjectee.NAME2);
+		injector.map(Class1, MixedParametersMethodInjectee.NAME1).toClass(Class1);
+		injector.map(Class1).toClass(Class1);
+		injector.map(Interface1, MixedParametersMethodInjectee.NAME2).toClass(Class1);
 
 		injector.injectInto(injectee1);
 		Assert.isNotNull(injectee1.getDependency1());
@@ -448,7 +398,7 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function perform_constructor_injection_with_one_parameter():Void
 	{
-		injector.mapClass(Class1, Class1);
+		injector.map(Class1).toClass(Class1);
 
 		var injectee = injector.instantiate(OneParameterConstructorInjectee);
 		Assert.isNotNull(injectee.getDependency());
@@ -457,19 +407,19 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function perform_constructor_injection_with_two_parameters():Void
 	{
-		injector.mapClass(Class1, Class1);
-		injector.mapValue(String, "stringDependency");
+		injector.map(Class1).toClass(Class1);
+		injector.map(String).toValue('stringDependency');
 
 		var injectee = injector.instantiate(TwoParametersConstructorInjectee);
 
 		Assert.isNotNull(injectee.getDependency1());
-		Assert.areEqual(injectee.getDependency2(), "stringDependency");
+		Assert.areEqual(injectee.getDependency2(), 'stringDependency');
 	}
 
 	@Test
 	public function perform_constructor_injection_with_one_named_parameter():Void
 	{
-		injector.mapClass(Class1, Class1, OneNamedParameterConstructorInjectee.NAME);
+		injector.map(Class1, OneNamedParameterConstructorInjectee.NAME).toClass(Class1);
 		var injectee = injector.instantiate(OneNamedParameterConstructorInjectee);
 		Assert.isNotNull(injectee.getDependency());
 	}
@@ -477,9 +427,9 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function perform_constructor_injection_with_two_named_parameter():Void
 	{
-		var stringValue = "stringDependency";
-		injector.mapClass(Class1, Class1, TwoNamedParametersConstructorInjectee.NAME1);
-		injector.mapValue(String, stringValue, TwoNamedParametersConstructorInjectee.NAME2);
+		var stringValue = 'stringDependency';
+		injector.map(Class1, TwoNamedParametersConstructorInjectee.NAME1).toClass(Class1);
+		injector.map(String, TwoNamedParametersConstructorInjectee.NAME2).toValue(stringValue);
 
 		var injectee = injector.instantiate(TwoNamedParametersConstructorInjectee);
 		Assert.isNotNull(injectee.getDependency1());
@@ -489,9 +439,9 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function perform_constructor_injection_with_mixed_parameters():Void
 	{
-		injector.mapClass(Class1, Class1, MixedParametersConstructorInjectee.NAME1);
-		injector.mapClass(Class1, Class1);
-		injector.mapClass(Interface1, Class1, MixedParametersConstructorInjectee.NAME2);
+		injector.map(Class1, MixedParametersConstructorInjectee.NAME1).toClass(Class1);
+		injector.map(Class1).toClass(Class1);
+		injector.map(Interface1, MixedParametersConstructorInjectee.NAME2).toClass(Class1);
 
 		var injectee = injector.instantiate(MixedParametersConstructorInjectee);
 		Assert.isNotNull(injectee.getDependency1());
@@ -502,9 +452,9 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function perform_named_array_injection():Void
 	{
-		var array = ["value1", "value2", "value3"];
+		var array = ['value1', 'value2', 'value3'];
 
-		injector.mapValueToTypeId('Array<String>', array, NamedArrayInjectee.NAME);
+		injector.mapType('Array<String>', NamedArrayInjectee.NAME).toValue(array);
 		var injectee = injector.instantiate(NamedArrayInjectee);
 
 		Assert.isNotNull(injectee.array);
@@ -512,23 +462,23 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function perform_mapped_rule_injection():Void
+	public function perform_mapped_mapping_injection():Void
 	{
-		var rule = injector.mapSingletonOf(Interface1, Class1);
-		injector.mapRule(Interface2, rule);
+		var mapping = injector.map(Interface1).toSingleton(Class1);
+		injector.map(Interface2).toMapping(mapping);
 
 		var injectee = injector.instantiate(MultipleSingletonsOfSameClassInjectee);
 		Assert.areEqual(injectee.property1, injectee.property2);
 	}
 
 	@Test
-	public function perform_mapped_named_rule_injection():Void
+	public function perform_mapped_named_mapping_injection():Void
 	{
-		var rule = injector.mapSingletonOf(Interface1, Class1);
+		var mapping = injector.map(Interface1).toSingleton(Class1);
 
-		injector.mapRule(Interface2, rule);
-		injector.mapRule(Interface1, rule, MultipleNamedSingletonsOfSameClassInjectee.NAME1);
-		injector.mapRule(Interface2, rule, MultipleNamedSingletonsOfSameClassInjectee.NAME2);
+		injector.map(Interface2).toMapping(mapping);
+		injector.map(Interface1, MultipleNamedSingletonsOfSameClassInjectee.NAME1).toMapping(mapping);
+		injector.map(Interface2, MultipleNamedSingletonsOfSameClassInjectee.NAME2).toMapping(mapping);
 
 		var injectee = injector.instantiate(MultipleNamedSingletonsOfSameClassInjectee);
 		Assert.areEqual(injectee.property1, injectee.property2);
@@ -541,8 +491,8 @@ import minject.support.injectees.RecursiveInjectee;
 	{
 		var injectee = new InterfaceInjectee();
 
-		injector.mapValue(InterfaceInjectee, injectee);
-		injector.mapSingletonOf(Interface1, RecursiveInterfaceInjectee);
+		injector.map(InterfaceInjectee).toValue(injectee);
+		injector.map(Interface1).toSingleton(RecursiveInterfaceInjectee);
 
 		injector.injectInto(injectee);
 		Assert.isTrue(true);
@@ -552,9 +502,9 @@ import minject.support.injectees.RecursiveInjectee;
 	public function inject_x_m_l_value() : Void
 	{
 		var injectee = new XMLInjectee();
-		var value = Xml.parse("<test/>");
+		var value = Xml.parse('<test/>');
 
-		injector.mapValue(Xml, value);
+		injector.map(Xml).toValue(value);
 		injector.injectInto(injectee);
 
 		Assert.areEqual(injectee.property, value);
@@ -566,7 +516,7 @@ import minject.support.injectees.RecursiveInjectee;
 		var injectee = new ClassInjectee();
 		var value = new Class1();
 
-		injector.mapValue(Class1, value);
+		injector.map(Class1).toValue(value);
 		injector.injectInto(injectee);
 
 		Assert.isTrue(injectee.someProperty);
@@ -582,55 +532,55 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function has_rule_fails_for_unmapped_unnamed_class():Void
+	public function has_mapping_fails_for_unmapped_unnamed_class():Void
 	{
-		Assert.isFalse(injector.hasRule(Class1));
+		Assert.isFalse(injector.hasMapping(Class1));
 	}
 
 	@Test
-	public function has_rule_fails_for_unmapped_named_class():Void
+	public function has_mapping_fails_for_unmapped_named_class():Void
 	{
-		Assert.isFalse(injector.hasRule(Class1, "namedClass"));
+		Assert.isFalse(injector.hasMapping(Class1, 'namedClass'));
 	}
 
 	@Test
-	public function has_rule_succeeds_for_mapped_unnamed_class():Void
+	public function has_mapping_succeeds_for_mapped_unnamed_class():Void
 	{
-		injector.mapClass(Class1, Class1);
-		Assert.isTrue(injector.hasRule(Class1));
+		injector.map(Class1).toClass(Class1);
+		Assert.isTrue(injector.hasMapping(Class1));
 	}
 
 	@Test
-	public function has_rule_succeeds_for_mapped_named_class():Void
+	public function has_mapping_succeeds_for_mapped_named_class():Void
 	{
-		injector.mapClass(Class1, Class1, "namedClass");
-		Assert.isTrue(injector.hasRule(Class1, "namedClass"));
+		injector.map(Class1, 'namedClass').toClass(Class1);
+		Assert.isTrue(injector.hasMapping(Class1, 'namedClass'));
 	}
 
 	@Test
-	public function get_rule_response_succeeds_for_mapped_unnamed_class():Void
+	public function get_mapping_response_succeeds_for_mapped_unnamed_class():Void
 	{
 		var class1 = new Class1();
-		injector.mapValue(Class1, class1);
+		injector.map(Class1).toValue(class1);
 		Assert.areEqual(injector.getInstance(Class1), class1);
 	}
 
 	@Test
-	public function get_rule_response_succeeds_for_mapped_named_class():Void
+	public function get_mapping_response_succeeds_for_mapped_named_class():Void
 	{
 		var class1 = new Class1();
-		injector.mapValue(Class1, class1, "namedClass");
-		Assert.areEqual(injector.getInstance(Class1, "namedClass"), class1);
+		injector.map(Class1, 'namedClass').toValue(class1);
+		Assert.areEqual(injector.getInstance(Class1, 'namedClass'), class1);
 	}
 
 	@Test
-	public function injector_removes_singleton_instance_on_rule_removal():Void
+	public function injector_removes_singleton_instance_on_mapping_removal():Void
 	{
-		injector.mapSingleton(Class1);
+		injector.map(Class1).asSingleton();
 
 		var injectee1 = injector.instantiate(ClassInjectee);
 		injector.unmap(Class1);
-		injector.mapSingleton(Class1);
+		injector.map(Class1).asSingleton();
 
 		var injectee2 = injector.instantiate(ClassInjectee);
 		Assert.isFalse(injectee1.property == injectee2.property);
@@ -673,7 +623,7 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function get_rule_response_fails_for_unmapped_unnamed_class():Void
+	public function get_mapping_response_fails_for_unmapped_unnamed_class():Void
 	{
 		var passed = false;
 
@@ -690,13 +640,13 @@ import minject.support.injectees.RecursiveInjectee;
 	}
 
 	@Test
-	public function get_rule_response_fails_for_unmapped_named_class():Void
+	public function get_mapping_response_fails_for_unmapped_named_class():Void
 	{
 		var passed = false;
 
 		try
 		{
-			injector.getInstance(Class1, "namedClass");
+			injector.getInstance(Class1, 'namedClass');
 		}
 		catch (e:Dynamic)
 		{
@@ -726,16 +676,16 @@ import minject.support.injectees.RecursiveInjectee;
 	@Test
 	public function should_instantiate_recursive_injectee()
 	{
-		injector.mapSingleton(RecursiveInjectee1);
-		injector.mapSingleton(RecursiveInjectee2);
+		injector.map(RecursiveInjectee1).asSingleton();
+		injector.map(RecursiveInjectee2).asSingleton();
 		injector.instantiate(RecursiveInjectee1);
 	}
 
 	@Test
 	public function should_get_response()
 	{
-		injector.mapValue(Int, 10, 'sessionExpiry');
-		var value = injector.getResponse(Int, 'sessionExpiry');
+		injector.map(Int, 'sessionExpiry').toValue(10);
+		var value = injector.getValue(Int, 'sessionExpiry');
 		Assert.areEqual(10, value);
 	}
 
@@ -743,31 +693,31 @@ import minject.support.injectees.RecursiveInjectee;
 	public function should_map_type_by_class_reference()
 	{
 		var reference = Class1;
-		injector.mapValue(reference, new Class1());
-		Assert.isTrue(injector.hasRule(Class1));
+		injector.map(reference).toValue(new Class1());
+		Assert.isTrue(injector.hasMapping(Class1));
 	}
 
 	@Test
 	public function should_map_type_by_instance_reference()
 	{
 		var reference = new Class1();
-		injector.mapValue(reference, new Class1());
-		Assert.isTrue(injector.hasRule(Class1));
+		injector.map(reference).toValue(new Class1());
+		Assert.isTrue(injector.hasMapping(Class1));
 	}
 
 	@Test
 	public function should_map_type_by_enum_reference()
 	{
 		var reference = ValueType;
-		injector.mapValue(reference, TObject);
-		Assert.isTrue(injector.hasRule(ValueType));
+		injector.map(reference).toValue(TObject);
+		Assert.isTrue(injector.hasMapping(ValueType));
 	}
 
 	@Test
 	public function should_map_type_by_enum_value_reference()
 	{
 		var reference = ValueType.TObject;
-		injector.mapValue(reference, TObject);
-		Assert.isTrue(injector.hasRule(ValueType));
+		injector.map(reference).toValue(TObject);
+		Assert.isTrue(injector.hasMapping(ValueType));
 	}
 }

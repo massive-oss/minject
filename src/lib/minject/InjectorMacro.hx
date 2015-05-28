@@ -1,24 +1,4 @@
-/*
-Copyright (c) 2012-2015 Massive Interactive
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// See the file "LICENSE" for the full license governing this code
 
 package minject;
 
@@ -73,10 +53,10 @@ class InjectorMacro
 		Returns a string representing the type for the supplied value
 
 		- if expr is a type (String, foo.Bar) result is full type path
-		- anything else is passed to `Injector.getValueTypeId` which will attempt to determine a
+		- anything else is passed to `Injector.getValueType` which will attempt to determine a
 		  runtime type name.
 	**/
-	public static function getExprTypeId(expr:Expr):Expr
+	public static function getExprType(expr:Expr):Expr
 	{
 		switch (Context.typeof(expr))
 		{
@@ -84,7 +64,7 @@ class InjectorMacro
 				var expr = expr.toString();
 				try
 				{
-					var type = getTypeId(Context.getType(expr));
+					var type = getType(Context.getType(expr));
 					var index = type.indexOf("<");
 					var typeWithoutParams = (index>-1) ? type.substr(0, index) : type;
 					return macro $v{typeWithoutParams};
@@ -95,10 +75,10 @@ class InjectorMacro
 				return macro $v{type};
 			default:
 		}
-		return macro minject.Injector.getValueTypeId($expr);
+		return macro minject.Injector.getValueType($expr);
 	}
 
-	static function getTypeId(type:Type):String
+	static function getType(type:Type):String
 	{
 		return followType(type).toString();
 	}
@@ -209,7 +189,7 @@ class InjectorMacro
 		{
 			case FVar(_, _):
 				keep.set('set_' + field.name, true);
-				rtti.push(getTypeId(field.type));
+				rtti.push(getType(field.type));
 				if (names.length > 0) rtti.push(names[0].getValue());
 				else rtti.push('');
 			case FMethod(_):
@@ -219,7 +199,7 @@ class InjectorMacro
 						for (i in 0...args.length)
 						{
 							var arg = args[i];
-							var type = getTypeId(arg.t);
+							var type = getType(arg.t);
 
 							if (!arg.opt && type == 'Dynamic')
 							{

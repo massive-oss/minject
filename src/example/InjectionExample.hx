@@ -1,3 +1,5 @@
+// See the file "LICENSE" for the full license governing this code
+
 import minject.Injector;
 import Type;
 
@@ -7,15 +9,15 @@ class InjectionExample
 	{
 		var injector = new Injector();
 
-		injector.mapSingleton(TypeA);
-		injector.mapClass(TypeB, TypeB, "foo");
-		injector.mapValue(Int, 20);
-		injector.mapValue(ValueType, TObject);
-		injector.mapValueToTypeId('Void -> String', function () return 'Hello!');
-		injector.mapValueToTypeId('Array<Int>', [0,1,2]);
-		injector.mapValueToTypeId('Iterable<Int>', [0,1,2]);
-		injector.mapValueToTypeId('String -> String -> Bool', function(a, b) return a == b);
-		injector.mapValueToTypeId('haxe.EnumFlags<ValueType>', new haxe.EnumFlags<ValueType>());
+		injector.map(TypeA).asSingleton();
+		injector.map(TypeB, "foo").toClass(TypeB);
+		injector.map(Int).toValue(20);
+		injector.map(ValueType).toValue(TObject);
+		injector.mapType('Void -> String').toValue(function () return 'Hello!');
+		injector.mapType('Array<Int>').toValue([0,1,2]);
+		injector.mapType('Iterable<Int>').toValue([0,1,2]);
+		injector.mapType('String -> String -> Bool').toValue(function(a, b) return a == b);
+		injector.mapType('haxe.EnumFlags<ValueType>').toValue(new haxe.EnumFlags<ValueType>());
 
 		var a = injector.getInstance(TypeA);
 		a.id = 123;
@@ -23,7 +25,7 @@ class InjectionExample
 		var c = new TypeC();
 		c.id = 666;
 
-		injector.mapValue(TypeB, c, "bar");
+		injector.map(TypeB, "bar").toValue(c);
 
 		var foo = new Foo();
 		injector.injectInto(foo);
@@ -41,7 +43,7 @@ class InjectionExample
 		trace('foo.enumValue ${foo.enumValue}');
 		trace('foo.flags ${foo.flags}');
 
-		trace(minject.Injector.getExprTypeId(function () return ''));
+		// trace(minject.Injector.getExprTypeId(function () return ''));
 	}
 }
 
