@@ -77,10 +77,30 @@ class Injector
 		InjectorMacro.keep(type);
 
 		// get type identifier
-		var type = InjectorMacro.getExprType(type);
+		var id = InjectorMacro.getExprType(type);
+
+		// get value type
+		var type = InjectorMacro.getValueType(type);
 
 		// forward to runtime method
+		return macro $ethis.mapType($id, $name, (null:$type));
+	}
+
+	public macro function mapTypeOf(ethis:Expr, value:Expr, ?name:Expr):Expr
+	{
+		var type = InjectorMacro.getValueId(value);
 		return macro $ethis.mapType($type, $name);
+	}
+
+	public function mapRuntimeTypeOf(value:Dynamic, ?name:String):InjectorMapping<Dynamic>
+	{
+		return mapType(getValueType(value), name);
+	}
+
+	public macro function injectValue(ethis:Expr, value:Expr, ?name:Expr):Expr
+	{
+		var type = InjectorMacro.getValueId(value);
+		return macro $ethis.mapType($type, $name).toValue($value);
 	}
 
 	/**
@@ -97,19 +117,14 @@ class Injector
 		@param type The type identifier to map
 		@param name The optional name for the mapping
 	**/
-	public function mapType(type:String, ?name:String):InjectorMapping<Dynamic>
+	public function mapType<T:Dynamic>(type:String, ?name:String, ?value:T):InjectorMapping<T>
 	{
 		var key = getMappingKey(type, name);
 		if (mappings.exists(key))
-			return mappings.get(key);
+			return cast mappings.get(key);
 		var mapping = new InjectorMapping(type, name);
 		mappings.set(key, mapping);
-		return mapping;
-	}
-
-	public function mapTypeOf(value:Dynamic, ?name:String):InjectorMapping<Dynamic>
-	{
-		return mapType(getValueType(value), name);
+		return cast mapping;
 	}
 
 	/**

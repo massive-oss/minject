@@ -77,7 +77,39 @@ class InjectorMacro
 				catch (e:Dynamic) {}
 			default:
 		}
-		return expr;//macro minject.Injector.getValueType($expr);
+		return expr;
+	}
+
+	public static function getValueId(expr:Expr):Expr
+	{
+		var type = Context.typeof(expr).toString();
+		return macro $v{type};
+	}
+
+	public static function getValueType(expr:Expr):ComplexType
+	{
+		switch (expr.expr)
+		{
+			case EConst(CString(type)):
+				return getComplexType(type);
+			default:
+		}
+		switch (Context.typeof(expr))
+		{
+			case TType(_, _):
+				return getComplexType(expr.toString());
+			default:
+		}
+		return null;
+	}
+
+	static function getComplexType(type:String):ComplexType
+	{
+		return switch (Context.parse('(null:Null<$type>)', Context.currentPos()))
+		{
+			case macro (null:$type): type;
+			default: null;
+		}
 	}
 
 	static function getType(type:Type):String

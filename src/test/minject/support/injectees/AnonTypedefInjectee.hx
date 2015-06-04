@@ -9,16 +9,7 @@ class AnonTypedefInjectee
 	@inject
 	public var property:Greeter;
 
-	public function new()
-	{
-	}
-
-	@post(1)
-	public function sayHi():Void
-	{
-		trace(property.hello(property.name));
-	}
-
+	public function new() {}
 }
 
 typedef Greeter = {

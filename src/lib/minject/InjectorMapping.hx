@@ -71,7 +71,7 @@ class InjectorMapping<T>
 		return _toSingleton(cast Type.resolveClass(type));
 	}
 
-	public function toMapping(mapping:InjectorMapping<T>):InjectorMapping<T>
+	public function toMapping(mapping:InjectorMapping<Dynamic>):InjectorMapping<T>
 	{
 		return toProvider(new OtherMappingProvider(mapping));
 	}

@@ -1,4 +1,4 @@
-// See the file "LICENSE" for the full license governing this code
+// See the file 'LICENSE' for the full license governing this code
 
 package minject;
 
@@ -196,8 +196,8 @@ import minject.support.types.*;
 		injector.map('Array<String>').toValue(['Jason', 'David']);
 		injector.map('Array<Int>').toValue([0,1,2]);
 		// These 2 mappings should match an Array with any type parameter - hence the need for names.
-		injector.map(Array, 'cities').toValue(['London', 'Sydney', 'Perth']);
-		injector.map(Array, 'populations').toValue([8416535,4840600,2021200]);
+		injector.map('Array<String>', 'cities').toValue(['London', 'Sydney', 'Perth']);
+		injector.map('Array<Int>', 'populations').toValue([8416535,4840600,2021200]);
 
 		var injectee = new TypeParamInjectee();
 		injector.injectInto(injectee);
@@ -299,17 +299,15 @@ import minject.support.types.*;
 	{
 		var injectee = new AnonTypedefInjectee();
 
-		var myGreeter:Greeter = {
-			name:"world", 
+		var myGreeter = {
+			name:'world',
 			hello:function(name) {
-				return "hello " + name;
+				return 'hello ' + name;
 			}
 		};
 
-		injector.map(Greeter).toValue(myGreeter);
-
+		injector.map('minject.support.injectees.Greeter').toValue(myGreeter);
 		injector.injectInto(injectee);
-
 		Assert.isNotNull(injectee.property);
 	}
 
@@ -319,16 +317,14 @@ import minject.support.types.*;
 		var injectee = new AnonTypedefInjectee();
 
 		var myGreeter:Greeter = {
-			name:"world", 
+			name:'world',
 			hello:function(name) {
-				return "hello " + name;
+				return 'hello ' + name;
 			}
 		};
 
-		injector.map(myGreeter).toValue(myGreeter);
-
+		injector.injectValue(myGreeter);
 		injector.injectInto(injectee);
-
 		Assert.isNotNull(injectee.property);
 	}
 
@@ -338,18 +334,15 @@ import minject.support.types.*;
 		var injectee = new AnonTypedefInjectee();
 
 		var myGreeter:Greeter = {
-			name:"world", 
+			name:'world',
 			hello:function(name) {
-				return "hello " + name;
+				return 'hello ' + name;
 			}
 		};
 
-		var greeter = "minject.support.injectees.Greeter";
-
-		injector.map(greeter).toValue(myGreeter);
-
+		var greeter = 'minject.support.injectees.Greeter';
+		injector.mapType(greeter).toValue(myGreeter);
 		injector.injectInto(injectee);
-
 		Assert.isNotNull(injectee.property);
 	}
 
@@ -753,7 +746,7 @@ import minject.support.types.*;
 	public function should_map_type_by_class_reference()
 	{
 		var reference = Class1;
-		injector.mapTypeOf(reference).toValue(new Class1());
+		injector.mapRuntimeTypeOf(reference).toValue(new Class1());
 		Assert.isTrue(injector.hasMapping(Class1));
 	}
 
@@ -769,7 +762,7 @@ import minject.support.types.*;
 	public function should_map_type_by_enum_reference()
 	{
 		var reference = ValueType;
-		injector.mapTypeOf(reference).toValue(TObject);
+		injector.mapRuntimeTypeOf(reference).toValue(TObject);
 		Assert.isTrue(injector.hasMapping(ValueType));
 	}
 
