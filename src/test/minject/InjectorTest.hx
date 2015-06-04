@@ -6,6 +6,7 @@ import Type;
 
 import massive.munit.Assert;
 import minject.support.injectees.*;
+import minject.support.injectees.AnonTypedefInjectee;
 import minject.support.injectees.TypedefInjectee;
 import minject.support.injectees.RecursiveInjectee;
 import minject.support.types.*;
@@ -291,6 +292,65 @@ import minject.support.types.*;
 		Assert.isTrue(Std.is(injectee.property1, Class1));
 		Assert.isTrue(Std.is(injectee.property2, Class2));
 		Assert.isFalse(injectee.property1 == injectee.property2);
+	}
+
+	@Test
+	public function bind_anonymous_structure_typedef():Void
+	{
+		var injectee = new AnonTypedefInjectee();
+
+		var myGreeter:Greeter = {
+			name:"world", 
+			hello:function(name) {
+				return "hello " + name;
+			}
+		};
+
+		injector.map(Greeter).toValue(myGreeter);
+
+		injector.injectInto(injectee);
+
+		Assert.isNotNull(injectee.property);
+	}
+
+	@Test
+	public function bind_anonymous_structure_typedef_by_reference():Void
+	{
+		var injectee = new AnonTypedefInjectee();
+
+		var myGreeter:Greeter = {
+			name:"world", 
+			hello:function(name) {
+				return "hello " + name;
+			}
+		};
+
+		injector.map(myGreeter).toValue(myGreeter);
+
+		injector.injectInto(injectee);
+
+		Assert.isNotNull(injectee.property);
+	}
+
+	@Test
+	public function bind_anonymous_structure_typedef_by_fieds_string():Void
+	{
+		var injectee = new AnonTypedefInjectee();
+
+		var myGreeter:Greeter = {
+			name:"world", 
+			hello:function(name) {
+				return "hello " + name;
+			}
+		};
+
+		var greeter = "minject.support.injectees.Greeter";
+
+		injector.map(greeter).toValue(myGreeter);
+
+		injector.injectInto(injectee);
+
+		Assert.isNotNull(injectee.property);
 	}
 
 	@Test
