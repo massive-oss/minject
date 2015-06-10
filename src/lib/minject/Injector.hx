@@ -83,13 +83,13 @@ class Injector
 		var type = InjectorMacro.getValueType(type);
 
 		// forward to runtime method
-		return macro $ethis.mapType($id, $name, (null:$type));
+		return macro @:pos(ethis.pos) $ethis.mapType($id, $name, (null:$type));
 	}
 
 	public macro function mapTypeOf(ethis:Expr, value:Expr, ?name:Expr):Expr
 	{
 		var type = InjectorMacro.getValueId(value);
-		return macro $ethis.mapType($type, $name);
+		return macro @:pos(ethis.pos) $ethis.mapType($type, $name);
 	}
 
 	public function mapRuntimeTypeOf(value:Dynamic, ?name:String):InjectorMapping<Dynamic>
@@ -100,7 +100,7 @@ class Injector
 	public macro function injectValue(ethis:Expr, value:Expr, ?name:Expr):Expr
 	{
 		var type = InjectorMacro.getValueId(value);
-		return macro $ethis.mapType($type, $name).toValue($value);
+		return macro @:pos(ethis.pos) $ethis.mapType($type, $name).toValue($value);
 	}
 
 	/**
@@ -136,7 +136,7 @@ class Injector
 	public macro function unmap(ethis:Expr, type:Expr, ?name:Expr):Expr
 	{
 		var type = InjectorMacro.getExprType(type);
-		return macro $ethis.unmapType($type, $name);
+		return macro @:pos(ethis.pos) $ethis.unmapType($type, $name);
 	}
 
 	/**
@@ -166,7 +166,7 @@ class Injector
 	public macro function hasMapping(ethis:Expr, type:Expr, ?name:Expr):Expr
 	{
 		var type = InjectorMacro.getExprType(type);
-		return macro $ethis.hasMappingForType($type, $name);
+		return macro @:pos(ethis.pos) $ethis.hasMappingForType($type, $name);
 	}
 
 	/**
@@ -213,7 +213,7 @@ class Injector
 	public macro function getValue(ethis:Expr, type:Expr, ?name:Expr):Expr
 	{
 		var type = InjectorMacro.getExprType(type);
-		return macro $ethis.getValueForType($type, $name);
+		return macro @:pos(ethis.pos) $ethis.getValueForType($type, $name);
 	}
 
 	/**
@@ -262,7 +262,7 @@ class Injector
 	public macro function construct(ethis:Expr, type:Expr):Expr
 	{
 		InjectorMacro.keep(type);
-		return macro ethis._construct(type);
+		return macro @:pos(ethis.pos) ethis._construct(type);
 	}
 
 	@:dox(hide)
@@ -291,7 +291,7 @@ class Injector
 	public macro function instantiate(ethis:Expr, type:Expr):Expr
 	{
 		InjectorMacro.keep(type);
-		return macro $ethis._instantiate($type);
+		return macro @:pos(ethis.pos) $ethis._instantiate($type);
 	}
 
 	@:dox(hide)
