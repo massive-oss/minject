@@ -4,6 +4,7 @@ package minject;
 
 import haxe.rtti.Meta;
 import haxe.macro.Expr;
+import haxe.ds.ArraySort;
 
 import minject.point.*;
 import minject.provider.*;
@@ -350,6 +351,18 @@ class Injector
 	{
 		var info = new InjectorInfo(null, []);
 		addClassToInfo(forClass, info, []);
+		// sort rtti to ensure post constructors are last and in order
+		ArraySort.sort(info.fields, function(p1,p2) {
+			var post1 = Std.instance(p1,PostInjectionPoint);
+			var post2 = Std.instance(p2,PostInjectionPoint);
+			return switch ([post1, post2])
+			{
+				case [null,null]: 0;
+				case [null,_]: -1;
+				case [_,null]: 1;
+				default: post1.order - post2.order;
+			}
+		});
 		if (info.ctor == null) info.ctor = new ConstructorInjectionPoint([]);
 		return info;
 	}
@@ -374,17 +387,26 @@ class Injector
 				if (injected.indexOf(name) > -1) continue;
 				injected.push(name);
 
-				if (name == 'new')
-				{
-					info.ctor = new ConstructorInjectionPoint(field.slice(1));
-				}
-				else if (field.length == 3)
+				if (field.length == 3)
 				{
 					info.fields.push(new PropertyInjectionPoint(name, field[1], field[2]));
 				}
+				else if (name == 'new')
+				{
+					info.ctor = new ConstructorInjectionPoint(field.slice(2));
+				}
 				else
 				{
-					info.fields.push(new MethodInjectionPoint(name, field.slice(1)));
+					var orderStr = field[1];
+					if (orderStr == '')
+					{
+						info.fields.push(new MethodInjectionPoint(name, field.slice(2)));
+					}
+					else
+					{
+						var order = Std.parseInt(orderStr);
+						info.fields.push(new PostInjectionPoint(name, field.slice(2), order));
+					}
 				}
 			}
 		}

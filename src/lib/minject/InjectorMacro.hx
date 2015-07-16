@@ -177,15 +177,12 @@ class InjectorMacro
 			if (keep.exists(field.name))
 				field.meta.add(':keep', [], Context.currentPos());
 
-		// sort rtti to ensure post constructors are last and in order
-		infos.sort(function (a, b) return a.order - b.order);
-
 		// add rtti to type
-		var rtti = infos.map(function (info) return macro $v{info.rtti});
+		var rtti = infos.map(function (rtti) return macro $v{rtti});
 		if (rtti.length > 0) ref.meta.add('rtti', rtti, ref.pos);
 	}
 
-	static function processField(field:ClassField, infos:Array<{order:Int, rtti:Array<String>}>, keep:Map<String, Bool>):Void
+	static function processField(field:ClassField, rttis:Array<Array<String>>, keep:Map<String, Bool>):Void
 	{
 		if (!field.isPublic) return;
 
@@ -208,16 +205,8 @@ class InjectorMacro
 			field.meta.remove('inject');
 		}
 
-		// extract post construct order from metadata
-		var order = 0;
-		if (post != null)
-		{
-			order = post.params.length > 0 ? post.params[0].getValue() + 1 : 1;
-			field.meta.remove('post');
-		}
-
 		var rtti = [field.name];
-		infos.push({order:order, rtti:rtti});
+		rttis.push(rtti);
 
 		switch (field.kind)
 		{
@@ -230,6 +219,17 @@ class InjectorMacro
 				switch (field.type)
 				{
 					case TFun(args, _):
+						if (post != null)
+						{
+							var order = post.params.length > 0 ? post.params[0].getValue() + 1 : 1;
+							field.meta.remove('post');
+							rtti.push(""+order);
+						}
+						else
+						{
+							rtti.push("");
+						}
+
 						for (i in 0...args.length)
 						{
 							var arg = args[i];
