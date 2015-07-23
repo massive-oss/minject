@@ -11,8 +11,8 @@
 	"contributors": [
 		"massive"
 	],
-	"releasenote": "See https://github.com/massiveinteractive/minject/blob/master/CHANGES.md",
-	"version": "2.0.0",
+	"releasenote": "See https://github.com/massiveinteractive/minject/blob/master/doc/changes.md",
+	"version": "2.0.0-rc.1",
 	"url": "https://github.com/massiveinteractive/minject",
 	"dependencies": {}
 }

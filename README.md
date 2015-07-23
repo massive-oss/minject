@@ -1,8 +1,6 @@
 ## Overview
 
-Minject is a metadata driven Inversion of Control (IOC) solution for Haxe. It has been thoroughly
-tested on JS, AVM1/2 and Neko platforms, but should also work on other platforms (waiting for
-cpp/php support in munit!)
+minject is a metadata driven inversion of control (IOC) solution for Haxe. It has been thoroughly tested on JS, AVM1/2, PHP and Neko, but should also work on other platforms.
 
 This documentation is a modified version of the original, which can be
 found [here](https://github.com/tschneidereit/SwiftSuspenders/blob/the-past/README.textile).
@@ -14,23 +12,20 @@ the documentation:
 
 * metadata based annotation of injection points
 * injecting into:
-    * properties (i.e. setters)
-    * variables
+    * properties
     * methods (with support for optional arguments)
     * constructors (with support for optional arguments)
 
 * named injections, allowing for more specific binding of injections than just
-by their type. (See "Defining injection points")
+by their type. (See "defining injection points")
 * @post annotations for invoking methods after all injections have been applied
 * mapping:
-    * values
+    * values of nearly any type (enums, abstracts, typedefs, functions)
     * classes (of which new instances are created for each injection)
-    * singletons (which are created lazily on first injection and then reused
-      for each additional injection of the same rule)
+    * singletons (which are created lazily on first injection and then reused for each additional injection of the same rule)
     * rules (which allows sharing singletons between multiple mapping rules)
 
-* creating child injectors which share their parents' injection mappings but
-  can define additional mappings complementing or replacing the parents' ones
+* creating child injectors which share their parents' injection mappings but can define additional mappings complementing or replacing the parents' ones
 * querying for the existence of injection rules using Injector#hasMapping
 * direct application of injection rules using Injector#getInstance
 
@@ -40,13 +35,13 @@ by their type. (See "Defining injection points")
 
 ## Usage
 
-You can download an example of minject usage [here](https://github.com/downloads/massiveinteractive/minject/example.zip)
+You can find an example of minject usage [here](https://github.com/massiveinteractive/minject/blob/master/src/example)
 
 ### Defining dependencies
 
 minject supports three types of dependency definitions:
 * *value bindings*, which simply map an injection request to be satisfied by
-  injecting the given object
+  injecting the given value
 * *class bindings*, which map an injection request to be satisfied by injecting
   a new instance of the given class
 * *singleton bindings*, which map all injection requests for the given class by
