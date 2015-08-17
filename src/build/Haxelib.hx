@@ -1,22 +1,24 @@
 // See the file "LICENSE" for the full license governing this code
 
 import sys.io.File;
+
 import haxe.Json;
+import haxe.macro.Context;
 
 import mdk.sys.SysApi;
-import mdk.lib.LibProject;
 
 class Haxelib
 {
-	static function main()
+	static function run()
 	{
 		var jsonPath = 'haxelib.json';
 
 		var json = Json.parse(File.getContent(jsonPath));
-		json.version = LibProject.current.version.toString();
+		var info = Json.parse(File.getContent('mdk/info.json'));
+		json.version = info.version;
 		File.saveContent(jsonPath, Json.stringify(json, null, '\t') + '\n');
 
-		var path = 'bin/haxelib';
+		var path = Context.definedValue('output');
 		SysApi.createDirectory(path);
 		SysApi.copy('LICENSE', '$path/LICENSE');
 		SysApi.copy('src/lib', '$path/src/lib');

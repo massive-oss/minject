@@ -5,12 +5,12 @@
 
 --each
 
--js example/html.js
+-js bin/example/html.js
 
 --next
 
--swf example/flash.swf
+-swf bin/example/flash.swf
 
 --next
 
--neko example/neko.n
+-neko bin/example/neko.n

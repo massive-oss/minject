@@ -1,0 +1,9 @@
+{
+	"mlib": "2.0.2",
+	"mcover": "2.1.1",
+	"hamcrest": "1.2.1",
+	"mconsole": "1.6.1",
+	"mdk-core": "073c62f",
+	"munit": "2.1.1",
+	"hxcpp": "3.2.102"
+}
