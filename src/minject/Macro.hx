@@ -92,6 +92,16 @@ class Macro
 				{
 					case TType(t, _):
 						var def = t.get();
+						
+						while(true)
+							switch(def.type)
+							{
+								case TType(t, _): 
+									def = t.get();
+								default:
+									break;
+							}
+						
 						switch (def.type)
 						{
 							case TInst(t, params):

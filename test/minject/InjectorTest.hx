@@ -49,9 +49,12 @@ import minject.support.injectees.XMLInjectee;
 import minject.support.injectees.OrderedPostConstructInjectee;
 import minject.support.types.Class1;
 import minject.support.types.Class2;
+import minject.support.types.Class3;
 import minject.support.types.Interface1;
 import minject.support.types.Interface2;
 import minject.support.types.ComplexClass;
+import minject.support.types.TypedefToClass1;
+import minject.support.types.TypedefToTypedefToClass1;
 import minject.support.injectees.SetterInjectee;
 import minject.support.injectees.RecursiveInjectee;
 
@@ -492,6 +495,17 @@ class InjectorTest
 		//Assert.areEqual(injectee.property1, injectee.property2);//"Instance field 'property1' should be identical to Instance field 'property2'"
 		//Assert.areEqual(injectee.property1, injectee.namedProperty1);//"Instance field 'property1' should be identical to Instance field 'namedProperty1'"
 		//Assert.areEqual(injectee.property1, injectee.namedProperty2);//"Instance field 'property1' should be identical to Instance field 'namedProperty2'"
+	}
+	
+	@Test
+	public function performNestedTypedefInjection():Void
+	{
+		var injectee = new Class3();
+		var injector = new Injector();
+		injector.mapSingleton(TypedefToTypedefToClass1);
+		injector.injectInto(injectee);
+		
+		Assert.isTrue(Std.is(injectee.value, Class1));
 	}
 	
 	@Test
