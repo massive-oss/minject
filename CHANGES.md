@@ -1,3 +1,7 @@
+## 1.6.2
+
+- fixes injections of nested typedefs
+
 ## 1.5.2
 
 - Use Map to track injected instances under cpp as WeakMap is not implemented.

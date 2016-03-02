@@ -1,17 +1,17 @@
 {
-	"project": 
+	"project":
 	{
 		"name": "MassiveInject",
-		"version": "1.6.1",
+		"version": "1.6.2",
 		"id": "minject",
-		"devDependencies": 
+		"devDependencies":
 		{
 			"mcover": "2.x",
 			"hamcrest": "1.x",
 			"mtask": "3.x",
 			"munit": "2.x"
 		},
-		"dependencies": 
+		"dependencies":
 		{
 
 		}
