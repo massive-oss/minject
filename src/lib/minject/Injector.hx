@@ -12,7 +12,6 @@ import minject.provider.*;
 /**
 	The dependency injector
 **/
-#if !macro @:build(minject.InjectorMacro.addMetadata()) #end
 class Injector
 {
 	public static function getValueType(value:Dynamic):String
