@@ -138,12 +138,11 @@ class InjectorMacro
 	}
 
 	/**
-		Do not call this method, it is called by Injector as a build macro.
+		Do not call this method, it is called in extraParams.hxml
 	**/
-	public static function addMetadata():Array<Field>
+	public static function addMetadata()
 	{
 		Context.onGenerate(processTypes);
-		return Context.getBuildFields();
 	}
 
 	static function processTypes(types:Array<Type>):Void
@@ -160,7 +159,7 @@ class InjectorMacro
 		var ref = t.get();
 
 		// add meta to interfaces, there's no otherway of telling at runtime!
-		if (ref.isInterface) ref.meta.add("interface", [], ref.pos);
+		if (ref.isInterface && !ref.meta.has('interface')) ref.meta.add("interface", [], ref.pos);
 
 		var infos = [];
 		var keep = new Map<String, Bool>();
