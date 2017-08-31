@@ -38,7 +38,7 @@ class Injector
 	/**
 		The parent of this injector
 	**/
-	public var parent(default, null):Injector;
+	public var parent:Injector;
 
 	// map of injector mappings by type#name
 	var mappings = new Map<String, InjectorMapping<Dynamic>>();
