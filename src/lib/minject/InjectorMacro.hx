@@ -215,6 +215,17 @@ class InjectorMacro
 				rtti.push(getType(field.type));
 				if (names.length > 0) rtti.push(names[0].getValue());
 				else rtti.push('');
+
+				// Identify optional field
+				var isOptional = switch (field.type)
+				{
+					case TType(t, params):
+						(Std.string(t) == 'Null');
+					default:
+						false;
+				}
+				rtti.push(isOptional ? '1' : '0');
+
 			case FMethod(_):
 				switch (field.type)
 				{
