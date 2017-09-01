@@ -9,17 +9,23 @@ class PropertyInjectionPoint implements InjectionPoint
 	public var field(default, null):String;
 	public var type(default, null):String;
 	public var name(default, null):String;
+	public var optional(default, null):Bool;
 
-	public function new(field:String, type:String, ?name:String=null)
+	public function new(field:String, type:String, ?name:String=null, optional:Bool = false)
 	{
 		this.field = field;
 		this.type = type;
 		this.name = name;
+		this.optional = optional;
 	}
 
 	public function applyInjection(target:Dynamic, injector:Injector):Dynamic
 	{
 		var response = injector.getValueForType(type, name);
+
+		// When don't have a response and the injection is optional, simply return the target
+		if(response == null && optional)
+			return target;
 
 		#if debug
 		if (response == null)

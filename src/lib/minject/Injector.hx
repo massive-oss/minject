@@ -387,9 +387,9 @@ class Injector
 				if (injected.indexOf(name) > -1) continue;
 				injected.push(name);
 
-				if (field.length == 3)
+				if (field.length == 4)
 				{
-					info.fields.push(new PropertyInjectionPoint(name, field[1], field[2]));
+					info.fields.push(new PropertyInjectionPoint(name, field[1], field[2], field[3] == '1'));
 				}
 				else if (name == 'new')
 				{
