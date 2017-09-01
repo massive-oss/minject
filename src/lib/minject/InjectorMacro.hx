@@ -219,8 +219,8 @@ class InjectorMacro
 				// Identify optional field
 				var isOptional = switch (field.type)
 				{
-					case TType(t, params):
-						(Std.string(t) == 'Null');
+					case TType(_.get() => {pack:[], name:"Null"}, params):
+						true;
 					default:
 						false;
 				}
