@@ -10,8 +10,8 @@
 	"contributors": [
 	"massive"
 ],
-	"releasenote": "Fix for Haxe 3.1",
-	"version": "1.6.2",
+	"releasenote": "Fix for Haxe 4",
+	"version": "1.6.3",
 	"url": "http://github.com/massiveinteractive/minject",
 	"dependencies": 
 	{

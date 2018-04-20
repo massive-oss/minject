@@ -1,3 +1,7 @@
+## 1.6.3
+
+- Fixes compatibility with Haxe 4
+
 ## 1.6.2
 
 - fixes injections of nested typedefs
