@@ -1,0 +1,38 @@
+{
+	"name": "minject",
+	"version": "2.0.0-rc.1",
+	"environment":
+	{
+		"haxe": "3.2.0",
+		"mdk": "1.0.0"
+	},
+	"dependencies":
+	[
+		{
+			"name": "mcover",
+			"version": "^2.0.0",
+			"development": true
+		},
+		{
+			"name": "hamcrest",
+			"version": "^1.0.0",
+			"development": true
+		},
+		{
+			"name": "munit",
+			"version": "^2.0.0",
+			"development": true
+		},
+		{
+			"name": "hxcpp",
+			"version": "^3.1.0",
+			"source": "haxelib",
+			"development": true
+		},
+		{
+			"name": "mdk-core",
+			"version": "master",
+			"development": true
+		}
+	]
+}

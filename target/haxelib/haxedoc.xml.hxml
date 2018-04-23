@@ -1,5 +1,0 @@
--lib mdata
--js haxedoc.js
---no-output
--cp src
---macro include('minject')

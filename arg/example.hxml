@@ -1,0 +1,16 @@
+-main InjectionExample
+-lib minject
+-cp src/example
+-dce full
+
+--each
+
+-js bin/example/html.js
+
+--next
+
+-swf bin/example/flash.swf
+
+--next
+
+-neko bin/example/neko.n

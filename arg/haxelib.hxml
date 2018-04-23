@@ -1,0 +1,4 @@
+-cp src/build
+--macro Haxelib.run()
+-lib mdk-core
+-D output=bin/haxelib

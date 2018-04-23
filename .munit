@@ -1,7 +1,7 @@
 version=0.9.6
-src=test
+src=src/test
 bin=bin/test
 report=bin/test-report
-hxml=test/targets.hxml
-classPaths=src
+hxml=arg/test.hxml
+classPaths=src/lib
 coveragePackages=minject

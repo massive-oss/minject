@@ -1,0 +1,46 @@
+-swf bin/test/as3_test.swf
+-main TestMain
+-debug
+-lib munit
+-lib mcover
+-cp src/lib
+-cp src/test
+-dce full
+-swf-version 9
+--macro keep('TestSuite')
+
+--next
+
+-js bin/test/js_test.js
+-main TestMain
+-debug
+-lib munit
+-lib mcover
+-cp src/lib
+-cp src/test
+-dce full
+--macro keep('TestSuite')
+
+--next
+
+-neko bin/test/neko_test.n
+-main TestMain
+-debug
+-lib munit
+-lib mcover
+-cp src/lib
+-cp src/test
+-dce full
+--macro keep('TestSuite')
+
+--next
+
+-cpp bin/test/cpp_test
+-main TestMain
+-debug
+-lib munit
+-lib mcover
+-cp src/lib
+-cp src/test
+-dce full
+--macro keep('TestSuite')
